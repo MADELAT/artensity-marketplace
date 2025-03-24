@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -16,7 +17,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   
   return (
-    <DashboardLayout>
+    <DashboardLayout userType="admin">
       <div className="flex flex-col space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
