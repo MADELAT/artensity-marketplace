@@ -13,7 +13,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DashboardLayoutProps {
   children: ReactNode;
-  userType?: "admin" | "artist" | "gallery" | "buyer";
+  userType: "admin" | "artist" | "gallery" | "buyer";
 }
 
 interface NavItem {
@@ -23,7 +23,7 @@ interface NavItem {
   notification?: number;
 }
 
-export function DashboardLayout({ children, userType = "admin" }: DashboardLayoutProps) {
+export function DashboardLayout({ children, userType }: DashboardLayoutProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const location = useLocation();
   const isMobile = useIsMobile();
