@@ -39,19 +39,28 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             
           if (error) {
             console.error('Error fetching profile:', error);
+            toast({
+              title: "Error",
+              description: "No se pudo cargar el perfil del usuario",
+              variant: "destructive"
+            });
           } else {
             setProfile(data as Profile);
             
             // Redirect based on role
             if (data) {
-              if (data.role === 'admin') {
-                navigate('/admin');
-              } else if (data.role === 'artist') {
-                navigate('/artist-dashboard');
-              } else if (data.role === 'gallery') {
-                navigate('/gallery-dashboard');
-              } else {
-                navigate('/explore');
+              switch (data.role) {
+                case 'admin':
+                  navigate('/admin');
+                  break;
+                case 'artist':
+                  navigate('/artist-dashboard');
+                  break;
+                case 'gallery':
+                  navigate('/gallery-dashboard');
+                  break;
+                default:
+                  navigate('/explore');
               }
             }
           }
@@ -76,6 +85,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           .then(({ data, error }) => {
             if (error) {
               console.error('Error fetching profile:', error);
+              toast({
+                title: "Error",
+                description: "No se pudo cargar el perfil del usuario",
+                variant: "destructive"
+              });
             } else {
               setProfile(data as Profile);
             }
@@ -89,7 +103,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate]);
+  }, [navigate, toast]);
 
   const signIn = async (email: string, password: string) => {
     try {
@@ -97,7 +111,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       if (error) {
         toast({
-          title: "Login Failed",
+          title: "Error de inicio de sesión",
           description: error.message,
           variant: "destructive",
         });
@@ -105,11 +119,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       toast({
-        title: "Welcome back!",
-        description: "You have successfully logged in.",
+        title: "¡Bienvenido de nuevo!",
+        description: "Has iniciado sesión correctamente.",
       });
     } catch (error: any) {
-      console.error('Sign in error:', error.message);
+      console.error('Error de inicio de sesión:', error.message);
       throw error;
     }
   };
@@ -123,14 +137,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           data: {
             first_name: userData.first_name,
             last_name: userData.last_name,
-            role: userData.role || 'buyer'
+            role: userData.role || 'buyer',
+            telephone: userData.telephone
           }
         }
       });
 
       if (error) {
         toast({
-          title: "Registration Failed",
+          title: "Error de registro",
           description: error.message,
           variant: "destructive",
         });
@@ -138,11 +153,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
 
       toast({
-        title: "Registration Successful",
-        description: "Please check your email for verification.",
+        title: "¡Registro exitoso!",
+        description: "Por favor verifica tu email para continuar.",
       });
     } catch (error: any) {
-      console.error('Sign up error:', error.message);
+      console.error('Error de registro:', error.message);
       throw error;
     }
   };
@@ -152,13 +167,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       await supabase.auth.signOut();
       navigate('/');
       toast({
-        title: "Logout Successful",
-        description: "You have been logged out.",
+        title: "Sesión cerrada",
+        description: "Has cerrado sesión correctamente.",
       });
     } catch (error: any) {
-      console.error('Sign out error:', error.message);
+      console.error('Error al cerrar sesión:', error.message);
       toast({
-        title: "Logout Failed",
+        title: "Error al cerrar sesión",
         description: error.message,
         variant: "destructive",
       });

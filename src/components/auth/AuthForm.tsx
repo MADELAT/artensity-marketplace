@@ -8,11 +8,14 @@ import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 
 export function AuthForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { signIn, signUp } = useAuth();
   
   // Login form state
   const [loginEmail, setLoginEmail] = useState("");
@@ -21,44 +24,25 @@ export function AuthForm() {
   // Register form state
   const [registerEmail, setRegisterEmail] = useState("");
   const [registerPassword, setRegisterPassword] = useState("");
-  const [username, setUsername] = useState("");
-  const [userType, setUserType] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [userType, setUserType] = useState<"buyer" | "artist" | "gallery">("buyer");
   
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     
     try {
-      // Mock authentication - to be replaced with Supabase auth
-      console.log("Login attempted with:", loginEmail, loginPassword);
-      
-      // Simulate login success for demo purposes
-      setTimeout(() => {
-        toast({
-          title: "Login Successful",
-          description: "Welcome back to Artendency.",
-        });
-        
-        // Redirect based on role (simulated)
-        if (loginEmail.includes("admin")) {
-          navigate("/admin");
-        } else if (loginEmail.includes("artist")) {
-          navigate("/artist-dashboard");
-        } else if (loginEmail.includes("gallery")) {
-          navigate("/gallery-dashboard");
-        } else {
-          navigate("/explore");
-        }
-        
-        setIsLoading(false);
-      }, 1000);
-    } catch (error) {
+      await signIn(loginEmail, loginPassword);
+    } catch (error: any) {
       console.error("Login error:", error);
       toast({
-        title: "Login Failed",
-        description: "Please check your credentials and try again.",
+        title: "Error al iniciar sesión",
+        description: error.message,
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -69,41 +53,44 @@ export function AuthForm() {
     
     try {
       // Validate form
-      if (!registerEmail || !registerPassword || !username || !userType) {
+      if (!registerEmail || !registerPassword || !firstName || !lastName || !userType) {
         toast({
-          title: "Registration Failed",
-          description: "Please fill out all fields.",
+          title: "Error de registro",
+          description: "Por favor completa todos los campos requeridos.",
           variant: "destructive",
         });
         setIsLoading(false);
         return;
       }
       
-      // Mock registration - to be replaced with Supabase auth
-      console.log("Registration attempted with:", registerEmail, registerPassword, username, userType);
+      await signUp(registerEmail, registerPassword, {
+        first_name: firstName,
+        last_name: lastName,
+        telephone: telephone,
+        role: userType,
+      });
       
-      // Simulate registration success
-      setTimeout(() => {
-        toast({
-          title: "Registration Successful",
-          description: "Welcome to Artendency. Please sign in with your new account.",
-        });
-        
-        // Reset form and switch to login tab
-        setRegisterEmail("");
-        setRegisterPassword("");
-        setUsername("");
-        setUserType("");
-        
-        setIsLoading(false);
-      }, 1000);
-    } catch (error) {
+      toast({
+        title: "Registro exitoso",
+        description: "Tu cuenta ha sido creada. Por favor inicia sesión.",
+      });
+      
+      // Reset form
+      setRegisterEmail("");
+      setRegisterPassword("");
+      setFirstName("");
+      setLastName("");
+      setTelephone("");
+      setUserType("buyer");
+      
+    } catch (error: any) {
       console.error("Registration error:", error);
       toast({
-        title: "Registration Failed",
-        description: "There was a problem creating your account. Please try again.",
+        title: "Error de registro",
+        description: error.message,
         variant: "destructive",
       });
+    } finally {
       setIsLoading(false);
     }
   };
@@ -112,16 +99,16 @@ export function AuthForm() {
     <Card className="w-full max-w-md mx-auto">
       <Tabs defaultValue="login">
         <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="register">Register</TabsTrigger>
+          <TabsTrigger value="login">Iniciar sesión</TabsTrigger>
+          <TabsTrigger value="register">Registrarse</TabsTrigger>
         </TabsList>
         
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <CardHeader>
-              <CardTitle className="text-2xl">Welcome back</CardTitle>
+              <CardTitle className="text-2xl">Bienvenido de nuevo</CardTitle>
               <CardDescription>
-                Enter your credentials to access your account
+                Ingresa tus credenciales para acceder a tu cuenta
               </CardDescription>
             </CardHeader>
             
@@ -131,7 +118,7 @@ export function AuthForm() {
                 <Input
                   id="email"
                   type="email"
-                  placeholder="email@example.com"
+                  placeholder="email@ejemplo.com"
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   required
@@ -140,9 +127,9 @@ export function AuthForm() {
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Password</Label>
+                  <Label htmlFor="password">Contraseña</Label>
                   <a href="#" className="text-xs text-primary hover:underline">
-                    Forgot password?
+                    ¿Olvidaste tu contraseña?
                   </a>
                 </div>
                 <Input
@@ -157,7 +144,7 @@ export function AuthForm() {
             
             <CardFooter>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Signing in..." : "Sign in"}
+                {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
               </Button>
             </CardFooter>
           </form>
@@ -166,19 +153,45 @@ export function AuthForm() {
         <TabsContent value="register">
           <form onSubmit={handleRegister}>
             <CardHeader>
-              <CardTitle className="text-2xl">Create an account</CardTitle>
+              <CardTitle className="text-2xl">Crear una cuenta</CardTitle>
               <CardDescription>
-                Join Artendency to start your art journey
+                Únete a Artendency para comenzar tu viaje en el arte
               </CardDescription>
             </CardHeader>
             
             <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="firstName">Nombre</Label>
+                  <Input
+                    id="firstName"
+                    type="text"
+                    placeholder="Juan"
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    required
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="lastName">Apellido</Label>
+                  <Input
+                    id="lastName"
+                    type="text"
+                    placeholder="Pérez"
+                    value={lastName}
+                    onChange={(e) => setLastName(e.target.value)}
+                    required
+                  />
+                </div>
+              </div>
+              
               <div className="space-y-2">
                 <Label htmlFor="register-email">Email</Label>
                 <Input
                   id="register-email"
                   type="email"
-                  placeholder="email@example.com"
+                  placeholder="email@ejemplo.com"
                   value={registerEmail}
                   onChange={(e) => setRegisterEmail(e.target.value)}
                   required
@@ -186,19 +199,18 @@ export function AuthForm() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="username">Username</Label>
+                <Label htmlFor="telephone">Teléfono</Label>
                 <Input
-                  id="username"
-                  type="text"
-                  placeholder="johndoe"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  required
+                  id="telephone"
+                  type="tel"
+                  placeholder="+34 123 456 789"
+                  value={telephone}
+                  onChange={(e) => setTelephone(e.target.value)}
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="register-password">Password</Label>
+                <Label htmlFor="register-password">Contraseña</Label>
                 <Input
                   id="register-password"
                   type="password"
@@ -209,15 +221,15 @@ export function AuthForm() {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="user-type">I am a</Label>
-                <Select value={userType} onValueChange={setUserType} required>
+                <Label htmlFor="user-type">Tipo de cuenta</Label>
+                <Select value={userType} onValueChange={(value: "buyer" | "artist" | "gallery") => setUserType(value)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select your role" />
+                    <SelectValue placeholder="Selecciona tu rol" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="buyer">Art Collector/Buyer</SelectItem>
-                    <SelectItem value="artist">Artist</SelectItem>
-                    <SelectItem value="gallery">Gallery Owner</SelectItem>
+                    <SelectItem value="buyer">Coleccionista/Comprador</SelectItem>
+                    <SelectItem value="artist">Artista</SelectItem>
+                    <SelectItem value="gallery">Galería</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -225,7 +237,7 @@ export function AuthForm() {
             
             <CardFooter>
               <Button type="submit" className="w-full" disabled={isLoading}>
-                {isLoading ? "Creating account..." : "Create account"}
+                {isLoading ? "Creando cuenta..." : "Crear cuenta"}
               </Button>
             </CardFooter>
           </form>
