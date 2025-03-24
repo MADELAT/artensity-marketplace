@@ -24,9 +24,9 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
   const isMobile = useIsMobile();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const [filters, setFilters] = useState<FilterValues>({
-    category: "",
-    style: "",
-    technique: "",
+    category: "all",
+    style: "all",
+    technique: "all",
     priceRange: [0, 10000],
     sortBy: "newest",
   });
@@ -38,9 +38,9 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
 
   const handleReset = () => {
     setFilters({
-      category: "",
-      style: "",
-      technique: "",
+      category: "all",
+      style: "all",
+      technique: "all",
       priceRange: [0, 10000],
       sortBy: "newest",
     });
@@ -66,7 +66,7 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
             <SelectValue placeholder="All Categories" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Categories</SelectItem>
+            <SelectItem value="all">All Categories</SelectItem>
             <SelectItem value="Painting">Painting</SelectItem>
             <SelectItem value="Sculpture">Sculpture</SelectItem>
             <SelectItem value="Photography">Photography</SelectItem>
@@ -86,7 +86,7 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
             <SelectValue placeholder="All Styles" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Styles</SelectItem>
+            <SelectItem value="all">All Styles</SelectItem>
             <SelectItem value="Abstract">Abstract</SelectItem>
             <SelectItem value="Contemporary">Contemporary</SelectItem>
             <SelectItem value="Minimalist">Minimalist</SelectItem>
@@ -106,7 +106,7 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
             <SelectValue placeholder="All Techniques" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">All Techniques</SelectItem>
+            <SelectItem value="all">All Techniques</SelectItem>
             <SelectItem value="Oil">Oil</SelectItem>
             <SelectItem value="Acrylic">Acrylic</SelectItem>
             <SelectItem value="Watercolor">Watercolor</SelectItem>

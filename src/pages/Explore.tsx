@@ -8,9 +8,9 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export default function Explore() {
   const isMobile = useIsMobile();
   const [filters, setFilters] = useState<FilterValues>({
-    category: "",
-    style: "",
-    technique: "",
+    category: "all",
+    style: "all",
+    technique: "all",
     priceRange: [0, 10000],
     sortBy: "newest",
   });
@@ -39,9 +39,9 @@ export default function Explore() {
           <div className="w-full md:w-3/4">
             {isMobile && <ArtworkFilters onFilterChange={handleFilterChange} />}
             <ArtworkGrid 
-              category={filters.category} 
-              style={filters.style} 
-              technique={filters.technique} 
+              category={filters.category !== "all" ? filters.category : ""} 
+              style={filters.style !== "all" ? filters.style : ""} 
+              technique={filters.technique !== "all" ? filters.technique : ""} 
             />
           </div>
         </div>

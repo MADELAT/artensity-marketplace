@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { ArtworkCard } from "./ArtworkCard";
 import { useToast } from "@/hooks/use-toast";
@@ -102,19 +101,19 @@ export function ArtworkGrid({ category, artistId, style, technique }: ArtworkGri
         // Filter by props if provided
         let filteredArtworks = mockArtworks;
         
-        if (category) {
+        if (category && category.length > 0) {
           filteredArtworks = filteredArtworks.filter(artwork => artwork.category === category);
         }
         
-        if (artistId) {
+        if (artistId && artistId.length > 0) {
           filteredArtworks = filteredArtworks.filter(artwork => artwork.artistId === artistId);
         }
         
-        if (style) {
+        if (style && style.length > 0) {
           filteredArtworks = filteredArtworks.filter(artwork => artwork.style === style);
         }
         
-        if (technique) {
+        if (technique && technique.length > 0) {
           filteredArtworks = filteredArtworks.filter(artwork => artwork.technique === technique);
         }
         
