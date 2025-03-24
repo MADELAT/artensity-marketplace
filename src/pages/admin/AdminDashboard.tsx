@@ -1,8 +1,7 @@
-
 import { useState } from "react";
 import { 
   Users, ShoppingCart, Image, Wallet, TrendingUp, 
-  CheckCircle, XCircle, Clock 
+  CheckCircle, XCircle, Clock, Building2 
 } from "lucide-react";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { StatCard } from "@/components/dashboard/StatCard";
@@ -11,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Separator } from "@/components/ui/separator";
+import { Badge } from "@/components/ui/badge";
 import { 
   LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, 
   Tooltip, ResponsiveContainer, PieChart, Pie, Cell 
@@ -419,7 +419,7 @@ export default function AdminDashboard() {
               <StatCard
                 title="Galleries"
                 value="154"
-                icon={<Building />}
+                icon={<Building2 />}
               />
               <StatCard
                 title="Buyers"
