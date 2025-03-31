@@ -1,48 +1,20 @@
 
-import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { useToast } from './use-toast';
+import { useToast } from '@/hooks/use-toast';
 import { toast as sonnerToast } from 'sonner';
 import { Profile } from '@/types/supabase';
+import { AuthContext, AuthProviderProps } from '@/contexts/AuthContext';
+import { fetchUserProfile } from '@/utils/profileUtils';
+import { redirectUserBasedOnRole } from '@/utils/authRedirect';
 
-interface AuthContextType {
-  user: any | null;
-  profile: Profile | null;
-  isLoading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, userData: Partial<Profile>) => Promise<void>;
-  signOut: () => Promise<void>;
-}
-
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const { toast } = useToast();
-
-  // Redirect user based on role
-  const redirectUserBasedOnRole = (role: string) => {
-    console.log("Redirecting user based on role:", role);
-    switch (role) {
-      case 'admin':
-        navigate('/admin');
-        break;
-      case 'artist':
-        navigate('/artist-dashboard');
-        break;
-      case 'gallery':
-        navigate('/gallery-dashboard');
-        break;
-      case 'buyer':
-      default:
-        navigate('/buyer-dashboard');
-        break;
-    }
-  };
 
   useEffect(() => {
     // Set up auth state listener
@@ -54,7 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (session?.user) {
           // Fetch user profile when authenticated
           setTimeout(() => {
-            fetchUserProfile(session.user.id);
+            fetchUserProfileAndRedirect(session.user.id);
           }, 0);
         } else {
           setProfile(null);
@@ -69,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserProfile(session.user.id);
+        fetchUserProfileAndRedirect(session.user.id);
       } else {
         setIsLoading(false);
       }
@@ -80,37 +52,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, [navigate]);
 
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      console.log("Fetching profile for user:", userId);
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', userId)
-        .single();
-        
-      if (error) {
-        console.error('Error fetching profile:', error);
-        toast({
-          title: "Error",
-          description: "No se pudo cargar el perfil del usuario",
-          variant: "destructive"
-        });
-        setIsLoading(false);
-      } else {
-        console.log("Profile fetched:", data);
-        setProfile(data as Profile);
-        
-        // Redirect based on role if on login page or homepage
-        if (data && (window.location.pathname === '/login' || window.location.pathname === '/')) {
-          redirectUserBasedOnRole(data.role);
-        }
-        setIsLoading(false);
-      }
-    } catch (err) {
-      console.error("Error in fetchUserProfile:", err);
-      setIsLoading(false);
+  const fetchUserProfileAndRedirect = async (userId: string) => {
+    const userProfile = await fetchUserProfile(userId);
+    setProfile(userProfile);
+    
+    // Redirect based on role if on login page or homepage
+    if (userProfile && (window.location.pathname === '/login' || window.location.pathname === '/')) {
+      redirectUserBasedOnRole(userProfile.role, navigate);
     }
+    setIsLoading(false);
   };
 
   const signIn = async (email: string, password: string) => {
@@ -179,7 +129,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Explicitly navigate based on the role chosen during registration
       if (userData.role) {
         setTimeout(() => {
-          redirectUserBasedOnRole(userData.role);
+          redirectUserBasedOnRole(userData.role, navigate);
           setIsLoading(false);
         }, 1000);
       }
@@ -214,11 +164,3 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     </AuthContext.Provider>
   );
 }
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
