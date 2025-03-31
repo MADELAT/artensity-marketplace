@@ -96,25 +96,25 @@ export function AuthForm() {
   };
   
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="bg-black/15 backdrop-blur-md border-white/10 text-white">
       <Tabs defaultValue="login">
-        <TabsList className="grid w-full grid-cols-2">
-          <TabsTrigger value="login">Iniciar sesión</TabsTrigger>
-          <TabsTrigger value="register">Registrarse</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 bg-white/5 border-b border-white/10">
+          <TabsTrigger value="login" className="data-[state=active]:bg-white/10 text-white">Iniciar sesión</TabsTrigger>
+          <TabsTrigger value="register" className="data-[state=active]:bg-white/10 text-white">Registrarse</TabsTrigger>
         </TabsList>
         
         <TabsContent value="login">
           <form onSubmit={handleLogin}>
             <CardHeader>
-              <CardTitle className="text-2xl">Bienvenido de nuevo</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-2xl text-white">Bienvenido de nuevo</CardTitle>
+              <CardDescription className="text-white/80">
                 Ingresa tus credenciales para acceder a tu cuenta
               </CardDescription>
             </CardHeader>
             
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+                <Label htmlFor="email" className="text-white">Email</Label>
                 <Input
                   id="email"
                   type="email"
@@ -122,12 +122,13 @@ export function AuthForm() {
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   required
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                 />
               </div>
               
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="password">Contraseña</Label>
+                  <Label htmlFor="password" className="text-white">Contraseña</Label>
                   <a href="#" className="text-xs text-primary hover:underline">
                     ¿Olvidaste tu contraseña?
                   </a>
@@ -138,12 +139,13 @@ export function AuthForm() {
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   required
+                  className="bg-white/10 border-white/20 text-white"
                 />
               </div>
             </CardContent>
             
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-white text-black hover:bg-white/90" disabled={isLoading}>
                 {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
               </Button>
             </CardFooter>
@@ -153,8 +155,8 @@ export function AuthForm() {
         <TabsContent value="register">
           <form onSubmit={handleRegister}>
             <CardHeader>
-              <CardTitle className="text-2xl">Crear una cuenta</CardTitle>
-              <CardDescription>
+              <CardTitle className="text-2xl text-white">Crear una cuenta</CardTitle>
+              <CardDescription className="text-white/80">
                 Únete a Artendency para comenzar tu viaje en el arte
               </CardDescription>
             </CardHeader>
@@ -162,7 +164,7 @@ export function AuthForm() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">Nombre</Label>
+                  <Label htmlFor="firstName" className="text-white">Nombre</Label>
                   <Input
                     id="firstName"
                     type="text"
@@ -170,11 +172,12 @@ export function AuthForm() {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                   />
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">Apellido</Label>
+                  <Label htmlFor="lastName" className="text-white">Apellido</Label>
                   <Input
                     id="lastName"
                     type="text"
@@ -182,12 +185,13 @@ export function AuthForm() {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     required
+                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                   />
                 </div>
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="register-email">Email</Label>
+                <Label htmlFor="register-email" className="text-white">Email</Label>
                 <Input
                   id="register-email"
                   type="email"
@@ -195,48 +199,51 @@ export function AuthForm() {
                   value={registerEmail}
                   onChange={(e) => setRegisterEmail(e.target.value)}
                   required
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="telephone">Teléfono</Label>
+                <Label htmlFor="telephone" className="text-white">Teléfono</Label>
                 <Input
                   id="telephone"
                   type="tel"
                   placeholder="+34 123 456 789"
                   value={telephone}
                   onChange={(e) => setTelephone(e.target.value)}
+                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="register-password">Contraseña</Label>
+                <Label htmlFor="register-password" className="text-white">Contraseña</Label>
                 <Input
                   id="register-password"
                   type="password"
                   value={registerPassword}
                   onChange={(e) => setRegisterPassword(e.target.value)}
                   required
+                  className="bg-white/10 border-white/20 text-white"
                 />
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="user-type">Tipo de cuenta</Label>
+                <Label htmlFor="user-type" className="text-white">Tipo de cuenta</Label>
                 <Select value={userType} onValueChange={(value: "buyer" | "artist" | "gallery") => setUserType(value)}>
-                  <SelectTrigger>
+                  <SelectTrigger className="bg-white/10 border-white/20 text-white">
                     <SelectValue placeholder="Selecciona tu rol" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="buyer">Coleccionista/Comprador</SelectItem>
-                    <SelectItem value="artist">Artista</SelectItem>
-                    <SelectItem value="gallery">Galería</SelectItem>
+                  <SelectContent className="bg-black/90 border-white/20 text-white">
+                    <SelectItem value="buyer" className="focus:bg-white/10 focus:text-white">Coleccionista/Comprador</SelectItem>
+                    <SelectItem value="artist" className="focus:bg-white/10 focus:text-white">Artista</SelectItem>
+                    <SelectItem value="gallery" className="focus:bg-white/10 focus:text-white">Galería</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
             </CardContent>
             
             <CardFooter>
-              <Button type="submit" className="w-full" disabled={isLoading}>
+              <Button type="submit" className="w-full bg-white text-black hover:bg-white/90" disabled={isLoading}>
                 {isLoading ? "Creando cuenta..." : "Crear cuenta"}
               </Button>
             </CardFooter>

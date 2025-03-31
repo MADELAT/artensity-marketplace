@@ -1,5 +1,5 @@
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -107,6 +107,10 @@
 
   .glass-card {
     @apply bg-white/70 backdrop-blur-lg border border-white/40 shadow-sm;
+  }
+  
+  .glass-auth-form {
+    @apply backdrop-blur-xl bg-black/15 border border-white/10 shadow-lg;
   }
 }
 

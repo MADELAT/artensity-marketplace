@@ -20,29 +20,28 @@ export default function Index() {
   return (
     <Layout>
       {/* Hero Section */}
-      <section className="relative h-[85vh] flex items-center overflow-hidden">
+      <section className="relative h-[100vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=2000&q=80"
+            src="/lovable-uploads/a16d4ded-103b-4a6d-aad0-cd6acbbfddad.png"
             alt="Contemporary Art"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
         </div>
         
-        <div className="container mx-auto px-4 relative z-10">
-          <div className={`max-w-2xl transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <h1 className="text-4xl md:text-6xl font-serif font-bold text-white mb-4">
-              Discover Fine Art in the Digital Age
+        <div className="container mx-auto px-4 relative z-10 text-center">
+          <div className={`max-w-3xl mx-auto transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            <h1 className="text-6xl md:text-8xl font-serif font-light text-white mb-4 tracking-widest">
+              ArTendency
             </h1>
-            <p className="text-lg md:text-xl text-white/90 mb-8">
-              Artendency connects artists, galleries, and collectors in a curated contemporary art marketplace.
+            <p className="text-xl md:text-2xl text-white/90 mb-8 font-light tracking-wider">
+              Where artists exists
             </p>
-            <div className="flex flex-wrap gap-4">
-              <Button size="lg" asChild>
+            <div className="flex flex-wrap justify-center gap-6 mt-16">
+              <Button size="lg" className="bg-transparent border border-white hover:bg-white/20 text-white text-lg px-8 py-6" asChild>
                 <Link to="/explore">Explore Artworks</Link>
               </Button>
-              <Button size="lg" variant="outline" className="bg-white/10 backdrop-blur-md text-white border-white/20 hover:bg-white/20" asChild>
+              <Button size="lg" variant="outline" className="bg-transparent border border-white hover:bg-white/20 text-white text-lg px-8 py-6" asChild>
                 <Link to="/login">Join as Artist</Link>
               </Button>
             </div>
