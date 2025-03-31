@@ -1,20 +1,18 @@
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { toast as sonnerToast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 
 export function AuthForm() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
-  const navigate = useNavigate();
   const { signIn, signUp } = useAuth();
   
   // Login form state
@@ -37,11 +35,7 @@ export function AuthForm() {
       await signIn(loginEmail, loginPassword);
     } catch (error: any) {
       console.error("Login error:", error);
-      toast({
-        title: "Error al iniciar sesión",
-        description: error.message,
-        variant: "destructive",
-      });
+      // Error is already handled by useAuth
     } finally {
       setIsLoading(false);
     }
@@ -63,6 +57,8 @@ export function AuthForm() {
         return;
       }
       
+      sonnerToast.loading("Creando tu cuenta...");
+      
       await signUp(registerEmail, registerPassword, {
         first_name: firstName,
         last_name: lastName,
@@ -70,12 +66,7 @@ export function AuthForm() {
         role: userType,
       });
       
-      toast({
-        title: "¡Registro exitoso!",
-        description: "Tu cuenta ha sido creada. Por favor inicia sesión.",
-      });
-      
-      // Reset form
+      // Reset form - though user will likely be redirected
       setRegisterEmail("");
       setRegisterPassword("");
       setFirstName("");
@@ -85,11 +76,7 @@ export function AuthForm() {
       
     } catch (error: any) {
       console.error("Registration error:", error.message);
-      toast({
-        title: "Error de registro",
-        description: error.message,
-        variant: "destructive",
-      });
+      // Error already handled by useAuth
     } finally {
       setIsLoading(false);
     }

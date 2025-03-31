@@ -3,6 +3,7 @@ import { useState, useEffect, createContext, useContext, ReactNode } from 'react
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from './use-toast';
+import { toast as sonnerToast } from 'sonner';
 import { Profile } from '@/types/supabase';
 
 interface AuthContextType {
@@ -25,6 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Redirect user based on role
   const redirectUserBasedOnRole = (role: string) => {
+    console.log("Redirecting user based on role:", role);
     switch (role) {
       case 'admin':
         navigate('/admin');
@@ -37,7 +39,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         break;
       case 'buyer':
       default:
-        navigate('/explore');
+        navigate('/buyer-dashboard');
         break;
     }
   };
@@ -45,68 +47,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        console.log("Auth state changed:", event, session?.user?.id);
         setUser(session?.user ?? null);
         
         if (session?.user) {
           // Fetch user profile when authenticated
-          const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .eq('id', session.user.id)
-            .single();
-            
-          if (error) {
-            console.error('Error fetching profile:', error);
-            toast({
-              title: "Error",
-              description: "No se pudo cargar el perfil del usuario",
-              variant: "destructive"
-            });
-          } else {
-            setProfile(data as Profile);
-            
-            // Redirect based on role
-            if (data) {
-              redirectUserBasedOnRole(data.role);
-            }
-          }
+          setTimeout(() => {
+            fetchUserProfile(session.user.id);
+          }, 0);
         } else {
           setProfile(null);
+          setIsLoading(false);
         }
-        
-        setIsLoading(false);
       }
     );
 
     // Check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Checking existing session:", session?.user?.id);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', session.user.id)
-          .single()
-          .then(({ data, error }) => {
-            if (error) {
-              console.error('Error fetching profile:', error);
-              toast({
-                title: "Error",
-                description: "No se pudo cargar el perfil del usuario",
-                variant: "destructive"
-              });
-            } else {
-              setProfile(data as Profile);
-              
-              // Redirect based on role if on login page or homepage
-              if (data && (window.location.pathname === '/login' || window.location.pathname === '/')) {
-                redirectUserBasedOnRole(data.role);
-              }
-            }
-            setIsLoading(false);
-          });
+        fetchUserProfile(session.user.id);
       } else {
         setIsLoading(false);
       }
@@ -115,10 +78,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => {
       subscription.unsubscribe();
     };
-  }, [navigate, toast]);
+  }, [navigate]);
+
+  const fetchUserProfile = async (userId: string) => {
+    try {
+      console.log("Fetching profile for user:", userId);
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
+        
+      if (error) {
+        console.error('Error fetching profile:', error);
+        toast({
+          title: "Error",
+          description: "No se pudo cargar el perfil del usuario",
+          variant: "destructive"
+        });
+        setIsLoading(false);
+      } else {
+        console.log("Profile fetched:", data);
+        setProfile(data as Profile);
+        
+        // Redirect based on role if on login page or homepage
+        if (data && (window.location.pathname === '/login' || window.location.pathname === '/')) {
+          redirectUserBasedOnRole(data.role);
+        }
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error("Error in fetchUserProfile:", err);
+      setIsLoading(false);
+    }
+  };
 
   const signIn = async (email: string, password: string) => {
     try {
+      setIsLoading(true);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
@@ -127,6 +124,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           description: error.message,
           variant: "destructive",
         });
+        setIsLoading(false);
         throw error;
       }
       
@@ -136,13 +134,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
     } catch (error: any) {
       console.error('Error de inicio de sesión:', error.message);
+      setIsLoading(false);
       throw error;
     }
   };
 
   const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
     try {
-      const { error } = await supabase.auth.signUp({
+      console.log("Signing up with data:", { email, userData });
+      setIsLoading(true);
+      
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -161,15 +163,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           description: error.message,
           variant: "destructive",
         });
+        setIsLoading(false);
         throw error;
       }
-
-      toast({
-        title: "¡Registro exitoso!",
-        description: "Por favor verifica tu email para continuar.",
+      
+      console.log("Sign up successful:", data);
+      
+      // Show toast notification
+      sonnerToast.success("¡Registro exitoso!", {
+        description: "Accediendo a tu dashboard...",
+        duration: 3000,
       });
+      
+      // Don't rely on auth state change for first redirect after signup
+      // Explicitly navigate based on the role chosen during registration
+      if (userData.role) {
+        setTimeout(() => {
+          redirectUserBasedOnRole(userData.role);
+          setIsLoading(false);
+        }, 1000);
+      }
     } catch (error: any) {
       console.error('Error de registro:', error.message);
+      setIsLoading(false);
       throw error;
     }
   };
