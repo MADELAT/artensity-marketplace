@@ -71,7 +71,7 @@ export function AuthForm() {
       });
       
       toast({
-        title: "Registro exitoso",
+        title: "¡Registro exitoso!",
         description: "Tu cuenta ha sido creada. Por favor inicia sesión.",
       });
       
@@ -84,7 +84,7 @@ export function AuthForm() {
       setUserType("buyer");
       
     } catch (error: any) {
-      console.error("Registration error:", error);
+      console.error("Registration error:", error.message);
       toast({
         title: "Error de registro",
         description: error.message,
@@ -95,8 +95,12 @@ export function AuthForm() {
     }
   };
   
+  // Input and button styles for transparent form
+  const inputClasses = "bg-white/10 border-white/20 text-white placeholder:text-white/50";
+  const buttonClasses = "w-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30";
+  
   return (
-    <Card className="bg-black/15 backdrop-blur-md border-white/10 text-white">
+    <Card className="bg-transparent backdrop-blur-sm border-white/10 text-white">
       <Tabs defaultValue="login">
         <TabsList className="grid w-full grid-cols-2 bg-white/5 border-b border-white/10">
           <TabsTrigger value="login" className="data-[state=active]:bg-white/10 text-white">Iniciar sesión</TabsTrigger>
@@ -122,7 +126,7 @@ export function AuthForm() {
                   value={loginEmail}
                   onChange={(e) => setLoginEmail(e.target.value)}
                   required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  className={inputClasses}
                 />
               </div>
               
@@ -139,13 +143,13 @@ export function AuthForm() {
                   value={loginPassword}
                   onChange={(e) => setLoginPassword(e.target.value)}
                   required
-                  className="bg-white/10 border-white/20 text-white"
+                  className={inputClasses}
                 />
               </div>
             </CardContent>
             
             <CardFooter>
-              <Button type="submit" className="w-full bg-white text-black hover:bg-white/90" disabled={isLoading}>
+              <Button type="submit" className={buttonClasses} disabled={isLoading}>
                 {isLoading ? "Iniciando sesión..." : "Iniciar sesión"}
               </Button>
             </CardFooter>
@@ -172,7 +176,7 @@ export function AuthForm() {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     required
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    className={inputClasses}
                   />
                 </div>
                 
@@ -185,7 +189,7 @@ export function AuthForm() {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     required
-                    className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    className={inputClasses}
                   />
                 </div>
               </div>
@@ -199,7 +203,7 @@ export function AuthForm() {
                   value={registerEmail}
                   onChange={(e) => setRegisterEmail(e.target.value)}
                   required
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  className={inputClasses}
                 />
               </div>
               
@@ -211,7 +215,7 @@ export function AuthForm() {
                   placeholder="+34 123 456 789"
                   value={telephone}
                   onChange={(e) => setTelephone(e.target.value)}
-                  className="bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                  className={inputClasses}
                 />
               </div>
               
@@ -223,7 +227,7 @@ export function AuthForm() {
                   value={registerPassword}
                   onChange={(e) => setRegisterPassword(e.target.value)}
                   required
-                  className="bg-white/10 border-white/20 text-white"
+                  className={inputClasses}
                 />
               </div>
               
@@ -243,7 +247,7 @@ export function AuthForm() {
             </CardContent>
             
             <CardFooter>
-              <Button type="submit" className="w-full bg-white text-black hover:bg-white/90" disabled={isLoading}>
+              <Button type="submit" className={buttonClasses} disabled={isLoading}>
                 {isLoading ? "Creando cuenta..." : "Crear cuenta"}
               </Button>
             </CardFooter>

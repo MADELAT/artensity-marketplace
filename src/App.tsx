@@ -13,6 +13,8 @@ import Explore from "./pages/Explore";
 import ArtworkDetail from "./pages/ArtworkDetail";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ArtistDashboard from "./pages/artist/ArtistDashboard";
+import GalleryDashboard from "./pages/gallery/GalleryDashboard";
+import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import NotFound from "./pages/NotFound";
 
 // Route Protection Component
@@ -58,7 +60,17 @@ const App = () => (
               path="/gallery-dashboard/*" 
               element={
                 <ProtectedRoute allowedRoles={['gallery']}>
-                  <div>Gallery Dashboard</div>
+                  <GalleryDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Protected Buyer Dashboard Routes */}
+            <Route 
+              path="/buyer-dashboard/*" 
+              element={
+                <ProtectedRoute allowedRoles={['buyer']}>
+                  <BuyerDashboard />
                 </ProtectedRoute>
               } 
             />

@@ -9,18 +9,18 @@ export default function Login() {
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
           <img
-            src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
-            alt="Abstract Art Background"
+            src="https://images.unsplash.com/photo-1567095761054-7a02e69e5c43"
+            alt="Interior Art Background"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
         </div>
         
         <div className="w-full max-w-md z-10">
           <h1 className="text-4xl font-serif font-light text-white text-center mb-8 tracking-wider">
             Welcome to ArTendency
           </h1>
-          <div className="glass-auth-form">
+          <div className="bg-black/10 backdrop-blur-md border border-white/10 shadow-lg">
             <AuthForm />
           </div>
         </div>

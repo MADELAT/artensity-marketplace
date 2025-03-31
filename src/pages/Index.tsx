@@ -23,10 +23,11 @@ export default function Index() {
       <section className="relative h-[100vh] flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
-            src="/lovable-uploads/a16d4ded-103b-4a6d-aad0-cd6acbbfddad.png"
+            src="https://images.unsplash.com/photo-1541701494587-cb58502866ab"
             alt="Contemporary Art"
             className="w-full h-full object-cover"
           />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10 text-center">

@@ -23,6 +23,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const { toast } = useToast();
 
+  // Redirect user based on role
+  const redirectUserBasedOnRole = (role: string) => {
+    switch (role) {
+      case 'admin':
+        navigate('/admin');
+        break;
+      case 'artist':
+        navigate('/artist-dashboard');
+        break;
+      case 'gallery':
+        navigate('/gallery-dashboard');
+        break;
+      case 'buyer':
+      default:
+        navigate('/explore');
+        break;
+    }
+  };
+
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -49,19 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             
             // Redirect based on role
             if (data) {
-              switch (data.role) {
-                case 'admin':
-                  navigate('/admin');
-                  break;
-                case 'artist':
-                  navigate('/artist-dashboard');
-                  break;
-                case 'gallery':
-                  navigate('/gallery-dashboard');
-                  break;
-                default:
-                  navigate('/explore');
-              }
+              redirectUserBasedOnRole(data.role);
             }
           }
         } else {
@@ -92,6 +99,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               });
             } else {
               setProfile(data as Profile);
+              
+              // Redirect based on role if on login page or homepage
+              if (data && (window.location.pathname === '/login' || window.location.pathname === '/')) {
+                redirectUserBasedOnRole(data.role);
+              }
             }
             setIsLoading(false);
           });

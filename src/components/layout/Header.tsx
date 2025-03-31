@@ -12,7 +12,7 @@ export function Header() {
   const [isScrolled, setIsScrolled] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   // Close mobile menu when changing routes
   useEffect(() => {
@@ -90,7 +90,7 @@ export function Header() {
             </nav>
             
             <div className="flex items-center space-x-3">
-              {user && (
+              {user && profile && (
                 <>
                   <Link to="/cart">
                     <Button variant="ghost" size="icon" className="relative text-white">
