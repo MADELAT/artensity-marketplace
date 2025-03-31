@@ -5,7 +5,7 @@ import { Menu, X, ShoppingCart, Bell, MessageSquare, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/hooks/useAuth";
+import { useAuth } from "@/contexts/AuthContext";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
