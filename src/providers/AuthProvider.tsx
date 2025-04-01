@@ -13,6 +13,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<any | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -25,12 +26,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
         
         if (session?.user) {
           // Fetch user profile when authenticated
+          // Using setTimeout to avoid Supabase auth deadlock
           setTimeout(() => {
-            fetchUserProfileAndRedirect(session.user.id);
+            fetchUserProfileData(session.user.id);
           }, 0);
         } else {
           setProfile(null);
           setIsLoading(false);
+          setError(null);
         }
       }
     );
@@ -41,7 +44,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        fetchUserProfileAndRedirect(session.user.id);
+        fetchUserProfileData(session.user.id);
       } else {
         setIsLoading(false);
       }
@@ -52,20 +55,35 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [navigate]);
 
-  const fetchUserProfileAndRedirect = async (userId: string) => {
-    const userProfile = await fetchUserProfile(userId);
-    setProfile(userProfile);
-    
-    // Redirect based on role if on login page or homepage
-    if (userProfile && (window.location.pathname === '/login' || window.location.pathname === '/')) {
-      redirectUserBasedOnRole(userProfile.role, navigate);
+  const fetchUserProfileData = async (userId: string) => {
+    try {
+      setError(null);
+      const userProfile = await fetchUserProfile(userId);
+      
+      if (userProfile) {
+        console.log("User profile loaded:", userProfile);
+        setProfile(userProfile);
+        
+        // Redirect based on role if on login page or homepage
+        if (window.location.pathname === '/login' || window.location.pathname === '/') {
+          redirectUserBasedOnRole(userProfile.role, navigate);
+        }
+      } else {
+        console.log("No user profile found");
+        setError("No se pudo cargar el perfil del usuario");
+      }
+    } catch (err) {
+      console.error("Error fetching user profile:", err);
+      setError("Error al cargar el perfil del usuario");
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
+      setError(null);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       
       if (error) {
@@ -74,6 +92,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           description: error.message,
           variant: "destructive",
         });
+        setError(error.message);
         setIsLoading(false);
         throw error;
       }
@@ -93,6 +112,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       console.log("Signing up with data:", { email, userData });
       setIsLoading(true);
+      setError(null);
       
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -113,6 +133,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           description: error.message,
           variant: "destructive",
         });
+        setError(error.message);
         setIsLoading(false);
         throw error;
       }
@@ -125,13 +146,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
         duration: 3000,
       });
       
-      // Don't rely on auth state change for first redirect after signup
       // Explicitly navigate based on the role chosen during registration
       if (userData.role) {
+        // Add small delay to ensure profile is created
         setTimeout(() => {
           redirectUserBasedOnRole(userData.role, navigate);
           setIsLoading(false);
-        }, 1000);
+        }, 1500);
       }
     } catch (error: any) {
       console.error('Error de registro:', error.message);
@@ -142,6 +163,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signOut = async () => {
     try {
+      setError(null);
       await supabase.auth.signOut();
       navigate('/');
       toast({
@@ -150,6 +172,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
     } catch (error: any) {
       console.error('Error al cerrar sesión:', error.message);
+      setError(error.message);
       toast({
         title: "Error al cerrar sesión",
         description: error.message,
@@ -159,7 +182,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, profile, isLoading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      profile, 
+      isLoading, 
+      error,
+      signIn, 
+      signUp, 
+      signOut 
+    }}>
       {children}
     </AuthContext.Provider>
   );

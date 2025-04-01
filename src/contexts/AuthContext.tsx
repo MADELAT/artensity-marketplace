@@ -6,6 +6,7 @@ export interface AuthContextType {
   user: any | null;
   profile: Profile | null;
   isLoading: boolean;
+  error: string | null;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (email: string, password: string, userData: Partial<Profile>) => Promise<void>;
   signOut: () => Promise<void>;

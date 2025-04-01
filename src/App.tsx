@@ -15,6 +15,9 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import ArtistDashboard from "./pages/artist/ArtistDashboard";
 import GalleryDashboard from "./pages/gallery/GalleryDashboard";
 import BuyerDashboard from "./pages/buyer/BuyerDashboard";
+import About from "./pages/About";
+import Artists from "./pages/Artists";
+import Galleries from "./pages/Galleries";
 import NotFound from "./pages/NotFound";
 
 // Route Protection Component
@@ -34,6 +37,9 @@ const App = () => (
             <Route path="/login" element={<Login />} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/artwork/:id" element={<ArtworkDetail />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/artists" element={<Artists />} />
+            <Route path="/galleries" element={<Galleries />} />
             
             {/* Protected Admin Dashboard Routes */}
             <Route 
@@ -74,12 +80,6 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            
-            {/* Additional Pages */}
-            <Route path="/artists" element={<div className="container mx-auto py-10">This section is in development.</div>} />
-            <Route path="/galleries" element={<div className="container mx-auto py-10">This section is in development.</div>} />
-            <Route path="/categories" element={<div className="container mx-auto py-10">This section is in development.</div>} />
-            <Route path="/about" element={<div className="container mx-auto py-10">This section is in development.</div>} />
             
             {/* Catch all route */}
             <Route path="*" element={<NotFound />} />

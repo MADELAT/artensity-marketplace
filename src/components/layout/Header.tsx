@@ -1,18 +1,19 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingCart, Bell, MessageSquare, User } from "lucide-react";
+import { Menu, X, ShoppingCart, Bell, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Badge } from "@/components/ui/badge";
 import { useAuth } from "@/contexts/AuthContext";
+import { UserMenu } from "./UserMenu";
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
   const isMobile = useIsMobile();
   const location = useLocation();
-  const { user, profile } = useAuth();
+  const { user } = useAuth();
 
   // Close mobile menu when changing routes
   useEffect(() => {
@@ -42,9 +43,12 @@ export function Header() {
 
         {isMobile ? (
           <>
-            <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)} className="text-white">
-              {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-            </Button>
+            <div className="flex items-center gap-2">
+              {user && <UserMenu />}
+              <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)} className="text-white">
+                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+              </Button>
+            </div>
 
             {isOpen && (
               <div className="absolute top-full left-0 w-full bg-black/90 backdrop-blur-lg p-4 border-t border-white/10 animate-fade-in">
@@ -61,13 +65,15 @@ export function Header() {
                   <Link to="/about" className="text-lg px-2 py-1 text-white hover:text-primary transition-colors">
                     About
                   </Link>
-                  <div className="pt-2 border-t border-white/10">
-                    <Link to="/login">
-                      <Button className="w-full bg-transparent border border-white hover:bg-white/20 text-white">
-                        {user ? 'Profile' : 'Register / Login'}
-                      </Button>
-                    </Link>
-                  </div>
+                  {!user && (
+                    <div className="pt-2 border-t border-white/10">
+                      <Link to="/login">
+                        <Button className="w-full bg-transparent border border-white hover:bg-white/20 text-white">
+                          Iniciar sesión / Registrarse
+                        </Button>
+                      </Link>
+                    </div>
+                  )}
                 </nav>
               </div>
             )}
@@ -90,7 +96,7 @@ export function Header() {
             </nav>
             
             <div className="flex items-center space-x-3">
-              {user && profile && (
+              {user && (
                 <>
                   <Link to="/cart">
                     <Button variant="ghost" size="icon" className="relative text-white">
@@ -108,17 +114,14 @@ export function Header() {
                       <MessageSquare className="h-5 w-5" />
                     </Button>
                   </Link>
+                  
+                  <UserMenu />
                 </>
               )}
-              <Link to={user ? "/profile" : "/login"}>
-                <Button variant={isScrolled ? "ghost" : "outline"} size="icon" className={`text-white ${!isScrolled && "border-white hover:bg-white/20"}`}>
-                  <User className="h-5 w-5" />
-                </Button>
-              </Link>
               {!user && (
                 <Link to="/login">
                   <Button className="bg-transparent border border-white hover:bg-white/20 text-white ml-2">
-                    Register / Login
+                    Iniciar sesión / Registrarse
                   </Button>
                 </Link>
               )}
