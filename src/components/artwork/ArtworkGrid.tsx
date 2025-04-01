@@ -1,37 +1,32 @@
+
 import { useState, useEffect } from "react";
 import { ArtworkCard } from "./ArtworkCard";
 import { useToast } from "@/hooks/use-toast";
+import { Artwork } from "@/types/supabase";
 
-// Mock data interface
-interface Artwork {
-  id: string;
-  title: string;
-  artist: string;
-  artistId: string;
-  price: number;
-  imageUrl: string;
-  year: number;
-  medium: string;
-  category: string;
-  style: string;
-  technique: string;
-}
-
-interface ArtworkGridProps {
+// Interface for the component props
+export interface ArtworkGridProps {
   category?: string;
   artistId?: string;
   style?: string;
   technique?: string;
+  artworks?: Artwork[]; // Added artworks prop
 }
 
-export function ArtworkGrid({ category, artistId, style, technique }: ArtworkGridProps) {
+export function ArtworkGrid({ category, artistId, style, technique, artworks: providedArtworks }: ArtworkGridProps) {
   const [artworks, setArtworks] = useState<Artwork[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!providedArtworks);
   const [favorites, setFavorites] = useState<string[]>([]);
   const { toast } = useToast();
 
-  // Fetch artworks (mock data for now)
+  // Use provided artworks or fetch them
   useEffect(() => {
+    if (providedArtworks) {
+      setArtworks(providedArtworks);
+      setLoading(false);
+      return;
+    }
+
     const fetchArtworks = async () => {
       setLoading(true);
       
@@ -131,7 +126,7 @@ export function ArtworkGrid({ category, artistId, style, technique }: ArtworkGri
     };
     
     fetchArtworks();
-  }, [category, artistId, style, technique, toast]);
+  }, [category, artistId, style, technique, toast, providedArtworks]);
   
   // Load saved favorites from localStorage
   useEffect(() => {
