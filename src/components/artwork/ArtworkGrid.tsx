@@ -13,8 +13,21 @@ export interface ArtworkGridProps {
   artworks?: Artwork[]; // Added artworks prop
 }
 
+// Create a temporary mock artwork interface that matches what ArtworkCard expects
+interface ArtworkCardData {
+  id: string;
+  title: string;
+  artist: string;
+  artistId: string;
+  price: number;
+  imageUrl: string;
+  year: number | null;
+  medium: string;
+  isFavorite?: boolean;
+}
+
 export function ArtworkGrid({ category, artistId, style, technique, artworks: providedArtworks }: ArtworkGridProps) {
-  const [artworks, setArtworks] = useState<Artwork[]>([]);
+  const [artworks, setArtworks] = useState<ArtworkCardData[]>([]);
   const [loading, setLoading] = useState(!providedArtworks);
   const [favorites, setFavorites] = useState<string[]>([]);
   const { toast } = useToast();
@@ -22,7 +35,18 @@ export function ArtworkGrid({ category, artistId, style, technique, artworks: pr
   // Use provided artworks or fetch them
   useEffect(() => {
     if (providedArtworks) {
-      setArtworks(providedArtworks);
+      // Map Supabase Artwork type to ArtworkCardData type
+      const mappedArtworks: ArtworkCardData[] = providedArtworks.map(artwork => ({
+        id: artwork.id,
+        title: artwork.title,
+        artist: artwork.artist_id, // Note: This is just an ID, we would normally fetch artist name
+        artistId: artwork.artist_id,
+        price: artwork.price,
+        imageUrl: artwork.image_url || '',
+        year: artwork.year,
+        medium: artwork.technique || 'Unknown',
+      }));
+      setArtworks(mappedArtworks);
       setLoading(false);
       return;
     }
@@ -35,7 +59,7 @@ export function ArtworkGrid({ category, artistId, style, technique, artworks: pr
         await new Promise(resolve => setTimeout(resolve, 800));
         
         // Generate mock data
-        const mockArtworks: Artwork[] = Array.from({ length: 12 }).map((_, index) => ({
+        const mockArtworks: ArtworkCardData[] = Array.from({ length: 12 }).map((_, index) => ({
           id: `artwork-${index + 1}`,
           title: [
             "Harmony in Blue", 
@@ -88,16 +112,18 @@ export function ArtworkGrid({ category, artistId, style, technique, artworks: pr
             "Photography",
             "Installation"
           ][index % 8],
-          category: ["Painting", "Sculpture", "Photography", "Digital", "Mixed Media"][index % 5],
-          style: ["Abstract", "Contemporary", "Minimalist", "Figurative", "Expressionist"][index % 5],
-          technique: ["Oil", "Acrylic", "Watercolor", "Digital", "Mixed Media"][index % 5]
         }));
         
         // Filter by props if provided
         let filteredArtworks = mockArtworks;
         
         if (category && category.length > 0) {
-          filteredArtworks = filteredArtworks.filter(artwork => artwork.category === category);
+          filteredArtworks = filteredArtworks.filter(artwork => {
+            const artworkCategory = [
+              "Painting", "Sculpture", "Photography", "Digital", "Mixed Media"
+            ][parseInt(artwork.id.split('-')[1]) % 5];
+            return artworkCategory === category;
+          });
         }
         
         if (artistId && artistId.length > 0) {
@@ -105,11 +131,21 @@ export function ArtworkGrid({ category, artistId, style, technique, artworks: pr
         }
         
         if (style && style.length > 0) {
-          filteredArtworks = filteredArtworks.filter(artwork => artwork.style === style);
+          filteredArtworks = filteredArtworks.filter(artwork => {
+            const artworkStyle = [
+              "Abstract", "Contemporary", "Minimalist", "Figurative", "Expressionist"
+            ][parseInt(artwork.id.split('-')[1]) % 5];
+            return artworkStyle === style;
+          });
         }
         
         if (technique && technique.length > 0) {
-          filteredArtworks = filteredArtworks.filter(artwork => artwork.technique === technique);
+          filteredArtworks = filteredArtworks.filter(artwork => {
+            const artworkTechnique = [
+              "Oil", "Acrylic", "Watercolor", "Digital", "Mixed Media"
+            ][parseInt(artwork.id.split('-')[1]) % 5];
+            return artworkTechnique === technique;
+          });
         }
         
         setArtworks(filteredArtworks);
@@ -193,7 +229,7 @@ export function ArtworkGrid({ category, artistId, style, technique, artworks: pr
           artistId={artwork.artistId}
           price={artwork.price}
           imageUrl={artwork.imageUrl}
-          year={artwork.year}
+          year={artwork.year || 0}
           medium={artwork.medium}
           isFavorite={favorites.includes(artwork.id)}
           onToggleFavorite={handleToggleFavorite}
