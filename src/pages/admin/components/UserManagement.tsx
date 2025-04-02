@@ -9,6 +9,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { 
   Select,
   SelectContent,
@@ -24,12 +25,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
-import { Edit, MoreHorizontal, UserCog } from 'lucide-react';
+import { Edit, MoreHorizontal, Search, UserCog, Filter } from 'lucide-react';
 
 export default function UserManagement() {
   const { toast } = useToast();
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [roleFilter, setRoleFilter] = useState('all');
   
   useEffect(() => {
     fetchUsers();
@@ -88,11 +91,52 @@ export default function UserManagement() {
     }
   };
 
+  const filteredUsers = users.filter((user: any) => {
+    const matchesSearchTerm = 
+      (user.first_name && user.first_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.last_name && user.last_name.toLowerCase().includes(searchTerm.toLowerCase())) ||
+      (user.email && user.email.toLowerCase().includes(searchTerm.toLowerCase()));
+    
+    const matchesRoleFilter = roleFilter === 'all' || user.role === roleFilter;
+    
+    return matchesSearchTerm && matchesRoleFilter;
+  });
+
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Gestión de Usuarios</h2>
         <Button onClick={() => fetchUsers()}>Actualizar</Button>
+      </div>
+      
+      <div className="flex flex-col sm:flex-row gap-3">
+        <div className="relative flex-1">
+          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Buscar usuarios..."
+            className="pl-8"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+        </div>
+        <Select
+          value={roleFilter}
+          onValueChange={setRoleFilter}
+        >
+          <SelectTrigger className="w-[180px]">
+            <div className="flex items-center gap-2">
+              <Filter className="h-4 w-4" />
+              <SelectValue placeholder="Filtrar por rol" />
+            </div>
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Todos los roles</SelectItem>
+            <SelectItem value="admin">Admin</SelectItem>
+            <SelectItem value="artist">Artist</SelectItem>
+            <SelectItem value="gallery">Gallery</SelectItem>
+            <SelectItem value="buyer">Buyer</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       
       {loading ? (
@@ -112,14 +156,14 @@ export default function UserManagement() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {users.length === 0 ? (
+              {filteredUsers.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center py-6 text-muted-foreground">
-                    No hay usuarios registrados
+                    No hay usuarios coincidentes
                   </TableCell>
                 </TableRow>
               ) : (
-                users.map((user: any) => (
+                filteredUsers.map((user: any) => (
                   <TableRow key={user.id}>
                     <TableCell className="font-medium">
                       {user.first_name} {user.last_name}

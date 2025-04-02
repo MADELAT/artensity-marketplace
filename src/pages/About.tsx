@@ -12,7 +12,7 @@ export default function About() {
             alt="Gallery Interior"
             className="w-full h-full object-cover"
           />
-          <div className="absolute inset-0 bg-white/15 backdrop-blur-sm"></div>
+          <div className="absolute inset-0 bg-white/10 backdrop-blur-sm"></div>
         </div>
         
         <div className="container mx-auto px-4 py-24 relative z-10">
@@ -25,7 +25,7 @@ export default function About() {
             </div>
             
             <div className="space-y-12">
-              <section className="space-y-6 backdrop-blur-sm bg-white/10 p-8 rounded-lg border border-white/10">
+              <section className="space-y-6 bg-white/10 backdrop-blur-xl p-8 rounded-lg border border-white/10">
                 <h2 className="text-3xl font-serif font-light">Nuestra Misión</h2>
                 <p className="text-lg text-white/90">
                   ArTendency nace con el propósito de democratizar el acceso al arte contemporáneo, 
@@ -39,7 +39,7 @@ export default function About() {
                 </p>
               </section>
               
-              <section className="space-y-6 backdrop-blur-sm bg-white/10 p-8 rounded-lg border border-white/10">
+              <section className="space-y-6 bg-white/10 backdrop-blur-xl p-8 rounded-lg border border-white/10">
                 <h2 className="text-3xl font-serif font-light">Curaduría y Calidad</h2>
                 <p className="text-lg text-white/90">
                   Cada artista y obra en ArTendency pasa por un riguroso proceso de selección 
@@ -53,7 +53,7 @@ export default function About() {
                 </p>
               </section>
               
-              <section className="space-y-6 backdrop-blur-sm bg-white/10 p-8 rounded-lg border border-white/10">
+              <section className="space-y-6 bg-white/10 backdrop-blur-xl p-8 rounded-lg border border-white/10">
                 <h2 className="text-3xl font-serif font-light">Una Comunidad Global</h2>
                 <p className="text-lg text-white/90">
                   ArTendency es más que un marketplace: es una comunidad global que conecta 
@@ -68,7 +68,7 @@ export default function About() {
                 </p>
               </section>
               
-              <section className="space-y-6 backdrop-blur-sm bg-white/10 p-8 rounded-lg border border-white/10">
+              <section className="space-y-6 bg-white/10 backdrop-blur-xl p-8 rounded-lg border border-white/10">
                 <h2 className="text-3xl font-serif font-light">Únete a Nosotros</h2>
                 <p className="text-lg text-white/90">
                   Te invitamos a formar parte de ArTendency, ya sea como artista, galería o coleccionista. 

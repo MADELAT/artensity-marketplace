@@ -10,7 +10,7 @@ import CommissionManagement from './components/CommissionManagement';
 import TransactionsManagement from './components/TransactionsManagement';
 import FairsManagement from './components/FairsManagement';
 import NotificationsCenter from './components/NotificationsCenter';
-import { PieChart, LineChart, BarChart, Users, Image } from 'lucide-react';
+import { PieChart, LineChart, BarChart, Users, Image, AreaChart, TrendingUp } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
@@ -42,7 +42,7 @@ export default function AdminDashboard() {
               <StatCard 
                 title="Total Users" 
                 value="158"
-                description="Across all roles"
+                description="+12% this month"
                 icon={<Users className="h-4 w-4 text-blue-500" />}
               />
               <StatCard 
@@ -54,30 +54,81 @@ export default function AdminDashboard() {
               <StatCard 
                 title="Revenue" 
                 value="$12,580" 
-                description="This month"
+                description="+28% vs last month"
                 icon={<LineChart className="h-4 w-4 text-purple-500" />} 
               />
               <StatCard 
                 title="Commissions" 
                 value="$1,840" 
-                description="This month"
+                description="18 active artists"
                 icon={<BarChart className="h-4 w-4 text-amber-500" />} 
               />
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
               <div className="rounded-lg border bg-card p-6">
-                <h3 className="text-lg font-medium mb-4">Users by Role</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium">User Distribution</h3>
+                  <PieChart className="h-5 w-5 text-muted-foreground" />
+                </div>
                 <div className="h-[250px] flex items-center justify-center">
-                  {/* Placeholder for pie chart */}
-                  <div className="text-muted-foreground">Chart will be implemented soon</div>
+                  {/* Placeholder chart display */}
+                  <div className="space-y-2 w-full">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-blue-500 mr-2"></div>
+                        <span className="text-sm">Artists</span>
+                      </div>
+                      <span className="text-sm font-medium">42%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2.5">
+                      <div className="bg-blue-500 h-2.5 rounded-full" style={{ width: '42%' }}></div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-green-500 mr-2"></div>
+                        <span className="text-sm">Galleries</span>
+                      </div>
+                      <span className="text-sm font-medium">28%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2.5">
+                      <div className="bg-green-500 h-2.5 rounded-full" style={{ width: '28%' }}></div>
+                    </div>
+                    
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center">
+                        <div className="w-3 h-3 rounded-full bg-amber-500 mr-2"></div>
+                        <span className="text-sm">Buyers</span>
+                      </div>
+                      <span className="text-sm font-medium">30%</span>
+                    </div>
+                    <div className="w-full bg-muted rounded-full h-2.5">
+                      <div className="bg-amber-500 h-2.5 rounded-full" style={{ width: '30%' }}></div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div className="rounded-lg border bg-card p-6">
-                <h3 className="text-lg font-medium mb-4">Monthly Sales</h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium">Sales Trends</h3>
+                  <TrendingUp className="h-5 w-5 text-muted-foreground" />
+                </div>
                 <div className="h-[250px] flex items-center justify-center">
-                  {/* Placeholder for line chart */}
-                  <div className="text-muted-foreground">Chart will be implemented soon</div>
+                  {/* Placeholder chart */}
+                  <div className="w-full h-full flex items-end justify-around pt-6">
+                    {[35, 45, 30, 60, 75, 90, 85].map((height, index) => (
+                      <div key={index} className="relative group">
+                        <div 
+                          className="w-6 bg-primary/80 rounded-t transition-all group-hover:bg-primary"
+                          style={{ height: `${height}%` }}
+                        ></div>
+                        <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-muted-foreground">
+                          {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][index]}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             </div>

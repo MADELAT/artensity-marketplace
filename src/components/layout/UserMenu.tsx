@@ -91,7 +91,7 @@ export function UserMenu() {
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-zinc-900 dark:border dark:border-white/10 overflow-hidden z-50">
+        <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-white/20 overflow-hidden z-50">
           <div className="py-2 px-4 border-b border-gray-100 dark:border-gray-800">
             <p className="text-sm font-medium">{getDisplayName()}</p>
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>

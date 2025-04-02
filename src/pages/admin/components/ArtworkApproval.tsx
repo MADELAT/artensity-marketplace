@@ -14,12 +14,15 @@ import { CheckCircle, XCircle, Eye } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Textarea } from "@/components/ui/textarea";
 import { supabase } from '@/integrations/supabase/client';
+import { toast as sonnerToast } from 'sonner';
 
 export default function ArtworkApproval() {
   const { toast } = useToast();
   const [rejectReason, setRejectReason] = useState('');
   const [pendingArtworks, setPendingArtworks] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedArtwork, setSelectedArtwork] = useState(null);
 
   useEffect(() => {
     fetchPendingArtworks();
@@ -80,27 +83,25 @@ export default function ArtworkApproval() {
       // Update local state
       setPendingArtworks(pendingArtworks.filter(a => a.id !== artwork.id));
       
-      toast({
-        title: "Obra Aprobada",
+      // Close dialog if open
+      setDialogOpen(false);
+      
+      // Show toast notification
+      sonnerToast.success('Obra aprobada', {
         description: `La obra "${artwork.title}" ha sido aprobada y publicada`,
-        variant: "default",
       });
     } catch (error) {
       console.error('Error approving artwork:', error);
-      toast({
-        title: "Error",
+      sonnerToast.error('Error', {
         description: "No se pudo aprobar la obra",
-        variant: "destructive",
       });
     }
   };
 
   const handleReject = async (artwork) => {
     if (!rejectReason) {
-      toast({
-        title: "Error en el rechazo",
+      sonnerToast.error('Error', {
         description: "Por favor proporciona una razón para el rechazo",
-        variant: "destructive",
       });
       return;
     }
@@ -119,28 +120,32 @@ export default function ArtworkApproval() {
       // Update local state
       setPendingArtworks(pendingArtworks.filter(a => a.id !== artwork.id));
       
+      // Reset form and close dialog
       setRejectReason('');
+      setDialogOpen(false);
       
-      toast({
-        title: "Obra Rechazada",
+      // Show toast notification
+      sonnerToast.success('Obra rechazada', {
         description: `La obra "${artwork.title}" ha sido rechazada`,
-        variant: "default",
       });
     } catch (error) {
       console.error('Error rejecting artwork:', error);
-      toast({
-        title: "Error",
+      sonnerToast.error('Error', {
         description: "No se pudo rechazar la obra",
-        variant: "destructive",
       });
     }
+  };
+
+  const openArtworkDetails = (artwork) => {
+    setSelectedArtwork(artwork);
+    setDialogOpen(true);
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Aprobación de Obras</h2>
-        <Button onClick={fetchPendingArtworks}>Actualizar</Button>
+        <Button onClick={fetchPendingArtworks} variant="outline">Actualizar</Button>
       </div>
       
       {loading ? (
@@ -173,7 +178,8 @@ export default function ArtworkApproval() {
                     <img 
                       src={artwork.image_url || "https://via.placeholder.com/150"}
                       alt={artwork.title} 
-                      className="w-16 h-16 object-cover rounded"
+                      className="w-16 h-16 object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity"
+                      onClick={() => openArtworkDetails(artwork)}
                     />
                   </TableCell>
                   <TableCell className="font-medium">{artwork.title}</TableCell>
@@ -185,88 +191,14 @@ export default function ArtworkApproval() {
                   <TableCell>{new Date(artwork.created_at).toLocaleDateString()}</TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="outline" size="sm">
-                            <Eye className="h-4 w-4 mr-1" />
-                            Ver
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent className="max-w-2xl">
-                          <DialogHeader>
-                            <DialogTitle>{artwork.title}</DialogTitle>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <div className="aspect-square relative max-h-96">
-                              <img 
-                                src={artwork.image_url || "https://via.placeholder.com/800"} 
-                                alt={artwork.title} 
-                                className="w-full h-full object-contain rounded-md"
-                              />
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                              <div>
-                                <p className="text-sm font-medium">Artista</p>
-                                <p className="text-sm">{artwork.profiles?.first_name} {artwork.profiles?.last_name}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium">Precio</p>
-                                <p className="text-sm">${artwork.price}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium">Categoría</p>
-                                <p className="text-sm">{artwork.category || "No especificada"}</p>
-                              </div>
-                              <div>
-                                <p className="text-sm font-medium">Enviada</p>
-                                <p className="text-sm">{new Date(artwork.created_at).toLocaleDateString()}</p>
-                              </div>
-                              {artwork.technique && (
-                                <div>
-                                  <p className="text-sm font-medium">Técnica</p>
-                                  <p className="text-sm">{artwork.technique}</p>
-                                </div>
-                              )}
-                              {artwork.dimensions && (
-                                <div>
-                                  <p className="text-sm font-medium">Dimensiones</p>
-                                  <p className="text-sm">{artwork.dimensions}</p>
-                                </div>
-                              )}
-                            </div>
-                            
-                            {artwork.description && (
-                              <div>
-                                <p className="text-sm font-medium mb-1">Descripción</p>
-                                <p className="text-sm text-muted-foreground">{artwork.description}</p>
-                              </div>
-                            )}
-                            
-                            <div>
-                              <p className="text-sm font-medium mb-2">Comentario del administrador</p>
-                              <Textarea
-                                placeholder="Proporciona feedback para el artista..."
-                                value={rejectReason}
-                                onChange={(e) => setRejectReason(e.target.value)}
-                              />
-                            </div>
-                            
-                            <div className="flex justify-end gap-2">
-                              <Button 
-                                variant="outline" 
-                                onClick={() => handleReject(artwork)}
-                              >
-                                <XCircle className="h-4 w-4 mr-1" />
-                                Rechazar
-                              </Button>
-                              <Button onClick={() => handleApprove(artwork)}>
-                                <CheckCircle className="h-4 w-4 mr-1" />
-                                Aprobar
-                              </Button>
-                            </div>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => openArtworkDetails(artwork)}
+                      >
+                        <Eye className="h-4 w-4 mr-1" />
+                        Ver
+                      </Button>
                       
                       <Button 
                         variant="default" 
@@ -278,33 +210,17 @@ export default function ArtworkApproval() {
                         Aprobar
                       </Button>
                       
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <Button variant="destructive" size="sm">
-                            <XCircle className="h-4 w-4 mr-1" />
-                            Rechazar
-                          </Button>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>Rechazar Obra</DialogTitle>
-                          </DialogHeader>
-                          <div className="grid gap-4 py-4">
-                            <p>Por favor proporciona una razón para rechazar esta obra:</p>
-                            <Textarea
-                              placeholder="Motivo del rechazo..."
-                              value={rejectReason}
-                              onChange={(e) => setRejectReason(e.target.value)}
-                            />
-                            <Button 
-                              variant="destructive"
-                              onClick={() => handleReject(artwork)}
-                            >
-                              Confirmar Rechazo
-                            </Button>
-                          </div>
-                        </DialogContent>
-                      </Dialog>
+                      <Button 
+                        variant="destructive" 
+                        size="sm"
+                        onClick={() => {
+                          setSelectedArtwork(artwork);
+                          setDialogOpen(true);
+                        }}
+                      >
+                        <XCircle className="h-4 w-4 mr-1" />
+                        Rechazar
+                      </Button>
                     </div>
                   </TableCell>
                 </TableRow>
@@ -313,6 +229,88 @@ export default function ArtworkApproval() {
           </Table>
         </div>
       )}
+
+      {/* Artwork Detail Modal */}
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          {selectedArtwork && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{selectedArtwork.title}</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="aspect-square relative max-h-96">
+                  <img 
+                    src={selectedArtwork.image_url || "https://via.placeholder.com/800"} 
+                    alt={selectedArtwork.title} 
+                    className="w-full h-full object-contain rounded-md"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm font-medium">Artista</p>
+                    <p className="text-sm">{selectedArtwork.profiles?.first_name} {selectedArtwork.profiles?.last_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Precio</p>
+                    <p className="text-sm">${selectedArtwork.price}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Categoría</p>
+                    <p className="text-sm">{selectedArtwork.category || "No especificada"}</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium">Enviada</p>
+                    <p className="text-sm">{new Date(selectedArtwork.created_at).toLocaleDateString()}</p>
+                  </div>
+                  {selectedArtwork.technique && (
+                    <div>
+                      <p className="text-sm font-medium">Técnica</p>
+                      <p className="text-sm">{selectedArtwork.technique}</p>
+                    </div>
+                  )}
+                  {selectedArtwork.dimensions && (
+                    <div>
+                      <p className="text-sm font-medium">Dimensiones</p>
+                      <p className="text-sm">{selectedArtwork.dimensions}</p>
+                    </div>
+                  )}
+                </div>
+                
+                {selectedArtwork.description && (
+                  <div>
+                    <p className="text-sm font-medium mb-1">Descripción</p>
+                    <p className="text-sm text-muted-foreground">{selectedArtwork.description}</p>
+                  </div>
+                )}
+                
+                <div>
+                  <p className="text-sm font-medium mb-2">Comentario del administrador</p>
+                  <Textarea
+                    placeholder="Proporciona feedback para el artista..."
+                    value={rejectReason}
+                    onChange={(e) => setRejectReason(e.target.value)}
+                  />
+                </div>
+                
+                <div className="flex justify-end gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => handleReject(selectedArtwork)}
+                  >
+                    <XCircle className="h-4 w-4 mr-1" />
+                    Rechazar
+                  </Button>
+                  <Button onClick={() => handleApprove(selectedArtwork)}>
+                    <CheckCircle className="h-4 w-4 mr-1" />
+                    Aprobar
+                  </Button>
+                </div>
+              </div>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
