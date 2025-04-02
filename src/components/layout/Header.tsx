@@ -35,7 +35,7 @@ export function Header() {
   }, []);
 
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-2 bg-black/70 backdrop-blur-lg" : "py-4 bg-transparent"}`}>
+    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? "py-1 bg-black/30 backdrop-blur-lg" : "py-2 bg-transparent"}`}>
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="text-2xl font-serif font-light text-white tracking-wider">
           ArTendency
@@ -51,24 +51,24 @@ export function Header() {
             </div>
 
             {isOpen && (
-              <div className="absolute top-full left-0 w-full bg-black/90 backdrop-blur-lg p-4 border-t border-white/10 animate-fade-in">
+              <div className="absolute top-full left-0 w-full bg-white/90 dark:bg-black/90 backdrop-blur-lg p-4 border-t border-white/10 animate-fade-in">
                 <nav className="flex flex-col space-y-4">
-                  <Link to="/explore" className="text-lg px-2 py-1 text-white hover:text-primary transition-colors">
+                  <Link to="/explore" className="text-lg px-2 py-1 text-black dark:text-white hover:text-primary transition-colors">
                     Explore
                   </Link>
-                  <Link to="/artists" className="text-lg px-2 py-1 text-white hover:text-primary transition-colors">
+                  <Link to="/artists" className="text-lg px-2 py-1 text-black dark:text-white hover:text-primary transition-colors">
                     Artists
                   </Link>
-                  <Link to="/galleries" className="text-lg px-2 py-1 text-white hover:text-primary transition-colors">
+                  <Link to="/galleries" className="text-lg px-2 py-1 text-black dark:text-white hover:text-primary transition-colors">
                     Galleries
                   </Link>
-                  <Link to="/about" className="text-lg px-2 py-1 text-white hover:text-primary transition-colors">
+                  <Link to="/about" className="text-lg px-2 py-1 text-black dark:text-white hover:text-primary transition-colors">
                     About
                   </Link>
                   {!user && (
-                    <div className="pt-2 border-t border-white/10">
+                    <div className="pt-2 border-t border-black/10 dark:border-white/10">
                       <Link to="/login">
-                        <Button className="w-full bg-transparent border border-white hover:bg-white/20 text-white">
+                        <Button className="w-full bg-transparent border border-white hover:bg-white/20 text-black dark:text-white">
                           Iniciar sesión / Registrarse
                         </Button>
                       </Link>

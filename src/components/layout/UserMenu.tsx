@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, LogOut, Home, Settings } from 'lucide-react';
+import { User, LogOut, Home, Settings, PieChart } from 'lucide-react';
 
 export function UserMenu() {
   const { user, profile, signOut } = useAuth();
@@ -60,8 +60,13 @@ export function UserMenu() {
 
   // Handle logout
   const handleLogout = async () => {
-    setIsOpen(false);
-    await signOut();
+    try {
+      setIsOpen(false);
+      await signOut();
+      navigate('/');
+    } catch (error) {
+      console.error("Error logging out:", error);
+    }
   };
 
   // If not logged in, return null
@@ -86,7 +91,7 @@ export function UserMenu() {
       </button>
       
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-black dark:border dark:border-white/10 overflow-hidden z-50">
+        <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white dark:bg-zinc-900 dark:border dark:border-white/10 overflow-hidden z-50">
           <div className="py-2 px-4 border-b border-gray-100 dark:border-gray-800">
             <p className="text-sm font-medium">{getDisplayName()}</p>
             <p className="text-xs text-muted-foreground truncate">{user.email}</p>
@@ -94,7 +99,7 @@ export function UserMenu() {
           <div className="py-1">
             <Link
               to={getDashboardLink()}
-              className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2"
+              className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2"
               onClick={() => setIsOpen(false)}
             >
               <Home className="h-4 w-4" />
@@ -102,15 +107,25 @@ export function UserMenu() {
             </Link>
             <Link
               to="/profile"
-              className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2"
+              className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2"
               onClick={() => setIsOpen(false)}
             >
               <User className="h-4 w-4" />
               Mi perfil
             </Link>
+            {profile?.role === 'admin' && (
+              <Link
+                to="/admin"
+                className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2"
+                onClick={() => setIsOpen(false)}
+              >
+                <PieChart className="h-4 w-4" />
+                Admin Panel
+              </Link>
+            )}
             <Link
               to="/settings"
-              className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-900 flex items-center gap-2"
+              className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2"
               onClick={() => setIsOpen(false)}
             >
               <Settings className="h-4 w-4" />
@@ -120,7 +135,7 @@ export function UserMenu() {
           <div className="border-t border-gray-100 dark:border-gray-800">
             <button
               onClick={handleLogout}
-              className="px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-900 w-full text-left flex items-center gap-2"
+              className="px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-800 w-full text-left flex items-center gap-2"
             >
               <LogOut className="h-4 w-4" />
               Cerrar sesión

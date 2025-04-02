@@ -10,6 +10,13 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -119,18 +126,20 @@ export default function UserManagement() {
                     </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>
-                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                        ${user.role === 'admin' 
-                          ? 'bg-purple-100 text-purple-800' 
-                          : user.role === 'artist'
-                            ? 'bg-blue-100 text-blue-800'
-                            : user.role === 'gallery'
-                              ? 'bg-amber-100 text-amber-800'
-                              : 'bg-green-100 text-green-800'
-                        }`
-                      }>
-                        {user.role}
-                      </span>
+                      <Select 
+                        value={user.role} 
+                        onValueChange={(value) => handleRoleChange(user.id, value)}
+                      >
+                        <SelectTrigger className="w-32 h-8">
+                          <SelectValue placeholder="Seleccionar rol" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin">Admin</SelectItem>
+                          <SelectItem value="artist">Artist</SelectItem>
+                          <SelectItem value="gallery">Gallery</SelectItem>
+                          <SelectItem value="buyer">Buyer</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </TableCell>
                     <TableCell>
                       <DropdownMenu>
@@ -160,30 +169,6 @@ export default function UserManagement() {
                           >
                             <Edit className="mr-2 h-4 w-4" />
                             Editar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="cursor-pointer"
-                            onClick={() => handleRoleChange(user.id, 'admin')}
-                          >
-                            Establecer como Admin
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="cursor-pointer"
-                            onClick={() => handleRoleChange(user.id, 'artist')}
-                          >
-                            Establecer como Artista
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="cursor-pointer"
-                            onClick={() => handleRoleChange(user.id, 'gallery')}
-                          >
-                            Establecer como Galería
-                          </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            className="cursor-pointer"
-                            onClick={() => handleRoleChange(user.id, 'buyer')}
-                          >
-                            Establecer como Comprador
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

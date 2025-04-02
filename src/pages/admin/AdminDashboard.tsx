@@ -10,7 +10,7 @@ import CommissionManagement from './components/CommissionManagement';
 import TransactionsManagement from './components/TransactionsManagement';
 import FairsManagement from './components/FairsManagement';
 import NotificationsCenter from './components/NotificationsCenter';
-import { PieChart, LineChart, BarChart, Users } from 'lucide-react';
+import { PieChart, LineChart, BarChart, Users, Image } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
@@ -49,7 +49,7 @@ export default function AdminDashboard() {
                 title="Artworks" 
                 value="643" 
                 description="312 active listings"
-                icon={<PieChart className="h-4 w-4 text-green-500" />} 
+                icon={<Image className="h-4 w-4 text-green-500" />} 
               />
               <StatCard 
                 title="Revenue" 
