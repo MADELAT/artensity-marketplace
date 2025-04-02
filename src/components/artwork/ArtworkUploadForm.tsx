@@ -67,13 +67,24 @@ export function ArtworkUploadForm() {
       // 1. Upload the image to Supabase Storage
       const fileExt = file.name.split('.').pop();
       const fileName = `${user.id}-${Math.random().toString(36).substring(2, 15)}.${fileExt}`;
-      const filePath = `artwork/${fileName}`;
+      const filePath = `${fileName}`;
       
+      // Validate bucket exists before upload
+      const { data: buckets } = await supabase.storage.listBuckets();
+      console.log("Available buckets:", buckets);
+      
+      // Check if artworks bucket exists
+      if (!buckets?.some(bucket => bucket.name === 'artworks')) {
+        throw new Error("El bucket 'artworks' no existe. Por favor contacta al administrador.");
+      }
+      
+      // Upload to the artworks bucket
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('artworks')
         .upload(filePath, file);
         
       if (uploadError) {
+        console.error("Upload error:", uploadError);
         throw new Error(`Error al subir la imagen: ${uploadError.message}`);
       }
       

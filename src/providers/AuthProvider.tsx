@@ -63,6 +63,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (userProfile) {
         console.log("User profile loaded:", userProfile);
         setProfile(userProfile);
+        setIsLoading(false);
         
         // Redirect based on role if on login page or homepage
         if (window.location.pathname === '/login' || window.location.pathname === '/') {
@@ -71,11 +72,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
       } else {
         console.log("No user profile found");
         setError("No se pudo cargar el perfil del usuario");
+        setIsLoading(false);
       }
     } catch (err) {
       console.error("Error fetching user profile:", err);
       setError("Error al cargar el perfil del usuario");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -146,14 +147,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         duration: 3000,
       });
       
-      // Explicitly navigate based on the role chosen during registration
-      if (userData.role) {
-        // Add small delay to ensure profile is created
-        setTimeout(() => {
-          redirectUserBasedOnRole(userData.role, navigate);
-          setIsLoading(false);
-        }, 1500);
-      }
+      // No need to manually redirect here, onAuthStateChange will handle it
+      // Set isLoading to false when done to prevent the infinite loading
+      setIsLoading(false);
     } catch (error: any) {
       console.error('Error de registro:', error.message);
       setIsLoading(false);

@@ -1,6 +1,6 @@
 
 import { useState, useRef, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { User, LogOut, Home, Settings } from 'lucide-react';
@@ -9,6 +9,7 @@ export function UserMenu() {
   const { user, profile, signOut } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -55,6 +56,12 @@ export function UserMenu() {
       return `${profile.first_name} ${profile.last_name}`;
     }
     return user?.email || 'Usuario';
+  };
+
+  // Handle logout
+  const handleLogout = async () => {
+    setIsOpen(false);
+    await signOut();
   };
 
   // If not logged in, return null
@@ -112,10 +119,7 @@ export function UserMenu() {
           </div>
           <div className="border-t border-gray-100 dark:border-gray-800">
             <button
-              onClick={() => {
-                setIsOpen(false);
-                signOut();
-              }}
+              onClick={handleLogout}
               className="px-4 py-2 text-sm text-red-500 hover:bg-gray-100 dark:hover:bg-gray-900 w-full text-left flex items-center gap-2"
             >
               <LogOut className="h-4 w-4" />
