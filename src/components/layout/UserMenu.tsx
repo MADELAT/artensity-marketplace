@@ -3,7 +3,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, LogOut, Home, Settings, PieChart } from 'lucide-react';
+import { User, LogOut, Home, Settings, PieChart, Palette, Store, ShoppingBag } from 'lucide-react';
 
 export function UserMenu() {
   const { user, profile, signOut } = useAuth();
@@ -39,14 +39,31 @@ export function UserMenu() {
     
     switch (profile.role) {
       case 'admin':
-        return '/admin';
+        return '/dashboard/admin';
       case 'artist':
-        return '/artist-dashboard';
+        return '/dashboard/artist';
       case 'gallery':
-        return '/gallery-dashboard';
+        return '/dashboard/gallery';
       case 'buyer':
       default:
-        return '/buyer-dashboard';
+        return '/home';
+    }
+  };
+
+  // Get dashboard icon based on user role
+  const getDashboardIcon = () => {
+    if (!profile) return <Home className="h-4 w-4" />;
+    
+    switch (profile.role) {
+      case 'admin':
+        return <PieChart className="h-4 w-4" />;
+      case 'artist':
+        return <Palette className="h-4 w-4" />;
+      case 'gallery':
+        return <Store className="h-4 w-4" />;
+      case 'buyer':
+      default:
+        return <ShoppingBag className="h-4 w-4" />;
     }
   };
 
@@ -56,6 +73,24 @@ export function UserMenu() {
       return `${profile.first_name} ${profile.last_name}`;
     }
     return user?.email || 'Usuario';
+  };
+
+  // Get role display name
+  const getRoleDisplayName = () => {
+    if (!profile) return 'Usuario';
+    
+    switch (profile.role) {
+      case 'admin':
+        return 'Administrador';
+      case 'artist':
+        return 'Artista';
+      case 'gallery':
+        return 'Galería';
+      case 'buyer':
+        return 'Coleccionista';
+      default:
+        return 'Usuario';
+    }
   };
 
   // Handle logout
@@ -94,7 +129,7 @@ export function UserMenu() {
         <div className="absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white/90 dark:bg-zinc-900/90 backdrop-blur-xl border border-white/20 overflow-hidden z-50">
           <div className="py-2 px-4 border-b border-gray-100 dark:border-gray-800">
             <p className="text-sm font-medium">{getDisplayName()}</p>
-            <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+            <p className="text-xs text-muted-foreground truncate">{getRoleDisplayName()}</p>
           </div>
           <div className="py-1">
             <Link
@@ -102,7 +137,7 @@ export function UserMenu() {
               className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2"
               onClick={() => setIsOpen(false)}
             >
-              <Home className="h-4 w-4" />
+              {getDashboardIcon()}
               Dashboard
             </Link>
             <Link
@@ -115,7 +150,7 @@ export function UserMenu() {
             </Link>
             {profile?.role === 'admin' && (
               <Link
-                to="/admin"
+                to="/dashboard/admin"
                 className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 flex items-center gap-2"
                 onClick={() => setIsOpen(false)}
               >

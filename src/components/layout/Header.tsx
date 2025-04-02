@@ -1,119 +1,167 @@
 
 import { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Menu, X, ShoppingCart, Bell, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Badge } from "@/components/ui/badge";
-import { useAuth } from "@/contexts/AuthContext";
 import { UserMenu } from "./UserMenu";
+import { useAuth } from "@/contexts/AuthContext";
+import { Menu, X } from "lucide-react";
 
 export function Header() {
-  const [isOpen, setIsOpen] = useState(false);
-  const isMobile = useIsMobile();
-  const location = useLocation();
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user } = useAuth();
-
-  // Close mobile menu when changing routes
+  const location = useLocation();
+  
   useEffect(() => {
-    setIsOpen(false);
-  }, [location.pathname]);
-
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 10);
+    };
+    
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+  
+  // Close mobile menu when location changes
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location]);
+  
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 py-1.5 bg-black/30 backdrop-blur-lg">
-      <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-serif font-light text-white tracking-wider">
-          ArTendency
+    <header 
+      className={`fixed top-0 left-0 right-0 z-50 transition-colors duration-300 ${
+        isScrolled 
+          ? "bg-white/70 dark:bg-zinc-900/70 backdrop-blur-md border-b border-gray-200 dark:border-gray-800" 
+          : "bg-white/30 dark:bg-zinc-900/30 backdrop-blur-sm"
+      }`}
+    >
+      <div className="container flex h-14 items-center px-4 md:px-6">
+        <Link to="/" className="mr-6 flex items-center">
+          <span className="text-xl font-serif">ArTendency</span>
         </Link>
-
-        {isMobile ? (
-          <>
-            <div className="flex items-center gap-2">
-              {user && <UserMenu />}
-              <Button variant="ghost" size="icon" onClick={() => setIsOpen(!isOpen)} className="text-white">
-                {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+        
+        {/* Desktop navigation */}
+        <nav className="hidden md:flex items-center space-x-4 lg:space-x-6 flex-1">
+          <Link 
+            to="/explore" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              location.pathname === '/explore' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            Explorar
+          </Link>
+          <Link 
+            to="/artists" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              location.pathname === '/artists' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            Artistas
+          </Link>
+          <Link 
+            to="/galleries" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              location.pathname === '/galleries' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            Galerías
+          </Link>
+          <Link 
+            to="/about" 
+            className={`text-sm font-medium transition-colors hover:text-primary ${
+              location.pathname === '/about' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            Acerca de
+          </Link>
+        </nav>
+        
+        <div className="hidden md:flex items-center ml-auto space-x-4">
+          {user ? (
+            <UserMenu />
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link to="/login">Iniciar sesión</Link>
               </Button>
-            </div>
-
-            {isOpen && (
-              <div className="absolute top-full left-0 w-full bg-white/90 dark:bg-black/90 backdrop-blur-lg p-4 border-t border-white/10 animate-fade-in">
-                <nav className="flex flex-col space-y-4">
-                  <Link to="/explore" className="text-lg px-2 py-1 text-black dark:text-white hover:text-primary transition-colors">
-                    Explore
-                  </Link>
-                  <Link to="/artists" className="text-lg px-2 py-1 text-black dark:text-white hover:text-primary transition-colors">
-                    Artists
-                  </Link>
-                  <Link to="/galleries" className="text-lg px-2 py-1 text-black dark:text-white hover:text-primary transition-colors">
-                    Galleries
-                  </Link>
-                  <Link to="/about" className="text-lg px-2 py-1 text-black dark:text-white hover:text-primary transition-colors">
-                    About
-                  </Link>
-                  {!user && (
-                    <div className="pt-2 border-t border-black/10 dark:border-white/10">
-                      <Link to="/login">
-                        <Button className="w-full bg-transparent border border-white hover:bg-white/20 text-black dark:text-white">
-                          Iniciar sesión / Registrarse
-                        </Button>
-                      </Link>
-                    </div>
-                  )}
-                </nav>
+              <Button asChild>
+                <Link to="/login">Registrarse</Link>
+              </Button>
+            </>
+          )}
+        </div>
+        
+        {/* Mobile menu button */}
+        <div className="md:hidden ml-auto flex items-center">
+          {user && <UserMenu />}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="ml-2"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </Button>
+        </div>
+      </div>
+      
+      {/* Mobile navigation */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-200 dark:border-gray-800 bg-white/90 dark:bg-zinc-900/90 backdrop-blur-md">
+          <nav className="flex flex-col p-4 space-y-3">
+            <Link 
+              to="/explore" 
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                location.pathname === '/explore' 
+                  ? 'bg-muted text-foreground' 
+                  : 'text-muted-foreground hover:bg-muted/50'
+              }`}
+            >
+              Explorar
+            </Link>
+            <Link 
+              to="/artists" 
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                location.pathname === '/artists' 
+                  ? 'bg-muted text-foreground' 
+                  : 'text-muted-foreground hover:bg-muted/50'
+              }`}
+            >
+              Artistas
+            </Link>
+            <Link 
+              to="/galleries" 
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                location.pathname === '/galleries' 
+                  ? 'bg-muted text-foreground' 
+                  : 'text-muted-foreground hover:bg-muted/50'
+              }`}
+            >
+              Galerías
+            </Link>
+            <Link 
+              to="/about" 
+              className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                location.pathname === '/about' 
+                  ? 'bg-muted text-foreground' 
+                  : 'text-muted-foreground hover:bg-muted/50'
+              }`}
+            >
+              Acerca de
+            </Link>
+            
+            {!user && (
+              <div className="pt-3 border-t border-gray-200 dark:border-gray-800 space-y-2">
+                <Button variant="outline" className="w-full" asChild>
+                  <Link to="/login">Iniciar sesión</Link>
+                </Button>
+                <Button className="w-full" asChild>
+                  <Link to="/login">Registrarse</Link>
+                </Button>
               </div>
             )}
-          </>
-        ) : (
-          <div className="flex items-center">
-            <nav className="hidden md:flex items-center mr-6 space-x-8">
-              <Link to="/explore" className="text-sm font-medium text-white hover:text-primary transition-colors">
-                Explore
-              </Link>
-              <Link to="/artists" className="text-sm font-medium text-white hover:text-primary transition-colors">
-                Artists
-              </Link>
-              <Link to="/galleries" className="text-sm font-medium text-white hover:text-primary transition-colors">
-                Galleries
-              </Link>
-              <Link to="/about" className="text-sm font-medium text-white hover:text-primary transition-colors">
-                About
-              </Link>
-            </nav>
-            
-            <div className="flex items-center space-x-3">
-              {user && (
-                <>
-                  <Link to="/cart">
-                    <Button variant="ghost" size="icon" className="relative text-white">
-                      <ShoppingCart className="h-5 w-5" />
-                      <Badge className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0">0</Badge>
-                    </Button>
-                  </Link>
-                  <Link to="/notifications">
-                    <Button variant="ghost" size="icon" className="relative text-white">
-                      <Bell className="h-5 w-5" />
-                    </Button>
-                  </Link>
-                  <Link to="/messages">
-                    <Button variant="ghost" size="icon" className="relative text-white">
-                      <MessageSquare className="h-5 w-5" />
-                    </Button>
-                  </Link>
-                  
-                  <UserMenu />
-                </>
-              )}
-              {!user && (
-                <Link to="/login">
-                  <Button className="bg-transparent border border-white hover:bg-white/20 text-white ml-2">
-                    Iniciar sesión / Registrarse
-                  </Button>
-                </Link>
-              )}
-            </div>
-          </div>
-        )}
-      </div>
+          </nav>
+        </div>
+      )}
     </header>
   );
 }

@@ -6,17 +6,17 @@ export const redirectUserBasedOnRole = (role: string, navigate: NavigateFunction
   
   switch (role) {
     case 'admin':
-      navigate('/admin');
+      navigate('/dashboard/admin');
       break;
     case 'artist':
-      navigate('/artist-dashboard');
+      navigate('/dashboard/artist');
       break;
     case 'gallery':
-      navigate('/gallery-dashboard');
+      navigate('/dashboard/gallery');
       break;
     case 'buyer':
     default:
-      navigate('/buyer-dashboard');
+      navigate('/home');
       break;
   }
 };

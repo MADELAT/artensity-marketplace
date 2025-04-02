@@ -102,6 +102,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         title: "¡Bienvenido de nuevo!",
         description: "Has iniciado sesión correctamente.",
       });
+      
+      // No need to manually redirect here as onAuthStateChange will handle it
     } catch (error: any) {
       console.error('Error de inicio de sesión:', error.message);
       setIsLoading(false);
@@ -147,8 +149,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         duration: 3000,
       });
       
-      // No need to manually redirect here, onAuthStateChange will handle it
-      // Set isLoading to false when done to prevent the infinite loading
+      // Important: Set isLoading to false to prevent infinite loading
       setIsLoading(false);
     } catch (error: any) {
       console.error('Error de registro:', error.message);

@@ -40,10 +40,11 @@ const App = () => (
             <Route path="/about" element={<About />} />
             <Route path="/artists" element={<Artists />} />
             <Route path="/galleries" element={<Galleries />} />
+            <Route path="/home" element={<Explore />} />
             
             {/* Protected Admin Dashboard Routes */}
             <Route 
-              path="/admin/*" 
+              path="/dashboard/admin/*" 
               element={
                 <ProtectedRoute allowedRoles={['admin']}>
                   <AdminDashboard />
@@ -53,7 +54,7 @@ const App = () => (
             
             {/* Protected Artist Dashboard Routes */}
             <Route 
-              path="/artist-dashboard/*" 
+              path="/dashboard/artist/*" 
               element={
                 <ProtectedRoute allowedRoles={['artist']}>
                   <ArtistDashboard />
@@ -63,7 +64,7 @@ const App = () => (
             
             {/* Protected Gallery Dashboard Routes */}
             <Route 
-              path="/gallery-dashboard/*" 
+              path="/dashboard/gallery/*" 
               element={
                 <ProtectedRoute allowedRoles={['gallery']}>
                   <GalleryDashboard />
@@ -73,10 +74,30 @@ const App = () => (
             
             {/* Protected Buyer Dashboard Routes */}
             <Route 
-              path="/buyer-dashboard/*" 
+              path="/dashboard/buyer/*" 
               element={
                 <ProtectedRoute allowedRoles={['buyer']}>
                   <BuyerDashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Profile route */}
+            <Route 
+              path="/profile/*" 
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'artist', 'gallery', 'buyer']}>
+                  <div>Profile page content (coming soon)</div>
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Settings route */}
+            <Route 
+              path="/settings/*" 
+              element={
+                <ProtectedRoute allowedRoles={['admin', 'artist', 'gallery', 'buyer']}>
+                  <div>Settings page content (coming soon)</div>
                 </ProtectedRoute>
               } 
             />
