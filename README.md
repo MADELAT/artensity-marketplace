@@ -1,69 +1,66 @@
-# Welcome to your Lovable project
 
-## Project info
+# 🎨 ArTendency Marketplace
 
-**URL**: https://lovable.dev/projects/5527ecba-7f31-4c1d-86e6-12a22c2bd25e
+ArTendency es una plataforma digital diseñada para conectar artistas, galerías y coleccionistas a través de una experiencia visual poderosa y una arquitectura sólida basada en Supabase y React.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## ✨ ¿Qué es ArTendency?
 
-**Use Lovable**
+Una vitrina curada de arte contemporáneo donde confluyen:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5527ecba-7f31-4c1d-86e6-12a22c2bd25e) and start prompting.
+- 🧑‍🎨 Artistas emergentes y consagrados  
+- 🖼️ Galerías con propuestas únicas  
+- 🧠 Coleccionistas que buscan autenticidad y trazabilidad  
 
-Changes made via Lovable will be committed automatically to this repo.
+Todo sustentado en una infraestructura moderna y transparente.
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🚀 Características principales
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- Visuales de alto impacto inspirados en [Artsy](https://www.artsy.net/)
+- Dashboard personalizado para artistas, galerías y admins
+- Sistema de favoritos, pedidos, comisiones y seguimiento de obras
+- Búsquedas filtradas por técnica, estilo, categoría y ubicación
+- Arquitectura descentralizada: autenticación, almacenamiento y trazabilidad con Supabase
 
-Follow these steps:
+---
+
+## 🧠 Stack Tecnológico
+
+- **Frontend**: React + TypeScript + Tailwind
+- **Backend**: Supabase (PostgreSQL + Storage + Auth)
+- **Estilo**: UI minimalista con aforismos e impacto visual
+
+---
+
+## 📌 Estado del proyecto
+
+El desarrollo está activo.  
+Puedes seguir el avance detallado en [`PROJECT_STATUS.md`](./PROJECT_STATUS.md)
+
+---
+
+## 📬 Contacto
+
+¿Interesado en colaborar, invertir o exhibir?  
+Escríbenos a: **info@artendency.io**
+
+---
+
+## ⚙️ Edición y despliegue con Lovable
+
+Este proyecto puede editarse directamente desde [Lovable](https://lovable.dev/projects/5527ecba-7f31-4c1d-86e6-12a22c2bd25e).  
+Los cambios realizados desde Lovable se suben automáticamente a este repositorio.
+
+También puedes trabajar localmente:
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+git clone <TU_URL_DEL_REPO>
+cd artensity-marketplace
+npm install
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
-
-## What technologies are used for this project?
-
-This project is built with .
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/5527ecba-7f31-4c1d-86e6-12a22c2bd25e) and click on Share -> Publish.
-
-## I want to use a custom domain - is that possible?
-
-We don't support custom domains (yet). If you want to deploy your project under your own domain then we recommend using Netlify. Visit our docs for more details: [Custom domains](https://docs.lovable.dev/tips-tricks/custom-domain/)
+> Para publicar con un clic, usa la opción **Share → Publish** desde Lovable.
