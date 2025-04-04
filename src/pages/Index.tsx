@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Layout } from "@/components/layout/Layout";
@@ -18,21 +17,21 @@ export default function Index() {
   }, []);
 
   return (
-    <Layout>
+    <Layout removePadding>
       {/* Hero Section */}
-      <section className="relative h-[100vh] flex items-center justify-center overflow-hidden">
+      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img
             src="https://images.unsplash.com/photo-1541701494587-cb58502866ab"
             alt="Contemporary Art"
-            className="w-full h-full object-cover"
+            className="w-full h-[110vh] object-cover"
           />
           <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
         </div>
         
         <div className="container mx-auto px-4 relative z-10 text-center">
           <div className={`max-w-3xl mx-auto transition-all duration-1000 ${isLoaded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            <h1 className="text-6xl md:text-8xl font-serif font-light text-white mb-4 tracking-widest">
+            <h1 className="text-6xl md:text-8xl font-['Helvetica Neue'] font-light text-white mb-4 tracking-widest">
               ArTendency
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 font-light tracking-wider">
