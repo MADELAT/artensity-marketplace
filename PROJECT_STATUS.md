@@ -1,137 +1,126 @@
-# ArTendency Marketplace - Estado del Proyecto
 
-## Estructura de la Base de Datos
+# 🎨 ArTendency Marketplace — Estado del Proyecto
+### 🗓 Última actualización: 04-Abr-2025
+
+---
+
+## ✅ Estado General
+
+- 🔧 Proyecto en desarrollo activo
+- 🎯 Objetivo actual: MVP funcional con Supabase, frontend en React/Next y backend conectado
+- 🧠 Desarrollo guiado por AI con Lovable y Cursor 
+
+---
+
+## 🛠️ Tareas Recientes Completadas
+
+| Fecha       | Descripción                                                                 |
+|-------------|------------------------------------------------------------------------------|
+| 04-Abr-2025 | Refactor del `Header.tsx` con clases condicionales y efecto scroll          |
+| 04-Abr-2025 | Eliminación de `bun.lockb` y resolución de conflicto de ramas               |
+| 04-Abr-2025 | Configuración SSH con Git + rutina diaria en Cursor                         |
+| 03-Abr-2025 | Creación inicial de la estructura de base de datos en Supabase              |
+
+---
+
+## 🔜 Próximos Pasos
+
+### 🔥 Prioridad Alta — MVP y experiencia visual
+
+- [ ] Ajustar páginas `artists`, `artworks` y `galeries`:
+  - Hero con imagen de obra artística y aforismo temático
+  - Diseño visual basado en [Artsy Collect](https://www.artsy.net/collect) y [Artsy Artists](https://www.artsy.net/artists)
+  - Filtros completos y funcionales + imágenes de demo
+
+- [ ] Mejorar y desarrollar dashboards personalizados:
+  - Dashboard de artista
+  - Dashboard de galería
+  - Dashboard de administración
+
+- [ ] Implementar sistema de pedidos y pagos (Stripe o Supabase Functions)
+- [ ] Crear sistema de perfiles con roles y panel de administración
+- [ ] Añadir lógica de roles y permisos (RBAC)
+- [ ] Desarrollar sistema de comisiones por ventas
+- [ ] Sistema de favoritos (obras guardadas por coleccionistas)
+- [ ] Integrar galería dinámica desde Supabase (para `artworks`)
+
+---
+
+### ⚙️ Backend y escalabilidad
+
+- [ ] Desarrollar API pública (con autenticación y rate limiting)
+- [ ] Implementar sistema de analíticas (vistas, actividad, ventas, tráfico)
+
+---
+
+### 🌐 Comunidad y experiencia extendida
+
+- [ ] Crear sistema de eventos y ferias virtuales
+- [ ] Sistema de verificación para artistas y galerías
+- [ ] Modo de curaduría (obras destacadas por admins)
+
+---
+
+## 🧠 Notas Técnicas
+
+- **Base de datos**: PostgreSQL con PostGIS
+- **Autenticación**: Supabase Auth
+- **Almacenamiento**: Supabase Storage
+- **API**: RESTful con Supabase
+- **Frontend**: React con TypeScript
+- **Versionado**: Git con conexión SSH (`Push automático Lovable` activo)
+- **Flujo Git en Cursor**:
+  ```bash
+  git pull --rebase origin main
+  git add .
+  git commit -m "mensaje"
+  git push origin main
+  ```
+
+---
+
+## 🧩 Estructura de la Base de Datos
 
 ### Tablas Principales
-1. **profiles**
-   - Gestión de usuarios (artistas, galerías, coleccionistas, administradores)
-   - Información personal y de contacto
-   - Roles y permisos
-
-2. **artworks**
-   - Catálogo de obras de arte
-   - Información detallada de cada obra
-   - Estado y visibilidad
-
-3. **categories**
-   - Categorías de arte
-   - Organización jerárquica
-   - Filtrado y búsqueda
-
-4. **art_styles**
-   - Estilos artísticos
-   - Clasificación de obras
-   - Filtrado avanzado
-
-5. **techniques**
-   - Técnicas artísticas
-   - Asociación con obras
-   - Búsqueda especializada
-
-6. **materials**
-   - Materiales utilizados
-   - Relación con obras
-   - Filtrado por material
-
-7. **locations**
-   - Ubicaciones geográficas
-   - Integración con PostGIS
-   - Búsqueda por proximidad
-
-8. **tags**
-   - Etiquetas flexibles
-   - Categorización dinámica
-   - Búsqueda semántica
+1. **profiles** – Gestión de usuarios (artistas, galerías, coleccionistas, administradores)
+2. **artworks** – Catálogo de obras de arte
+3. **categories** – Categorías de arte
+4. **art_styles** – Estilos artísticos
+5. **techniques** – Técnicas artísticas
+6. **materials** – Materiales utilizados
+7. **locations** – Ubicaciones geográficas (con PostGIS)
+8. **tags** – Etiquetas flexibles
 
 ### Sistema de Mensajería
-1. **conversations**
-   - Gestión de conversaciones
-   - Agrupación de mensajes
-   - Vinculación con obras
-
-2. **messages**
-   - Mensajes individuales
-   - Soporte para archivos adjuntos
-   - Estado de lectura
-
-3. **conversation_participants**
-   - Gestión de participantes
-   - Roles y permisos
-   - Estado de lectura
+- **conversations**, **messages**, **conversation_participants**
 
 ### Sistema de Notificaciones
-1. **notifications**
-   - Notificaciones personalizadas
-   - Diferentes tipos de alertas
-   - Estado de lectura
-
-2. **notification_preferences**
-   - Preferencias de usuario
-   - Configuración por tipo
-   - Canales de notificación
+- **notifications**, **notification_preferences**
 
 ### Sistema de Seguimiento
-1. **follows**
-   - Relaciones de seguimiento
-   - Conexiones entre usuarios
-   - Contadores automáticos
-
-2. **follow_counts**
-   - Estadísticas de seguimiento
-   - Actualización automática
-   - Rendimiento optimizado
+- **follows**, **follow_counts**
 
 ### Sistema de Valoraciones
-1. **reviews**
-   - Reseñas de obras
-   - Calificaciones
-   - Comentarios verificados
+- **reviews**, **review_likes**
 
-2. **review_likes**
-   - Interacción con reseñas
-   - Contadores automáticos
-   - Validación de usuarios
+---
 
-## Características Implementadas
+## 🎯 Características Implementadas
 
 ### Filtrado y Búsqueda
-- Filtrado por categorías
-- Búsqueda por estilo y técnica
-- Filtrado por material
-- Búsqueda geográfica
-- Etiquetado avanzado
+- Categorías, estilo, técnica, material, ubicación y etiquetas
 
 ### Interacción Social
-- Sistema de seguimiento
-- Valoraciones y reseñas
-- Mensajería interna
-- Notificaciones personalizadas
+- Seguimiento, valoraciones, mensajería, notificaciones
 
 ### Gestión de Contenido
-- Categorización jerárquica
-- Etiquetado flexible
-- Metadatos extensibles
-- Control de versiones
+- Categorización, etiquetas, metadatos, versiones
 
-## Próximos Pasos
-1. Implementar sistema de pedidos y pagos
-2. Desarrollar sistema de comisiones
-3. Crear sistema de eventos y ferias
-4. Implementar analíticas avanzadas
-5. Desarrollar API pública
+---
 
-## Notas Técnicas
-- Base de datos: PostgreSQL con PostGIS
-- Autenticación: Supabase Auth
-- Almacenamiento: Supabase Storage
-- API: RESTful con Supabase
-- Frontend: React con TypeScript
+## 💻 Código y Estilos Actuales
 
-## Versión Actual
-- Versión: 0.1.0
-- Última actualización: [Fecha actual]
-- Estado: Desarrollo activo 
-
+```css
 .hero {
     position: relative;
     text-align: center;
@@ -170,5 +159,14 @@
     width: 100%;
     height: auto;
 }
+```
 
-import './Artworks.css'; // Asegúrate de que la ruta sea correcta 
+```ts
+import './Artworks.css'; // Asegúrate de que la ruta sea correcta
+```
+
+---
+
+## 🔗 Repositorio
+
+[https://github.com/MADELAT/artensity-marketplace](https://github.com/MADELAT/artensity-marketplace)
