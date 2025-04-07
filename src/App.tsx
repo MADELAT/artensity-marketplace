@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,10 +10,13 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Explore from "./pages/Explore";
 import ArtworkDetail from "./pages/ArtworkDetail";
-import AdminDashboard from "./pages/admin/AdminDashboard";
+// TODO: Restaurar cuando esté disponible
+// import AdminDashboard from "./pages/admin/AdminDashboard";
 import ArtistDashboard from "./pages/artist/ArtistDashboard";
-import GalleryDashboard from "./pages/gallery/GalleryDashboard";
-import BuyerDashboard from "./pages/buyer/BuyerDashboard";
+// TODO: Restaurar cuando esté disponible
+// import GalleryDashboard from "./pages/gallery/GalleryDashboard";
+// TODO: Restaurar cuando esté disponible
+// import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import About from "./pages/About";
 import Artists from "./pages/Artists";
 import Galleries from "./pages/Galleries";
@@ -42,7 +44,7 @@ const App = () => (
             <Route path="/galleries" element={<Galleries />} />
             <Route path="/home" element={<Explore />} />
             
-            {/* Protected Admin Dashboard Routes */}
+            {/* TODO: Restaurar cuando esté disponible
             <Route 
               path="/dashboard/admin/*" 
               element={
@@ -51,6 +53,7 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            */}
             
             {/* Protected Artist Dashboard Routes */}
             <Route 
@@ -60,9 +63,15 @@ const App = () => (
                   <ArtistDashboard />
                 </ProtectedRoute>
               } 
-            />
+            >
+              <Route index element={<Navigate to="dashboard" replace />} />
+              <Route path="dashboard" element={<Navigate to="/dashboard/artist" replace />} />
+              <Route path="artworks" element={<Navigate to="/dashboard/artist/artworks" replace />} />
+              <Route path="statistics" element={<Navigate to="/dashboard/artist/statistics" replace />} />
+              <Route path="settings" element={<Navigate to="/dashboard/artist/settings" replace />} />
+            </Route>
             
-            {/* Protected Gallery Dashboard Routes */}
+            {/* TODO: Restaurar cuando esté disponible
             <Route 
               path="/dashboard/gallery/*" 
               element={
@@ -71,8 +80,9 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            */}
             
-            {/* Protected Buyer Dashboard Routes */}
+            {/* TODO: Restaurar cuando esté disponible
             <Route 
               path="/dashboard/buyer/*" 
               element={
@@ -81,6 +91,7 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            */}
             
             {/* Profile route */}
             <Route 
@@ -102,7 +113,7 @@ const App = () => (
               } 
             />
             
-            {/* Catch all route */}
+            {/* 404 route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>
