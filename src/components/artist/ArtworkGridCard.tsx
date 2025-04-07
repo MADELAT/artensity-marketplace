@@ -1,151 +1,219 @@
 import { useState } from 'react';
-import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { 
   Edit2,
+  Eye,
   BarChart2,
   Trash2,
-  Eye,
-  Clock,
-  CheckCircle2
+  MoreVertical
 } from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { cn } from '@/lib/utils';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+
+interface Artwork {
+  id: string;
+  title: string;
+  description: string;
+  imageUrl: string;
+  price: number;
+  status: 'available' | 'sold' | 'reserved';
+  views: number;
+  likes: number;
+  createdAt: Date;
+}
 
 interface ArtworkGridCardProps {
-  artwork: {
-    id: string;
-    title: string;
-    image_url: string;
-    status: 'active' | 'pending';
-    created_at: string;
-    views: number;
-  };
-  onEdit?: (id: string) => void;
-  onViewStats?: (id: string) => void;
-  onDelete?: (id: string) => void;
-  onView?: (id: string) => void;
+  artwork: Artwork;
+  viewMode: 'grid' | 'list';
+  onEdit: () => void;
+  onView: () => void;
+  onViewStats: () => void;
+  onDelete: () => void;
 }
 
 export function ArtworkGridCard({
   artwork,
+  viewMode,
   onEdit,
+  onView,
   onViewStats,
-  onDelete,
-  onView
+  onDelete
 }: ArtworkGridCardProps) {
   const [isHovered, setIsHovered] = useState(false);
-  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
-  const handleDelete = () => {
-    if (showDeleteConfirm && onDelete) {
-      onDelete(artwork.id);
-    } else {
-      setShowDeleteConfirm(true);
-      setTimeout(() => setShowDeleteConfirm(false), 3000);
+  const getStatusColor = (status: Artwork['status']) => {
+    switch (status) {
+      case 'available':
+        return 'bg-green-500';
+      case 'sold':
+        return 'bg-red-500';
+      case 'reserved':
+        return 'bg-yellow-500';
     }
   };
 
+  const formatPrice = (price: number) => {
+    return new Intl.NumberFormat('es-ES', {
+      style: 'currency',
+      currency: 'EUR'
+    }).format(price);
+  };
+
+  if (viewMode === 'list') {
+    return (
+      <Card className="group">
+        <CardContent className="p-4">
+          <div className="flex items-center gap-4">
+            <div className="relative w-24 h-24 flex-shrink-0">
+              <img
+                src={artwork.imageUrl}
+                alt={artwork.title}
+                className="w-full h-full object-cover rounded-lg"
+              />
+              <div className={cn(
+                "absolute top-2 right-2 w-2 h-2 rounded-full",
+                getStatusColor(artwork.status)
+              )} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h3 className="font-medium truncate">{artwork.title}</h3>
+              <p className="text-sm text-muted-foreground truncate">
+                {artwork.description}
+              </p>
+              <div className="flex items-center gap-4 mt-2">
+                <span className="text-sm font-medium">
+                  {formatPrice(artwork.price)}
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {artwork.views} vistas
+                </span>
+                <span className="text-sm text-muted-foreground">
+                  {artwork.likes} me gusta
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onView}
+              >
+                <Eye className="h-4 w-4" />
+              </Button>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onViewStats}
+              >
+                <BarChart2 className="h-4 w-4" />
+              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <MoreVertical className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onEdit}>
+                    <Edit2 className="h-4 w-4 mr-2" />
+                    Editar
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={onDelete}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Eliminar
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
-    <div 
-      className="group relative aspect-square rounded-lg overflow-hidden border bg-card"
+    <Card
+      className="group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {/* Imagen de la obra */}
-      <img
-        src={artwork.image_url}
-        alt={artwork.title}
-        className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-      />
-
-      {/* Overlay de hover */}
-      <div 
-        className={cn(
-          "absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent",
-          "opacity-0 transition-opacity duration-300",
-          isHovered ? "opacity-100" : "opacity-0"
-        )}
-      />
-
-      {/* Contenido */}
-      <div className="absolute inset-0 p-4 flex flex-col justify-between">
-        {/* Header */}
-        <div className="flex justify-between items-start">
-          <div className="flex items-center space-x-2">
-            {artwork.status === 'active' ? (
-              <CheckCircle2 className="h-4 w-4 text-green-500" />
-            ) : (
-              <Clock className="h-4 w-4 text-amber-500" />
-            )}
-            <span className="text-xs font-medium text-white/90">
-              {artwork.status === 'active' ? 'Activa' : 'Pendiente'}
-            </span>
-          </div>
-          <div className="flex items-center space-x-1 text-white/90">
-            <Eye className="h-3 w-3" />
-            <span className="text-xs">{artwork.views}</span>
+      <CardContent className="p-0">
+        <div className="relative aspect-square">
+          <img
+            src={artwork.imageUrl}
+            alt={artwork.title}
+            className="w-full h-full object-cover rounded-t-lg"
+          />
+          <div className={cn(
+            "absolute top-2 right-2 w-2 h-2 rounded-full",
+            getStatusColor(artwork.status)
+          )} />
+          <div className={cn(
+            "absolute inset-0 bg-black/50 flex items-center justify-center gap-2 opacity-0 transition-opacity",
+            isHovered && "opacity-100"
+          )}>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={onView}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={onViewStats}
+            >
+              <BarChart2 className="h-4 w-4" />
+            </Button>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="secondary" size="icon">
+                  <MoreVertical className="h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem onClick={onEdit}>
+                  <Edit2 className="h-4 w-4 mr-2" />
+                  Editar
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={onDelete}
+                >
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Eliminar
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="space-y-2">
-          <h3 className="text-white font-medium line-clamp-1">
-            {artwork.title}
-          </h3>
-          <p className="text-xs text-white/70">
-            Subida {formatDistanceToNow(new Date(artwork.created_at), { locale: es, addSuffix: true })}
+        <div className="p-4">
+          <h3 className="font-medium truncate">{artwork.title}</h3>
+          <p className="text-sm text-muted-foreground truncate">
+            {artwork.description}
           </p>
+          <div className="flex items-center justify-between mt-2">
+            <span className="font-medium">
+              {formatPrice(artwork.price)}
+            </span>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <span>{artwork.views} vistas</span>
+              <span>•</span>
+              <span>{artwork.likes} me gusta</span>
+            </div>
+          </div>
         </div>
-
-        {/* Acciones */}
-        <div 
-          className={cn(
-            "absolute inset-0 flex items-center justify-center space-x-2",
-            "opacity-0 transition-opacity duration-300",
-            isHovered ? "opacity-100" : "opacity-0"
-          )}
-        >
-          <Button
-            variant="secondary"
-            size="sm"
-            className="bg-white/90 hover:bg-white"
-            onClick={() => onView?.(artwork.id)}
-          >
-            <Eye className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="bg-white/90 hover:bg-white"
-            onClick={() => onEdit?.(artwork.id)}
-          >
-            <Edit2 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="secondary"
-            size="sm"
-            className="bg-white/90 hover:bg-white"
-            onClick={() => onViewStats?.(artwork.id)}
-          >
-            <BarChart2 className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="destructive"
-            size="sm"
-            className={cn(
-              "bg-red-500/90 hover:bg-red-500",
-              showDeleteConfirm && "bg-red-600"
-            )}
-            onClick={handleDelete}
-          >
-            <Trash2 className="h-4 w-4" />
-            {showDeleteConfirm && (
-              <span className="ml-1 text-xs">¿Seguro?</span>
-            )}
-          </Button>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 } 

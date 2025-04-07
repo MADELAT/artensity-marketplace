@@ -1,136 +1,59 @@
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { ChevronRight } from 'lucide-react';
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
-import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { BarChart2 } from 'lucide-react';
 
-interface StatisticsChartProps {
-  data?: {
-    date: string;
-    views: number;
-    sales: number;
-  }[];
-  onViewMore?: () => void;
-}
+const data = [
+  { month: 'Ene', views: 120, likes: 45 },
+  { month: 'Feb', views: 150, likes: 60 },
+  { month: 'Mar', views: 180, likes: 75 },
+  { month: 'Abr', views: 200, likes: 90 },
+  { month: 'May', views: 220, likes: 100 },
+  { month: 'Jun', views: 250, likes: 120 }
+];
 
-const generateDummyData = () => {
-  const dates = Array.from({ length: 7 }, (_, i) => {
-    const date = new Date();
-    date.setDate(date.getDate() - i);
-    return date.toLocaleDateString('es-ES', { weekday: 'short' });
-  }).reverse();
-
-  return dates.map(date => ({
-    date,
-    views: Math.floor(Math.random() * 100) + 20,
-    sales: Math.floor(Math.random() * 20) + 5,
-  }));
-};
-
-export function StatisticsChart({ 
-  data,
-  onViewMore 
-}: StatisticsChartProps) {
-  const [hoveredBar, setHoveredBar] = useState<string | null>(null);
-  const chartData = data || generateDummyData();
-
-  if (!chartData.length) {
-    return (
-      <div className="space-y-4">
-        <div className="flex justify-between items-center">
-          <h3 className="text-lg font-medium">Tendencia de Vistas</h3>
-          {onViewMore && (
-            <Button variant="ghost" size="sm" onClick={onViewMore}>
-              Ver más estadísticas
-              <ChevronRight className="ml-1 h-4 w-4" />
-            </Button>
-          )}
-        </div>
-        <div className="h-64 flex items-center justify-center">
-          <Skeleton className="h-full w-full" />
-        </div>
-      </div>
-    );
-  }
+export function StatisticsChart() {
+  const maxValue = Math.max(...data.map(d => Math.max(d.views, d.likes)));
 
   return (
-    <div className="space-y-4">
-      <div className="flex justify-between items-center">
-        <h3 className="text-lg font-medium">Tendencia de Vistas</h3>
-        {onViewMore && (
-          <Button variant="ghost" size="sm" onClick={onViewMore}>
-            Ver más estadísticas
-            <ChevronRight className="ml-1 h-4 w-4" />
-          </Button>
-        )}
-      </div>
-
-      <div className="h-64">
-        <ResponsiveContainer width="100%" height="100%">
-          <BarChart
-            data={chartData}
-            margin={{
-              top: 5,
-              right: 30,
-              left: 20,
-              bottom: 5,
-            }}
-          >
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis 
-              dataKey="date" 
-              tick={{ fontSize: 12 }}
-            />
-            <YAxis 
-              tick={{ fontSize: 12 }}
-              tickFormatter={(value) => value.toLocaleString()}
-            />
-            <Tooltip 
-              contentStyle={{ 
-                backgroundColor: 'hsl(var(--background))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '0.5rem',
-              }}
-              formatter={(value: number) => [value.toLocaleString(), '']}
-            />
-            <Bar
-              dataKey="views"
-              fill="hsl(var(--primary))"
-              radius={[4, 4, 0, 0]}
-              onMouseEnter={() => setHoveredBar('views')}
-              onMouseLeave={() => setHoveredBar(null)}
-              className={hoveredBar === 'views' ? 'opacity-100' : 'opacity-70'}
-            />
-            <Bar
-              dataKey="sales"
-              fill="hsl(var(--secondary))"
-              radius={[4, 4, 0, 0]}
-              onMouseEnter={() => setHoveredBar('sales')}
-              onMouseLeave={() => setHoveredBar(null)}
-              className={hoveredBar === 'sales' ? 'opacity-100' : 'opacity-70'}
-            />
-          </BarChart>
-        </ResponsiveContainer>
-      </div>
-
-      <div className="flex items-center justify-center space-x-4 text-sm text-muted-foreground">
-        <div className="flex items-center space-x-2">
-          <div className="h-3 w-3 rounded-full bg-primary" />
-          <span>Vistas</span>
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle>Evolución Mensual</CardTitle>
+          <BarChart2 className="h-4 w-4 text-muted-foreground" />
         </div>
-        <div className="flex items-center space-x-2">
-          <div className="h-3 w-3 rounded-full bg-secondary" />
-          <span>Ventas</span>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[300px] relative">
+          <div className="absolute inset-0 flex items-end gap-2">
+            {data.map((item, index) => (
+              <div key={index} className="flex-1 flex flex-col items-center">
+                <div className="w-full flex gap-1">
+                  <div
+                    className="flex-1 bg-primary/20 rounded-t"
+                    style={{ height: `${(item.views / maxValue) * 100}%` }}
+                  />
+                  <div
+                    className="flex-1 bg-primary/40 rounded-t"
+                    style={{ height: `${(item.likes / maxValue) * 100}%` }}
+                  />
+                </div>
+                <span className="text-xs text-muted-foreground mt-2">
+                  {item.month}
+                </span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
+        <div className="flex justify-center gap-4 mt-4">
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 bg-primary/20 rounded" />
+            <span className="text-xs">Vistas</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="h-3 w-3 bg-primary/40 rounded" />
+            <span className="text-xs">Me gusta</span>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 } 
