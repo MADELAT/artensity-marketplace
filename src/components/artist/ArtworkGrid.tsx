@@ -17,12 +17,12 @@ interface Artwork {
   id: string;
   title: string;
   description: string;
-  imageUrl: string;
+  image_url: string;
   price: number;
-  status: 'available' | 'sold' | 'reserved';
+  status: 'active' | 'pending' | 'sold';
   views: number;
   likes: number;
-  createdAt: Date;
+  created_at: string;
 }
 
 interface ArtworkGridProps {

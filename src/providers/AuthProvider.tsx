@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -17,32 +16,48 @@ export function AuthProvider({ children }: AuthProviderProps) {
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log("Auth state changed:", event, session?.user?.id);
-        setUser(session?.user ?? null);
-        
-        if (session?.user) {
-          // Fetch user profile when authenticated
-          // Using setTimeout to avoid Supabase auth deadlock
-          setTimeout(() => {
-            fetchUserProfileData(session.user.id);
-          }, 0);
-        } else {
-          setProfile(null);
-          setIsLoading(false);
-          setError(null);
-        }
-      }
-    );
+  const fetchUserProfileData = async (userId: string, allowRedirect = true) => {
+    try {
+      setError(null);
+      const userProfile = await fetchUserProfile(userId);
 
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Checking existing session:", session?.user?.id);
+      if (userProfile) {
+        setProfile(userProfile);
+        setIsLoading(false);
+
+        const isLandingOrLogin = ['/', '/login'].includes(window.location.pathname);
+        if (allowRedirect && isLandingOrLogin) {
+          redirectUserBasedOnRole(userProfile.role, navigate);
+        }
+      } else {
+        setError("No se pudo cargar el perfil del usuario");
+        setIsLoading(false);
+      }
+    } catch (err) {
+      console.error("Error fetching profile:", err);
+      setError("Error al cargar el perfil del usuario");
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
-      
+
+      if (session?.user) {
+        setTimeout(() => {
+          fetchUserProfileData(session.user.id);
+        }, 0);
+      } else {
+        setProfile(null);
+        setIsLoading(false);
+        setError(null);
+      }
+    });
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+
       if (session?.user) {
         fetchUserProfileData(session.user.id);
       } else {
@@ -50,43 +65,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
-  }, [navigate]);
-
-  const fetchUserProfileData = async (userId: string) => {
-    try {
-      setError(null);
-      const userProfile = await fetchUserProfile(userId);
-      
-      if (userProfile) {
-        console.log("User profile loaded:", userProfile);
-        setProfile(userProfile);
-        setIsLoading(false);
-        
-        // Redirect based on role if on login page or homepage
-        if (window.location.pathname === '/login' || window.location.pathname === '/') {
-          redirectUserBasedOnRole(userProfile.role, navigate);
-        }
-      } else {
-        console.log("No user profile found");
-        setError("No se pudo cargar el perfil del usuario");
-        setIsLoading(false);
-      }
-    } catch (err) {
-      console.error("Error fetching user profile:", err);
-      setError("Error al cargar el perfil del usuario");
-      setIsLoading(false);
-    }
-  };
+    return () => subscription.unsubscribe();
+  }, []);
 
   const signIn = async (email: string, password: string) => {
     try {
       setIsLoading(true);
       setError(null);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      
+      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
+
       if (error) {
         toast({
           title: "Error de inicio de sesión",
@@ -97,15 +84,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false);
         throw error;
       }
-      
+
       toast({
         title: "¡Bienvenido de nuevo!",
         description: "Has iniciado sesión correctamente.",
       });
-      
-      // No need to manually redirect here as onAuthStateChange will handle it
+
+      // Redirección directa post-login
+      if (data.user) {
+        await fetchUserProfileData(data.user.id);
+      }
+
     } catch (error: any) {
-      console.error('Error de inicio de sesión:', error.message);
+      console.error("Error de inicio de sesión:", error.message);
       setIsLoading(false);
       throw error;
     }
@@ -113,10 +104,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
     try {
-      console.log("Signing up with data:", { email, userData });
       setIsLoading(true);
       setError(null);
-      
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -140,19 +130,19 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setIsLoading(false);
         throw error;
       }
-      
-      console.log("Sign up successful:", data);
-      
-      // Show toast notification
+
       sonnerToast.success("¡Registro exitoso!", {
         description: "Accediendo a tu dashboard...",
-        duration: 3000,
       });
-      
-      // Important: Set isLoading to false to prevent infinite loading
+
+      // Redirección tras signup
+      if (data.user) {
+        await fetchUserProfileData(data.user.id);
+      }
+
       setIsLoading(false);
     } catch (error: any) {
-      console.error('Error de registro:', error.message);
+      console.error("Error de registro:", error.message);
       setIsLoading(false);
       throw error;
     }
@@ -162,13 +152,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setError(null);
       await supabase.auth.signOut();
-      navigate('/');
+      setUser(null);
+      setProfile(null);
       toast({
         title: "Sesión cerrada",
         description: "Has cerrado sesión correctamente.",
       });
+      navigate('/');
     } catch (error: any) {
-      console.error('Error al cerrar sesión:', error.message);
       setError(error.message);
       toast({
         title: "Error al cerrar sesión",
@@ -179,14 +170,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{ 
-      user, 
-      profile, 
-      isLoading, 
+    <AuthContext.Provider value={{
+      user,
+      profile,
+      isLoading,
       error,
-      signIn, 
-      signUp, 
-      signOut 
+      signIn,
+      signUp,
+      signOut
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,4 +1,3 @@
-
 import { ReactNode } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -13,7 +12,6 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
   const location = useLocation();
 
   if (isLoading) {
-    // Display loading state
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="flex flex-col items-center gap-4">
@@ -24,14 +22,13 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     );
   }
 
-  // If not logged in, redirect to login with return path
   if (!user) {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // If user doesn't have the required role, redirect to appropriate dashboard or home
-  if (profile && !allowedRoles.includes(profile.role)) {
-    // Redirect based on user role if they're accessing the wrong dashboard
+  // ✅ Permitir al usuario logueado navegar en páginas públicas
+  const isPublicPath = ['/', '/explore', '/home', '/about', '/artists', '/galleries'].includes(location.pathname);
+  if (profile && !allowedRoles.includes(profile.role) && !isPublicPath) {
     if (location.pathname.startsWith('/dashboard/')) {
       switch (profile.role) {
         case 'admin':
@@ -41,17 +38,14 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
         case 'gallery':
           return <Navigate to="/dashboard/gallery" replace />;
         case 'buyer':
-          return <Navigate to="/home" replace />;
         default:
           return <Navigate to="/home" replace />;
       }
     }
-    
-    // For other protected pages, just go to /explore
+
     return <Navigate to="/explore" replace />;
   }
 
-  // If the user is logged in and has the right role, show the protected content
   return <>{children}</>;
 };
 

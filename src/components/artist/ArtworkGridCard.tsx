@@ -20,12 +20,12 @@ interface Artwork {
   id: string;
   title: string;
   description: string;
-  imageUrl: string;
+  image_url: string;
   price: number;
-  status: 'available' | 'sold' | 'reserved';
+  status: 'active' | 'pending' | 'sold';
   views: number;
   likes: number;
-  createdAt: Date;
+  created_at: string;
 }
 
 interface ArtworkGridCardProps {
@@ -47,15 +47,16 @@ export function ArtworkGridCard({
 }: ArtworkGridCardProps) {
   const [isHovered, setIsHovered] = useState(false);
 
-  const getStatusColor = (status: Artwork['status']) => {
-    switch (status) {
-      case 'available':
-        return 'bg-green-500';
-      case 'sold':
-        return 'bg-red-500';
-      case 'reserved':
-        return 'bg-yellow-500';
-    }
+  const statusColors = {
+    active: 'bg-green-100 text-green-800',
+    pending: 'bg-yellow-100 text-yellow-800',
+    sold: 'bg-blue-100 text-blue-800'
+  };
+
+  const statusText = {
+    active: 'Activa',
+    pending: 'Pendiente',
+    sold: 'Vendida'
   };
 
   const formatPrice = (price: number) => {
@@ -72,14 +73,16 @@ export function ArtworkGridCard({
           <div className="flex items-center gap-4">
             <div className="relative w-24 h-24 flex-shrink-0">
               <img
-                src={artwork.imageUrl}
+                src={artwork.image_url}
                 alt={artwork.title}
                 className="w-full h-full object-cover rounded-lg"
               />
               <div className={cn(
-                "absolute top-2 right-2 w-2 h-2 rounded-full",
-                getStatusColor(artwork.status)
-              )} />
+                "absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium",
+                statusColors[artwork.status]
+              )}>
+                {statusText[artwork.status]}
+              </div>
             </div>
             <div className="flex-1 min-w-0">
               <h3 className="font-medium truncate">{artwork.title}</h3>
@@ -142,76 +145,59 @@ export function ArtworkGridCard({
 
   return (
     <Card
-      className="group"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
+      className={cn(
+        "group",
+        viewMode === 'grid' ? "aspect-square" : "w-48"
+      )}
     >
-      <CardContent className="p-0">
-        <div className="relative aspect-square">
-          <img
-            src={artwork.imageUrl}
-            alt={artwork.title}
-            className="w-full h-full object-cover rounded-t-lg"
-          />
-          <div className={cn(
-            "absolute top-2 right-2 w-2 h-2 rounded-full",
-            getStatusColor(artwork.status)
-          )} />
-          <div className={cn(
-            "absolute inset-0 bg-black/50 flex items-center justify-center gap-2 opacity-0 transition-opacity",
-            isHovered && "opacity-100"
-          )}>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={onView}
-            >
-              <Eye className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="secondary"
-              size="icon"
-              onClick={onViewStats}
-            >
-              <BarChart2 className="h-4 w-4" />
-            </Button>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="secondary" size="icon">
-                  <MoreVertical className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end">
-                <DropdownMenuItem onClick={onEdit}>
-                  <Edit2 className="h-4 w-4 mr-2" />
-                  Editar
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-destructive"
-                  onClick={onDelete}
-                >
-                  <Trash2 className="h-4 w-4 mr-2" />
-                  Eliminar
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+      <div className={cn(
+        "relative",
+        viewMode === 'grid' ? "aspect-square" : "w-48"
+      )}>
+        <img
+          src={artwork.image_url || '/placeholder-artwork.jpg'}
+          alt={artwork.title}
+          className="w-full h-full object-cover"
+        />
+        <div className={cn(
+          "absolute top-2 right-2 px-2 py-1 rounded-full text-xs font-medium",
+          statusColors[artwork.status]
+        )}>
+          {statusText[artwork.status]}
         </div>
-        <div className="p-4">
+      </div>
+
+      <CardContent className={cn(
+        "p-4",
+        viewMode === 'list' && "flex-1"
+      )}>
+        <div className="space-y-2">
           <h3 className="font-medium truncate">{artwork.title}</h3>
-          <p className="text-sm text-muted-foreground truncate">
+          <p className="text-sm text-muted-foreground line-clamp-2">
             {artwork.description}
           </p>
-          <div className="flex items-center justify-between mt-2">
-            <span className="font-medium">
-              {formatPrice(artwork.price)}
-            </span>
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <span>{artwork.views} vistas</span>
-              <span>•</span>
-              <span>{artwork.likes} me gusta</span>
-            </div>
+          <p className="font-medium">${artwork.price}</p>
+          <div className="text-sm text-muted-foreground">
+            {new Date(artwork.created_at).toLocaleDateString()}
           </div>
+        </div>
+
+        <div className={cn(
+          "flex gap-2 mt-4",
+          viewMode === 'list' && "justify-end"
+        )}>
+          <Button variant="outline" size="icon" onClick={onEdit}>
+            <Edit2 className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={onView}>
+            <Eye className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={onViewStats}>
+            <BarChart2 className="h-4 w-4" />
+          </Button>
+          <Button variant="outline" size="icon" onClick={onDelete}>
+            <Trash2 className="h-4 w-4" />
+          </Button>
         </div>
       </CardContent>
     </Card>
