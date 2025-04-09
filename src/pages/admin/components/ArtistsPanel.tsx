@@ -3,47 +3,58 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Instagram, Facebook, Globe } from "lucide-react";
+import { Instagram, Facebook, Globe, ExternalLink, Star } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { motion } from "framer-motion";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function ArtistsPanel() {
   const [artists, setArtists] = useState([]);
-  const [artworks, setArtworks] = useState([]);
   const [search, setSearch] = useState("");
   const [selectedLetter, setSelectedLetter] = useState("A");
 
   const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
 
   useEffect(() => {
-    fetchArtistsAndArtworks();
+    fetchArtistsWithStats();
   }, []);
 
-  const fetchArtistsAndArtworks = async () => {
-    const { data: profiles, error: profileError } = await supabase
+  const fetchArtistsWithStats = async () => {
+    const { data: profiles } = await supabase
       .from("profiles")
       .select("*")
       .eq("role", "artist");
 
-    const { data: artworksData, error: artworksError } = await supabase
+    const { data: artworks } = await supabase
       .from("artworks")
-      .select("id, artist_id, image_url")
+      .select("id, artist_id, image_url, is_sold, created_at")
       .eq("status", "approved");
 
-    if (profiles && artworksData) {
-      const enrichedArtists = profiles.map((artist) => {
-        const artistArtworks = artworksData.filter(
-          (a) => a.artist_id === artist.id
-        );
-        return {
-          ...artist,
-          artworks: artistArtworks,
-        };
-      });
+    const enriched = profiles.map((artist) => {
+      const artistArtworks = artworks.filter((a) => a.artist_id === artist.id);
+      const sold = artistArtworks.filter((a) => a.is_sold).length;
+      const lastActivity = artistArtworks
+        .map((a) => new Date(a.created_at))
+        .sort((a, b) => b.getTime() - a.getTime())[0];
 
-      setArtists(enrichedArtists);
-      setArtworks(artworksData);
-    }
+      return {
+        ...artist,
+        artworks: artistArtworks,
+        stats: {
+          approved: artistArtworks.length,
+          sold,
+          lastActivity: lastActivity
+            ? lastActivity.toLocaleDateString()
+            : "N/A",
+        },
+      };
+    });
+
+    setArtists(enriched);
   };
 
   const filteredArtists = artists
@@ -100,18 +111,39 @@ export default function ArtistsPanel() {
                 className="group relative"
               >
                 <Card className="overflow-hidden h-full border border-muted">
-                  <div className="aspect-[4/3] overflow-hidden">
+                  <div className="aspect-[4/3] overflow-hidden relative">
                     <img
                       src={placeholderImage}
                       alt={`${artist.first_name} ${artist.last_name}`}
                       className="object-cover w-full h-full"
                     />
+                    {artist.is_featured && (
+                      <div className="absolute top-2 right-2 bg-yellow-400 text-white px-2 py-1 text-xs font-bold rounded shadow">
+                        <Star className="h-4 w-4 inline mr-1" />
+                        Featured
+                      </div>
+                    )}
                   </div>
                   <CardContent className="p-4">
-                    <h3 className="text-lg font-medium capitalize">
-                      {artist.first_name} {artist.last_name}
-                    </h3>
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-lg font-medium capitalize">
+                        {artist.first_name} {artist.last_name}
+                      </h3>
+                      {artist.bio && (
+                        <Tooltip>
+                          <TooltipTrigger>
+                            <span className="text-xs text-muted-foreground underline cursor-help">
+                              Info
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent className="max-w-xs text-xs">
+                            {artist.bio}
+                          </TooltipContent>
+                        </Tooltip>
+                      )}
+                    </div>
+
+                    <p className="text-sm text-muted-foreground mb-1">
                       {artist.country || "Internacional"}
                     </p>
 
@@ -121,40 +153,66 @@ export default function ArtistsPanel() {
                       </Badge>
                     )}
 
-                    {artist.bio && (
-                      <div className="text-xs text-muted-foreground mt-2 line-clamp-3">
-                        {artist.bio}
-                      </div>
-                    )}
+                    <div className="text-xs space-y-1 mt-2">
+                      <p>
+                        Obras aprobadas:{" "}
+                        <span className="font-semibold">
+                          {artist.stats?.approved}
+                        </span>
+                      </p>
+                      <p>
+                        Vendidas:{" "}
+                        <span className="font-semibold">
+                          {artist.stats?.sold}
+                        </span>
+                      </p>
+                      <p>
+                        Última actividad:{" "}
+                        <span className="font-semibold">
+                          {artist.stats?.lastActivity}
+                        </span>
+                      </p>
+                    </div>
 
-                    <div className="flex items-center gap-3 mt-4">
-                      {artist.instagram && (
-                        <a
-                          href={artist.instagram}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <Instagram className="h-4 w-4 hover:text-primary" />
-                        </a>
-                      )}
-                      {artist.facebook && (
-                        <a
-                          href={artist.facebook}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <Facebook className="h-4 w-4 hover:text-primary" />
-                        </a>
-                      )}
-                      {artist.website && (
-                        <a
-                          href={artist.website}
-                          target="_blank"
-                          rel="noreferrer"
-                        >
-                          <Globe className="h-4 w-4 hover:text-primary" />
-                        </a>
-                      )}
+                    <div className="flex justify-between items-center mt-4">
+                      <div className="flex gap-3">
+                        {artist.instagram && (
+                          <a
+                            href={artist.instagram}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <Instagram className="h-4 w-4 hover:text-primary" />
+                          </a>
+                        )}
+                        {artist.facebook && (
+                          <a
+                            href={artist.facebook}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <Facebook className="h-4 w-4 hover:text-primary" />
+                          </a>
+                        )}
+                        {artist.website && (
+                          <a
+                            href={artist.website}
+                            target="_blank"
+                            rel="noreferrer"
+                          >
+                            <Globe className="h-4 w-4 hover:text-primary" />
+                          </a>
+                        )}
+                      </div>
+                      <a
+                        href={`/artist/${artist.id}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-xs text-primary underline hover:opacity-90 flex items-center gap-1"
+                      >
+                        Ver perfil
+                        <ExternalLink className="h-3 w-3" />
+                      </a>
                     </div>
                   </CardContent>
                 </Card>
