@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -6,18 +5,19 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { useAuth } from '@/contexts/AuthContext';
 import UserManagement from './components/UserManagement';
 import ArtworkApproval from './components/ArtworkApproval';
+import ApprovedArtworks from './components/ApprovedArtworks';
 import CommissionManagement from './components/CommissionManagement';
 import TransactionsManagement from './components/TransactionsManagement';
 import FairsManagement from './components/FairsManagement';
 import NotificationsCenter from './components/NotificationsCenter';
-import { PieChart, LineChart, BarChart, Users, Image, AreaChart, TrendingUp } from 'lucide-react';
+import { PieChart, LineChart, BarChart, Users, Image, TrendingUp } from 'lucide-react';
 
 export default function AdminDashboard() {
   const { profile } = useAuth();
   const [activeTab, setActiveTab] = useState("dashboard");
-  
+
   return (
-    <DashboardLayout userType="admin">
+    <DashboardLayout>
       <div className="flex flex-col space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Admin Dashboard</h1>
@@ -27,16 +27,17 @@ export default function AdminDashboard() {
         </div>
 
         <Tabs defaultValue="dashboard" value={activeTab} onValueChange={setActiveTab}>
-          <TabsList className="grid grid-cols-2 md:grid-cols-7 w-full">
+          <TabsList className="grid grid-cols-2 md:grid-cols-8 w-full">
             <TabsTrigger value="dashboard">Overview</TabsTrigger>
             <TabsTrigger value="users">Users</TabsTrigger>
-            <TabsTrigger value="artworks">Artworks</TabsTrigger>
+            <TabsTrigger value="pending_artworks">Pending Artworks</TabsTrigger>
+            <TabsTrigger value="approved_artworks">Approved Artworks</TabsTrigger>
             <TabsTrigger value="commissions">Commissions</TabsTrigger>
             <TabsTrigger value="transactions">Transactions</TabsTrigger>
             <TabsTrigger value="fairs">Fairs</TabsTrigger>
             <TabsTrigger value="notifications">Notifications</TabsTrigger>
           </TabsList>
-          
+
           <TabsContent value="dashboard" className="space-y-6 mt-6">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
               <StatCard 
@@ -72,7 +73,6 @@ export default function AdminDashboard() {
                   <PieChart className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div className="h-[250px] flex items-center justify-center">
-                  {/* Placeholder chart display */}
                   <div className="space-y-2 w-full">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center">
@@ -109,13 +109,13 @@ export default function AdminDashboard() {
                   </div>
                 </div>
               </div>
+
               <div className="rounded-lg border bg-card p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-medium">Sales Trends</h3>
                   <TrendingUp className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div className="h-[250px] flex items-center justify-center">
-                  {/* Placeholder chart */}
                   <div className="w-full h-full flex items-end justify-around pt-6">
                     {[35, 45, 30, 60, 75, 90, 85].map((height, index) => (
                       <div key={index} className="relative group">
@@ -133,27 +133,31 @@ export default function AdminDashboard() {
               </div>
             </div>
           </TabsContent>
-          
+
           <TabsContent value="users" className="space-y-6 mt-6">
             <UserManagement />
           </TabsContent>
-          
-          <TabsContent value="artworks" className="space-y-6 mt-6">
+
+          <TabsContent value="pending_artworks" className="space-y-6 mt-6">
             <ArtworkApproval />
           </TabsContent>
-          
+
+          <TabsContent value="approved_artworks" className="space-y-6 mt-6">
+            <ApprovedArtworks />
+          </TabsContent>
+
           <TabsContent value="commissions" className="space-y-6 mt-6">
             <CommissionManagement />
           </TabsContent>
-          
+
           <TabsContent value="transactions" className="space-y-6 mt-6">
             <TransactionsManagement />
           </TabsContent>
-          
+
           <TabsContent value="fairs" className="space-y-6 mt-6">
             <FairsManagement />
           </TabsContent>
-          
+
           <TabsContent value="notifications" className="space-y-6 mt-6">
             <NotificationsCenter />
           </TabsContent>

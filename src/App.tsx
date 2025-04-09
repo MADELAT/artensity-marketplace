@@ -10,12 +10,9 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Explore from "./pages/Explore";
 import ArtworkDetail from "./pages/ArtworkDetail";
-// TODO: Restaurar cuando esté disponible
-// import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminDashboard from "./pages/admin/AdminDashboard";
 import ArtistDashboard from "./pages/artist/ArtistDashboard";
-// TODO: Restaurar cuando esté disponible
 // import GalleryDashboard from "./pages/gallery/GalleryDashboard";
-// TODO: Restaurar cuando esté disponible
 // import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import About from "./pages/About";
 import Artists from "./pages/Artists";
@@ -43,8 +40,8 @@ const App = () => (
             <Route path="/artists" element={<Artists />} />
             <Route path="/galleries" element={<Galleries />} />
             <Route path="/home" element={<Explore />} />
-            
-            {/* TODO: Restaurar cuando esté disponible
+
+            {/* ✅ Admin Dashboard route habilitada */}
             <Route 
               path="/dashboard/admin/*" 
               element={
@@ -53,9 +50,8 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            */}
-            
-            {/* Protected Artist Dashboard Routes */}
+
+            {/* ✅ Protected Artist Dashboard Routes */}
             <Route 
               path="/dashboard/artist/*" 
               element={
@@ -70,29 +66,7 @@ const App = () => (
               <Route path="statistics" element={<Navigate to="/dashboard/artist/statistics" replace />} />
               <Route path="settings" element={<Navigate to="/dashboard/artist/settings" replace />} />
             </Route>
-            
-            {/* TODO: Restaurar cuando esté disponible
-            <Route 
-              path="/dashboard/gallery/*" 
-              element={
-                <ProtectedRoute allowedRoles={['gallery']}>
-                  <GalleryDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            */}
-            
-            {/* TODO: Restaurar cuando esté disponible
-            <Route 
-              path="/dashboard/buyer/*" 
-              element={
-                <ProtectedRoute allowedRoles={['buyer']}>
-                  <BuyerDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            */}
-            
+
             {/* Profile route */}
             <Route 
               path="/profile/*" 
@@ -102,7 +76,7 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            
+
             {/* Settings route */}
             <Route 
               path="/settings/*" 
@@ -112,7 +86,7 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
-            
+
             {/* 404 route */}
             <Route path="*" element={<NotFound />} />
           </Routes>
