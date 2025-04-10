@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+Este proyecto está construido con TypeScript, React, React Router DOM y Supabase. 
+Asegúrate de que toda generación de código respete este stack base.
+
+NUNCA generes código en NINGÚN otro lenguaje o framework. 

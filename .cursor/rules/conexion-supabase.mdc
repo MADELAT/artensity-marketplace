@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- NO rompas la conexión existente con Supabase.
+- Usa únicamente el cliente ubicado en: "@/integrations/supabase/client".
+- NUNCA crees archivos como "@/lib/supabase" u otras rutas falsas.
+- No modifiques ni reemplaces la lógica que ya conecta Supabase con el sistema.

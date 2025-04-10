@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+No crees nuevas carpetas como lib, pages, dashboard o similares usa las que ya existen y están en uso activo.  
+Toda la arquitectura actual del proyecto debe mantenerse estable.  
+Si necesitas agregar un componente nuevo, intégralo en la carpeta correspondiente ya existente.

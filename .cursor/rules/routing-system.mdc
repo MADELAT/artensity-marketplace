@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+No modifiques el sistema de rutas protegidas.
+El dashboard del artista debe seguir funcionando desde: /dashboard/artist
+Al correr npm run dev, la landing page debe seguir apareciendo como home por defecto.
+Usa react-router-dom para cualquier navegación interna.
+No reemplaces ProtectedRoute ni cambies su lógica base.

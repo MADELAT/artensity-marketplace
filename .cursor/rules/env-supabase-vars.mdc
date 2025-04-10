@@ -1,0 +1,8 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+Toda conexión a Supabase ya está preconfigurada dentro de '@/integrations/supabase/client' y debe utilizarse exclusivamente desde ahí.
+No accedas directamente a variables de entorno como VITE_SUPABASE_URL o VITE_SUPABASE_ANON_KEY.

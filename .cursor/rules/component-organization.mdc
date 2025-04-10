@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Trabaja exclusivamente dentro de src/components/artist para los componentes relacionados al dashboard del artista.
+Todos los nuevos componentes del dashboard del artista deben crearse dentro de esa carpeta.
+Si necesitas mover componentes desde otra carpeta (como dashboard/), asegúrate primero de que ya estén correctamente integrados en artist/, y elimina los duplicados solo después.
+No generes carpetas nuevas si ya existen estructuras adecuadas para esa función.
+

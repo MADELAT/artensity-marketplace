@@ -1,0 +1,9 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+- NO modifiques el contenido de "@/contexts/AuthContext".
+- Sí puedes usar `useAuth` para obtener la sesión del usuario.
+- NO edites ni reemplaces 'ProtectedRoute.tsx' ni cambies cómo se protegen las rutas.
+- La sesión del artista debe mantenerse funcional y estable en todo momento.

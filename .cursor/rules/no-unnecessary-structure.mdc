@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# No crees carpetas innecesarias como lib, pages, dashboard, etc., si ya existen estructuras adecuadas.
+No modifiques la arquitectura de carpetas ya establecida salvo que sea estrictamente necesario y consensuado.
+Cualquier nuevo componente debe ubicarse donde ya exista lógica similar funcionando. Prioriza consistencia y orden.
+

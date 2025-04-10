@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+Nunca elimines código o archivos que estén siendo usados actualmente.
+Antes de eliminar un archivo, asegúrate de que:
+- Ya no está siendo utilizado en ninguna parte del sistema.
+- Ha sido reemplazado por completo y de forma funcional por otro.
+- No es parte de ningún flujo activo del proyecto.

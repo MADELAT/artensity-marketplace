@@ -1,0 +1,11 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+Usa siempre TailwindCSS para los estilos.
+Asegúrate de que todos los nuevos componentes funcionen correctamente en desktop y mobile.
+Evita desbordamientos, deformaciones o solapamientos visuales.
+El menú lateral debe ser colapsable o adaptarse a pantallas pequeñas.
+Prioriza un diseño limpio, accesible y visualmente atractivo en todos los dispositivos.
