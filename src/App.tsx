@@ -4,6 +4,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
+import ArtistProfile from "@/pages/artist/[id]";
 
 // Pages
 import Index from "./pages/Index";
@@ -40,51 +41,68 @@ const App = () => (
             <Route path="/artists" element={<Artists />} />
             <Route path="/galleries" element={<Galleries />} />
             <Route path="/home" element={<Explore />} />
+            <Route path="/artist/:id" element={<ArtistProfile />} />
 
             {/* ✅ Admin Dashboard route habilitada */}
-            <Route 
-              path="/dashboard/admin/*" 
+            <Route
+              path="/dashboard/admin/*"
               element={
-                <ProtectedRoute allowedRoles={['admin']}>
+                <ProtectedRoute allowedRoles={["admin"]}>
                   <AdminDashboard />
                 </ProtectedRoute>
-              } 
+              }
             />
 
             {/* ✅ Protected Artist Dashboard Routes */}
-            <Route 
-              path="/dashboard/artist/*" 
+            <Route
+              path="/dashboard/artist/*"
               element={
-                <ProtectedRoute allowedRoles={['artist']}>
+                <ProtectedRoute allowedRoles={["artist"]}>
                   <ArtistDashboard />
                 </ProtectedRoute>
-              } 
+              }
             >
               <Route index element={<Navigate to="dashboard" replace />} />
-              <Route path="dashboard" element={<Navigate to="/dashboard/artist" replace />} />
-              <Route path="artworks" element={<Navigate to="/dashboard/artist/artworks" replace />} />
-              <Route path="statistics" element={<Navigate to="/dashboard/artist/statistics" replace />} />
-              <Route path="settings" element={<Navigate to="/dashboard/artist/settings" replace />} />
+              <Route
+                path="dashboard"
+                element={<Navigate to="/dashboard/artist" replace />}
+              />
+              <Route
+                path="artworks"
+                element={<Navigate to="/dashboard/artist/artworks" replace />}
+              />
+              <Route
+                path="statistics"
+                element={<Navigate to="/dashboard/artist/statistics" replace />}
+              />
+              <Route
+                path="settings"
+                element={<Navigate to="/dashboard/artist/settings" replace />}
+              />
             </Route>
 
             {/* Profile route */}
-            <Route 
-              path="/profile/*" 
+            <Route
+              path="/profile/*"
               element={
-                <ProtectedRoute allowedRoles={['admin', 'artist', 'gallery', 'buyer']}>
+                <ProtectedRoute
+                  allowedRoles={["admin", "artist", "gallery", "buyer"]}
+                >
                   <div>Profile page content (coming soon)</div>
                 </ProtectedRoute>
-              } 
+              }
             />
 
             {/* Settings route */}
-            <Route 
-              path="/settings/*" 
+            <Route
+              path="/settings/*"
               element={
-                <ProtectedRoute allowedRoles={['admin', 'artist', 'gallery', 'buyer']}>
+                <ProtectedRoute
+                  allowedRoles={["admin", "artist", "gallery", "buyer"]}
+                >
                   <div>Settings page content (coming soon)</div>
                 </ProtectedRoute>
-              } 
+              }
             />
 
             {/* 404 route */}
