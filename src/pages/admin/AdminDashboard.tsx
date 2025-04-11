@@ -6,7 +6,7 @@ import { StatCard } from "@/components/dashboard/StatCard";
 import { useAuth } from "@/contexts/AuthContext";
 import UserManagement from "./components/UserManagement";
 import ArtworkApproval from "./components/ArtworkApproval";
-import ApprovedArtworks from "./components/ApprovedArtworks";
+import Artists2bApproved from "./components/Artists2bApproved";
 import CommissionManagement from "./components/CommissionManagement";
 import TransactionsManagement from "./components/TransactionsManagement";
 import FairsManagement from "./components/FairsManagement";
@@ -45,7 +45,7 @@ export default function AdminDashboard() {
               ["artists", "Artists"],
               ["pending_artworks", "Pending Artworks"],
               ["users", "Users"],
-              ["approved_artworks", "Approved Artworks"],
+              ["artists_approval", "Artists 2b approved"],
               ["commissions", "Commissions"],
               ["transactions", "Transactions"],
               ["fairs", "Fairs"],
@@ -178,8 +178,8 @@ export default function AdminDashboard() {
             <ArtworkApproval />
           </TabsContent>
 
-          <TabsContent value="approved_artworks" className="space-y-6 mt-6">
-            <ApprovedArtworks />
+          <TabsContent value="artists_approval" className="space-y-6 mt-6">
+            <Artists2bApproved />
           </TabsContent>
 
           <TabsContent value="commissions" className="space-y-6 mt-6">
