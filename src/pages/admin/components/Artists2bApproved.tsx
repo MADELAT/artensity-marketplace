@@ -59,6 +59,8 @@ export default function Artists2bApproved() {
         .eq("status", "pending")
         .eq("role", "artist");
 
+      console.log("Artistas pendientes obtenidos:", data); // Verificar los datos obtenidos
+
       if (error) throw error;
       setPendingArtists(data || []);
     } catch (error) {
@@ -75,13 +77,16 @@ export default function Artists2bApproved() {
 
   const handleApprove = async (artist: PendingArtist) => {
     try {
-      const { error } = await supabase
+      console.log("Aprobando artista con ID:", artist.id); // Verificar el ID
+      const { data, error } = await supabase
         .from("profiles")
         .update({
           status: "approved",
           approved_at: new Date().toISOString(),
         })
         .eq("id", artist.id);
+
+      console.log("Respuesta de Supabase:", { data, error }); // Verificar la respuesta
 
       if (error) throw error;
 
