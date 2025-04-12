@@ -1,0 +1,16 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+Nunca crear, duplicar ni utilizar archivos diferentes al Supabase Client oficial ubicado en:
+src/integrations/supabase/client.ts
+
+Todas las conexiones a Supabase deben importarse exclusivamente desde:
+@/integrations/supabase/client.ts
+
+❌ Queda estrictamente prohibido usar archivos como lib/supabase.ts, supabaseClient.ts, lib/supabaseClient.ts, o cualquier derivación.
+
+⚠️ Usar process.env causará errores fatales en Vite. Siempre se debe usar import.meta.env para acceder a las variables del entorno en este proyecto.
+
+✅ Esta regla es inviolable y debe ser respetada en todo el stack.
