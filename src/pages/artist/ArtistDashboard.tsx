@@ -39,6 +39,7 @@ import {
 import { ArtworksSection } from "@/pages/artist/ArtworksSection";
 import { SettingsSection } from "@/pages/artist/SettingsSection";
 import { InquiryCenter } from "@/pages/artist/InquiryCenter";
+import { ArtworkUpload } from "@/pages/artist/ArtworkUpload";
 
 interface Artwork {
   id: string;
@@ -114,15 +115,15 @@ export default function ArtistDashboard() {
   let activeTab = "resumen"; // Default tab
 
   // Determinar el tab activo basado en la ruta actual
-  if (currentPath.includes("/artworks")) {
+  if (currentPath === "/dashboard/artist/artworks") {
     activeTab = "obras";
-  } else if (currentPath.includes("/inquiries")) {
+  } else if (currentPath === "/dashboard/artist/inquiries") {
     activeTab = "consultas";
-  } else if (currentPath.includes("/pending")) {
+  } else if (currentPath === "/dashboard/artist/pending") {
     activeTab = "pendientes";
-  } else if (currentPath.includes("/sales")) {
+  } else if (currentPath === "/dashboard/artist/sales") {
     activeTab = "ventas";
-  } else if (currentPath.includes("/settings")) {
+  } else if (currentPath === "/dashboard/artist/settings") {
     activeTab = "configuracion";
   }
 
@@ -337,7 +338,7 @@ export default function ArtistDashboard() {
   };
 
   const handleUploadArtwork = () => {
-    navigate("/dashboard/artist/artworks/upload");
+    navigate("artworks/upload");
   };
 
   const handleViewArtwork = (artworkId: string) => {
@@ -644,58 +645,68 @@ export default function ArtistDashboard() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Tabs navigation */}
-        <div className="bg-white p-1 rounded-xl shadow-sm overflow-x-auto mb-6">
-          <div className="flex">
-            {tabs.map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => handleTabChange(tab.id)}
-                className={`flex-1 py-3 px-4 text-center whitespace-nowrap transition-colors ${
-                  activeTab === tab.id
-                    ? "bg-gray-100 text-gray-900 font-medium"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                }`}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Tab content */}
-        {activeTab === "resumen" && <DashboardContent />}
-        {activeTab === "obras" &&
-          (() => {
-            console.log('Artworks in tab "obras":', artworks);
-            return (
-              <ArtworksSection
-                artworks={artworks}
-                onUpload={handleUploadArtwork}
-              />
-            );
-          })()}
-        {activeTab === "consultas" && <InquiryCenter />}
-        {activeTab === "pendientes" && (
-          <ArtworksSection artworks={pendingArtworks} filterStatus="pending" />
-        )}
-        {activeTab === "ventas" && (
-          <ArtworksSection
-            artworks={artworks.filter((a) => a.status === "sold")}
-            filterStatus="sold"
-          />
-        )}
-        {activeTab === "configuracion" && <SettingsSection />}
-
         {/* Routes for specific pages */}
         <Routes>
-          <Route path="/artworks/upload" element={<ArtworkUploadForm />} />
-          <Route path="/artworks/:artworkId" element={<ArtworkDetail />} />
+          {/* Ruta de upload debe ir primero para tener prioridad */}
+          <Route path="artworks/upload" element={<ArtworkUpload />} />
+
+          {/* Rutas dinámicas después */}
           <Route
-            path="/artworks/:artworkId/edit"
+            path="artworks/:artworkId/edit"
             element={<ArtworkEditForm />}
           />
-          <Route path="/sales/:saleId" element={<SaleDetail />} />
+          <Route path="artworks/:artworkId" element={<ArtworkDetail />} />
+          <Route path="sales/:saleId" element={<SaleDetail />} />
+
+          {/* Ruta por defecto para el dashboard */}
+          <Route
+            path="*"
+            element={
+              <>
+                {/* Tabs navigation */}
+                <div className="bg-white p-1 rounded-xl shadow-sm overflow-x-auto mb-6">
+                  <div className="flex">
+                    {tabs.map((tab) => (
+                      <button
+                        key={tab.id}
+                        onClick={() => handleTabChange(tab.id)}
+                        className={`flex-1 py-3 px-4 text-center whitespace-nowrap transition-colors ${
+                          activeTab === tab.id
+                            ? "bg-gray-100 text-gray-900 font-medium"
+                            : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Tab content */}
+                {activeTab === "resumen" && <DashboardContent />}
+                {activeTab === "obras" && (
+                  <ArtworksSection
+                    artworks={artworks}
+                    onUpload={handleUploadArtwork}
+                  />
+                )}
+                {activeTab === "consultas" && <InquiryCenter />}
+                {activeTab === "pendientes" && (
+                  <ArtworksSection
+                    artworks={pendingArtworks}
+                    filterStatus="pending"
+                  />
+                )}
+                {activeTab === "ventas" && (
+                  <ArtworksSection
+                    artworks={artworks.filter((a) => a.status === "sold")}
+                    filterStatus="sold"
+                  />
+                )}
+                {activeTab === "configuracion" && <SettingsSection />}
+              </>
+            }
+          />
         </Routes>
       </main>
     </div>
