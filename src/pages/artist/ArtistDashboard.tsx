@@ -159,12 +159,13 @@ export default function ArtistDashboard() {
           .from("artworks")
           .select("*")
           .eq("artist_id", user.id)
-          .eq("status", "active");
+          .eq("status", "approved");
 
         if (artworksError) {
           console.error("Error fetching artworks:", artworksError.message);
           hasError = true;
         } else {
+          console.log("Artworks data from Supabase:", artworksData);
           setArtworks(artworksData as Artwork[]);
         }
 
@@ -218,8 +219,11 @@ export default function ArtistDashboard() {
               sale &&
               sale.artwork &&
               typeof sale.artwork === "object" &&
-              !Array.isArray(sale.artwork)
-          ) || []) as Sale[];
+              !Array.isArray(sale.artwork) &&
+              "id" in sale.artwork &&
+              "title" in sale.artwork &&
+              "image_url" in sale.artwork
+          ) || []) as unknown as Sale[];
           setSales(validSales);
         }
 
@@ -661,9 +665,16 @@ export default function ArtistDashboard() {
 
         {/* Tab content */}
         {activeTab === "resumen" && <DashboardContent />}
-        {activeTab === "obras" && (
-          <ArtworksSection artworks={artworks} onUpload={handleUploadArtwork} />
-        )}
+        {activeTab === "obras" &&
+          (() => {
+            console.log('Artworks in tab "obras":', artworks);
+            return (
+              <ArtworksSection
+                artworks={artworks}
+                onUpload={handleUploadArtwork}
+              />
+            );
+          })()}
         {activeTab === "consultas" && <InquiryCenter />}
         {activeTab === "pendientes" && (
           <ArtworksSection artworks={pendingArtworks} filterStatus="pending" />

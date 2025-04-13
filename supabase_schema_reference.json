@@ -1,0 +1,7 @@
+{
+  "name": "Esquema Supabase - ArTendency",
+  "description": "Archivo de referencia obligatoria para cualquier desarrollo relacionado con la base de datos de ArTendency.",
+  "path": "./supabase_schema_diagnostics.md",
+  "contexts": ["sql", "typescript", "tsx"],
+  "usage": "Consulta este archivo antes de hacer cambios en queries, relaciones o validaciones. Toda lógica de backend y frontend relacionada con Supabase debe respetar este esquema."
+}
