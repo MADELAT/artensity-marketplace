@@ -360,14 +360,10 @@ export default function ArtistDashboard() {
         <div className="bg-white rounded-xl p-6 shadow-sm">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div className="flex items-center gap-4">
-              <ArtistAvatar
-                avatarUrl={profile?.avatar_url}
-                userId={user?.id}
-                onAvatarUpdate={(url) =>
-                  setProfile((prev) =>
-                    prev ? { ...prev, avatar_url: url } : null
-                  )
-                }
+              <img
+                src={profile?.avatar_url || "/default-avatar.png"}
+                alt="Admin Avatar"
+                className="w-10 h-10 rounded-full object-cover"
               />
               <div>
                 <h1 className="font-serif text-3xl font-bold mb-2">

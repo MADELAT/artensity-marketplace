@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
@@ -16,6 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, Upload, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export function ArtworkUploadForm() {
   const [title, setTitle] = useState("");
@@ -30,6 +32,25 @@ export function ArtworkUploadForm() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const { user } = useAuth();
+  const [availableTags, setAvailableTags] = useState<
+    { id: number; name: string }[]
+  >([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+
+  useEffect(() => {
+    async function fetchTags() {
+      const { data, error } = await supabase
+        .from("tags")
+        .select("id, name")
+        .order("name");
+
+      if (!error && data) {
+        setAvailableTags(data);
+      }
+    }
+
+    fetchTags();
+  }, []);
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -123,6 +144,30 @@ export function ArtworkUploadForm() {
           status: "pending",
         });
 
+      const { data: insertedArtwork, error: selectError } = await supabase
+        .from("pending_artworks")
+        .select("id")
+        .eq("artist_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .single();
+
+      if (insertedArtwork && selectedTagIds.length > 0) {
+        const artworkId = insertedArtwork.id;
+        const tagRelations = selectedTagIds.map((tagId) => ({
+          artwork_id: artworkId,
+          tag_id: tagId,
+        }));
+
+        const { error: tagsInsertError } = await supabase
+          .from("artwork_tags")
+          .insert(tagRelations);
+
+        if (tagsInsertError) {
+          console.error("Error al asignar etiquetas:", tagsInsertError);
+        }
+      }
+
       if (dbError) {
         throw new Error(`Error al guardar la obra: ${dbError.message}`);
       }
@@ -143,6 +188,7 @@ export function ArtworkUploadForm() {
       setStyle("");
       setFile(null);
       setPreviewUrl(null);
+      setSelectedTagIds([]);
     } catch (error: any) {
       console.error("Error uploading artwork:", error);
       toast.error("Error al subir la obra", {
@@ -333,6 +379,37 @@ export function ArtworkUploadForm() {
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Describe tu obra, inspiración, contexto..."
             />
+          </div>
+
+          {/* Tags */}
+          <div className="space-y-2 col-span-2">
+            <Label htmlFor="tags">Etiquetas</Label>
+            <ScrollArea className="h-24 rounded-md border p-2">
+              <div className="flex flex-wrap gap-2">
+                {availableTags.map((tag) => (
+                  <Badge
+                    key={tag.id}
+                    onClick={() =>
+                      setSelectedTagIds((prev) =>
+                        prev.includes(tag.id)
+                          ? prev.filter((id) => id !== tag.id)
+                          : [...prev, tag.id]
+                      )
+                    }
+                    className={`cursor-pointer ${
+                      selectedTagIds.includes(tag.id)
+                        ? "bg-primary text-white"
+                        : "bg-gray-200 text-gray-800"
+                    }`}
+                  >
+                    {tag.name}
+                  </Badge>
+                ))}
+              </div>
+            </ScrollArea>
+            <p className="text-xs text-muted-foreground">
+              Haz clic en las etiquetas para seleccionarlas.
+            </p>
           </div>
         </div>
 
