@@ -19,6 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAuth } from "@/contexts/AuthContext";
+import countryList from "react-select-country-list";
+import CountrySelect from "react-select";
 
 export function RegisterForm() {
   const [isLoading, setIsLoading] = useState(false);
@@ -124,6 +126,8 @@ export function RegisterForm() {
     "bg-white/10 border-white/20 text-white placeholder:text-white/50";
   const buttonClasses =
     "w-full bg-white/20 hover:bg-white/30 text-white backdrop-blur-sm border border-white/30";
+
+  const countries = countryList().getData();
 
   return (
     <form onSubmit={handleRegister}>
@@ -264,27 +268,13 @@ export function RegisterForm() {
           <Label htmlFor="country" className="text-white">
             País
           </Label>
-          <Input
-            id="country"
-            list="country-options"
-            placeholder="Ej. México"
-            value={country}
-            onChange={(e) => setCountry(e.target.value)}
-            required
-            className={inputClasses}
+          <CountrySelect
+            options={countries}
+            value={countries.find((c) => c.label === country)}
+            onChange={(selected) => setCountry(selected?.label || "")}
+            className="text-black"
+            isSearchable
           />
-          <datalist id="country-options">
-            <option value="México" />
-            <option value="España" />
-            <option value="Argentina" />
-            <option value="Colombia" />
-            <option value="Chile" />
-            <option value="Perú" />
-            <option value="Francia" />
-            <option value="Italia" />
-            <option value="Estados Unidos" />
-            <option value="Alemania" />
-          </datalist>
         </div>
 
         <div className="flex items-center space-x-2 pt-2">
