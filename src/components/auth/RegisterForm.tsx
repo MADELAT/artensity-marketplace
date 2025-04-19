@@ -117,6 +117,7 @@ export function RegisterForm() {
       console.error("Registration error:", error.message);
       // Error already handled by useAuth
     } finally {
+      sonnerToast.dismiss();
       setIsLoading(false);
     }
   };
