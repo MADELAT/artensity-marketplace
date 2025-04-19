@@ -154,6 +154,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           {
             id: data.user.id,
             country: userData.country || "unspecified",
+            telephone: userData.telephone || null,
           },
           { onConflict: "id" }
         );
