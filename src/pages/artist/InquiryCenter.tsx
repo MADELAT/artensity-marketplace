@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/integrations/supabase/client';
-import { Button } from '@/components/ui/button';
-import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Loader2, Search } from 'lucide-react';
+import { useState, useEffect } from "react";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Loader2, Search } from "lucide-react";
 
 interface Inquiry {
   id: string;
@@ -30,27 +30,31 @@ export function InquiryCenter() {
   const [inquiries, setInquiries] = useState<Inquiry[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     if (!user) return;
-    
+
     const fetchInquiries = async () => {
       try {
         const { data, error } = await supabase
-          .from('inquiries')
-          .select(`
+          .from("inquiries")
+          .select(
+            `
             *,
             artwork:artworks(id, title, image_url),
             sender:profiles(id, full_name, email)
-          `)
-          .eq('artist_id', user.id)
-          .order('created_at', { ascending: false });
+          `
+          )
+          .eq("artist_id", user.id)
+          .order("created_at", { ascending: false });
 
         if (error) throw error;
         setInquiries(data || []);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error fetching inquiries');
+        setError(
+          err instanceof Error ? err.message : "Error fetching inquiries"
+        );
       } finally {
         setLoading(false);
       }
@@ -59,10 +63,11 @@ export function InquiryCenter() {
     fetchInquiries();
   }, [user]);
 
-  const filteredInquiries = inquiries.filter(inquiry => 
-    inquiry.artwork.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inquiry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    inquiry.sender.full_name.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredInquiries = inquiries.filter(
+    (inquiry) =>
+      inquiry.artwork.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inquiry.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      inquiry.sender.full_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   if (loading) {
@@ -75,8 +80,8 @@ export function InquiryCenter() {
 
   if (error) {
     return (
-      <div className="text-center text-red-500 p-4">
-        {error}
+      <div className="text-center text-gray-500 p-4">
+        Aún no has recibido consultas de coleccionistas.
       </div>
     );
   }
@@ -113,7 +118,9 @@ export function InquiryCenter() {
               <Button
                 variant="outline"
                 size="sm"
-                onClick={() => window.location.href = `mailto:${inquiry.sender.email}`}
+                onClick={() =>
+                  (window.location.href = `mailto:${inquiry.sender.email}`)
+                }
               >
                 Reply
               </Button>
@@ -126,10 +133,8 @@ export function InquiryCenter() {
       </div>
 
       {filteredInquiries.length === 0 && (
-        <div className="text-center text-gray-500 p-8">
-          No inquiries found
-        </div>
+        <div className="text-center text-gray-500 p-8">No inquiries found</div>
       )}
     </div>
   );
-} 
+}
