@@ -1,4 +1,3 @@
-
 // Custom type definitions for our database tables
 // These work alongside the auto-generated Supabase types
 
@@ -9,8 +8,9 @@ export interface Profile {
   username: string | null;
   email: string | null;
   avatar_url: string | null;
-  role: 'admin' | 'artist' | 'gallery' | 'buyer';
+  role: "admin" | "artist" | "gallery" | "buyer";
   telephone: string | null;
+  country: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -43,7 +43,7 @@ export interface PendingArtwork {
   image_url: string | null;
   category: string | null;
   style: string | null;
-  status: 'pending' | 'approved' | 'rejected';
+  status: "pending" | "approved" | "rejected";
   admin_comment: string | null;
   created_at: string;
   updated_at: string;
@@ -63,7 +63,7 @@ export interface Order {
   buyer_id: string;
   seller_id: string;
   artwork_id: string;
-  status: 'pending' | 'escrow' | 'delivered';
+  status: "pending" | "escrow" | "delivered";
   total_amount: number;
   created_at: string;
   updated_at: string;

@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
-import { toast as sonnerToast } from 'sonner';
-import { Profile } from '@/types/supabase';
-import { AuthContext, AuthProviderProps } from '@/contexts/AuthContext';
-import { fetchUserProfile } from '@/utils/profileUtils';
-import { redirectUserBasedOnRole } from '@/utils/authRedirect';
+import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
+import { toast as sonnerToast } from "sonner";
+import { Profile } from "@/types/supabase";
+import { AuthContext, AuthProviderProps } from "@/contexts/AuthContext";
+import { fetchUserProfile } from "@/utils/profileUtils";
+import { redirectUserBasedOnRole } from "@/utils/authRedirect";
 
 export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<any | null>(null);
@@ -25,7 +25,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setProfile(userProfile);
         setIsLoading(false);
 
-        const isLandingOrLogin = ['/', '/login'].includes(window.location.pathname);
+        const isLandingOrLogin = ["/", "/login"].includes(
+          window.location.pathname
+        );
         if (allowRedirect && isLandingOrLogin) {
           redirectUserBasedOnRole(userProfile.role, navigate);
         }
@@ -41,7 +43,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((event, session) => {
       setUser(session?.user ?? null);
 
       if (session?.user) {
@@ -72,7 +76,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       setError(null);
-      const { error, data } = await supabase.auth.signInWithPassword({ email, password });
+      const { error, data } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
 
       if (error) {
         toast({
@@ -94,7 +101,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
       if (data.user) {
         await fetchUserProfileData(data.user.id);
       }
-
     } catch (error: any) {
       console.error("Error de inicio de sesión:", error.message);
       setIsLoading(false);
@@ -102,10 +108,15 @@ export function AuthProvider({ children }: AuthProviderProps) {
     }
   };
 
-  const signUp = async (email: string, password: string, userData: Partial<Profile>) => {
+  const signUp = async (
+    email: string,
+    password: string,
+    userData: Partial<Profile>
+  ) => {
     try {
       setIsLoading(true);
       setError(null);
+      console.log("📦 userData recibido en signUp:", userData);
 
       const { data, error } = await supabase.auth.signUp({
         email,
@@ -114,10 +125,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
           data: {
             first_name: userData.first_name,
             last_name: userData.last_name,
-            role: userData.role || 'buyer',
-            telephone: userData.telephone
-          }
-        }
+            role: userData.role || "buyer",
+            telephone: userData.telephone,
+            country: userData.country || "unspecified",
+          },
+        },
       });
 
       if (error) {
@@ -138,6 +150,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       // Redirección tras signup
       if (data.user) {
         await fetchUserProfileData(data.user.id);
+        await supabase.from("profiles").upsert(
+          {
+            id: data.user.id,
+            country: userData.country || "unspecified",
+          },
+          { onConflict: "id" }
+        );
       }
 
       setIsLoading(false);
@@ -158,7 +177,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         title: "Sesión cerrada",
         description: "Has cerrado sesión correctamente.",
       });
-      navigate('/');
+      navigate("/");
     } catch (error: any) {
       setError(error.message);
       toast({
@@ -170,15 +189,17 @@ export function AuthProvider({ children }: AuthProviderProps) {
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      profile,
-      isLoading,
-      error,
-      signIn,
-      signUp,
-      signOut
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        profile,
+        isLoading,
+        error,
+        signIn,
+        signUp,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
