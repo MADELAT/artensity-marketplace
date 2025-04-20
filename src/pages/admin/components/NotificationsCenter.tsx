@@ -35,7 +35,7 @@ import { supabase } from "@/integrations/supabase/client"; // Updated import
 
 export default function NotificationsCenter() {
   const { toast } = useToast();
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [title, setTitle] = useState("");
   const [message, setMessage] = useState("");
   const [selectedRole, setSelectedRole] = useState("");
@@ -47,9 +47,20 @@ export default function NotificationsCenter() {
 
   useEffect(() => {
     const fetchNotifications = async () => {
+      console.log("Current user role:", profile?.role);
+      if (!profile?.role) {
+        toast({
+          title: "Error fetching notifications",
+          description: "User role is not available.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       const { data, error } = await supabase
         .from("notifications")
         .select("*")
+        .in("role", [profile.role, "all"])
         .order("created_at", { ascending: false });
 
       if (error) {
@@ -64,7 +75,7 @@ export default function NotificationsCenter() {
     };
 
     fetchNotifications();
-  }, []);
+  }, [profile?.role]);
 
   const handleCreateNotification = async () => {
     if (!title || !message || !selectedRole) {
