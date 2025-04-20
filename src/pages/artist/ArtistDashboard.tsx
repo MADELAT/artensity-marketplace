@@ -40,6 +40,7 @@ import { ArtworksSection } from "@/pages/artist/ArtworksSection";
 import { SettingsSection } from "@/pages/artist/SettingsSection";
 import { InquiryCenter } from "@/pages/artist/InquiryCenter";
 import { ArtworkUpload } from "@/pages/artist/ArtworkUpload";
+import NotificationsCenter from "@/pages/admin/components/NotificationsCenter";
 
 interface Artwork {
   id: string;
@@ -96,6 +97,11 @@ const tabs = [
     label: "Configuración",
     path: "/dashboard/artist/settings",
   },
+  {
+    id: "notificaciones",
+    label: "Notificaciones",
+    path: "/dashboard/artist/notifications",
+  },
 ];
 
 export default function ArtistDashboard() {
@@ -125,6 +131,8 @@ export default function ArtistDashboard() {
     activeTab = "ventas";
   } else if (currentPath === "/dashboard/artist/settings") {
     activeTab = "configuracion";
+  } else if (currentPath === "/dashboard/artist/notifications") {
+    activeTab = "notificaciones";
   }
 
   useEffect(() => {
@@ -700,6 +708,7 @@ export default function ArtistDashboard() {
                   />
                 )}
                 {activeTab === "configuracion" && <SettingsSection />}
+                {activeTab === "notificaciones" && <NotificationsCenter />}
               </>
             }
           />
