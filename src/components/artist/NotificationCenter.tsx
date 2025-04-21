@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
-import { Bell, Eye, MessageSquare, DollarSign, X } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { Bell, Eye, MessageSquare, DollarSign, X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface Notification {
   id: string;
-  type: 'view' | 'message' | 'sale';
+  type: "view" | "message" | "sale";
   title: string;
   message: string;
   artworkId?: string;
@@ -25,30 +25,30 @@ export function NotificationCenter({
   notifications,
   onMarkAsRead,
   onClearAll,
-  onNotificationClick
+  onNotificationClick,
 }: NotificationCenterProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n) => !n.read).length;
 
-  const getIcon = (type: Notification['type']) => {
+  const getIcon = (type: Notification["type"]) => {
     switch (type) {
-      case 'view':
+      case "view":
         return <Eye className="h-4 w-4" />;
-      case 'message':
+      case "message":
         return <MessageSquare className="h-4 w-4" />;
-      case 'sale':
+      case "sale":
         return <DollarSign className="h-4 w-4" />;
     }
   };
 
-  const getTypeColor = (type: Notification['type']) => {
+  const getTypeColor = (type: Notification["type"]) => {
     switch (type) {
-      case 'view':
-        return 'text-blue-500';
-      case 'message':
-        return 'text-green-500';
-      case 'sale':
-        return 'text-purple-500';
+      case "view":
+        return "text-blue-500";
+      case "message":
+        return "text-green-500";
+      case "sale":
+        return "text-purple-500";
     }
   };
 
@@ -104,14 +104,16 @@ export function NotificationCenter({
                     exit={{ opacity: 0, x: 20 }}
                     className={cn(
                       "p-3 rounded-lg cursor-pointer transition-colors",
-                      notification.read 
-                        ? "bg-muted/50" 
+                      notification.read
+                        ? "bg-muted/50"
                         : "bg-primary/5 hover:bg-primary/10"
                     )}
                     onClick={() => onNotificationClick(notification)}
                   >
                     <div className="flex items-start gap-3">
-                      <div className={cn("mt-1", getTypeColor(notification.type))}>
+                      <div
+                        className={cn("mt-1", getTypeColor(notification.type))}
+                      >
                         {getIcon(notification.type)}
                       </div>
                       <div className="flex-1">
@@ -127,7 +129,9 @@ export function NotificationCenter({
                           {notification.message}
                         </p>
                         <span className="text-xs text-muted-foreground mt-1">
-                          {new Date(notification.timestamp).toLocaleDateString()}
+                          {new Date(
+                            notification.timestamp
+                          ).toLocaleDateString()}
                         </span>
                       </div>
                     </div>
@@ -140,4 +144,4 @@ export function NotificationCenter({
       </AnimatePresence>
     </div>
   );
-} 
+}

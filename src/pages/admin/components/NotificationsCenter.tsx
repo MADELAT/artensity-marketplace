@@ -167,63 +167,65 @@ export default function NotificationsCenter() {
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold">Notification Center</h2>
-        <Dialog>
-          <DialogTrigger asChild>
-            <Button>Create Notification</Button>
-          </DialogTrigger>
-          <DialogContent>
-            <DialogHeader>
-              <DialogTitle>Create New Notification</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid gap-2">
-                <Label htmlFor="title">Title</Label>
-                <Input
-                  id="title"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                />
-              </div>
+        {profile?.role === "admin" && (
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Create Notification</Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Notification</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <Label htmlFor="title">Title</Label>
+                  <Input
+                    id="title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                  />
+                </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="message">Message</Label>
-                <Textarea
-                  id="message"
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
-                />
-              </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="message">Message</Label>
+                  <Textarea
+                    id="message"
+                    value={message}
+                    onChange={(e) => setMessage(e.target.value)}
+                  />
+                </div>
 
-              <div className="grid gap-2">
-                <Label htmlFor="recipient-type">Recipient Type</Label>
-                <Select
-                  value={selectedRole}
-                  onValueChange={(value) => setSelectedRole(value)}
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select recipient type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Users</SelectItem>
-                    <SelectItem value="admin">Admins</SelectItem>
-                    <SelectItem value="artist">Artists</SelectItem>
-                    <SelectItem value="gallery">Galleries</SelectItem>
-                    <SelectItem value="buyer">Buyers</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="recipient-type">Recipient Type</Label>
+                  <Select
+                    value={selectedRole}
+                    onValueChange={(value) => setSelectedRole(value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select recipient type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Users</SelectItem>
+                      <SelectItem value="admin">Admins</SelectItem>
+                      <SelectItem value="artist">Artists</SelectItem>
+                      <SelectItem value="gallery">Galleries</SelectItem>
+                      <SelectItem value="buyer">Buyers</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
 
-              <div className="flex items-center space-x-2">
-                <Switch id="important" />
-                <Label htmlFor="important">Mark as Important</Label>
-              </div>
+                <div className="flex items-center space-x-2">
+                  <Switch id="important" />
+                  <Label htmlFor="important">Mark as Important</Label>
+                </div>
 
-              <Button onClick={handleCreateNotification}>
-                Send Notification
-              </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+                <Button onClick={handleCreateNotification}>
+                  Send Notification
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        )}
       </div>
 
       <div className="rounded-md border">
