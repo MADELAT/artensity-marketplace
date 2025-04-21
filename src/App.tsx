@@ -13,7 +13,7 @@ import Explore from "./pages/Explore";
 import ArtworkDetail from "./pages/ArtworkDetail";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ArtistDashboard from "./pages/artist/ArtistDashboard";
-// import GalleryDashboard from "./pages/gallery/GalleryDashboard";
+import GalleryDashboard from "./pages/gallery/GalleryDashboard";
 // import BuyerDashboard from "./pages/buyer/BuyerDashboard";
 import About from "./pages/About";
 import Artists from "./pages/Artists";
@@ -80,6 +80,15 @@ const App = () => (
                 element={<Navigate to="/dashboard/artist/settings" replace />}
               />
             </Route>
+
+            <Route
+              path="/dashboard/gallery/*"
+              element={
+                <ProtectedRoute allowedRoles={["gallery"]}>
+                  <GalleryDashboard />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Profile route */}
             <Route
