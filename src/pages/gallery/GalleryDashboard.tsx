@@ -26,6 +26,7 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import NewArtistForm from "@/components/artist/NewArtistForm";
 
 // Mock artist data for demonstration
 const mockArtists = [
@@ -104,6 +105,7 @@ export default function GalleryDashboard() {
   const { toast } = useToast();
   const navigate = useNavigate();
   const location = useLocation();
+  const [showNewArtistModal, setShowNewArtistModal] = useState(false);
 
   const tabs = [
     { value: "dashboard", label: "Overview" },
@@ -116,7 +118,7 @@ export default function GalleryDashboard() {
   ];
 
   const handleAddArtist = () => {
-    navigate("/dashboard/gallery/new-artist");
+    setShowNewArtistModal(true);
   };
 
   const handleUploadArtwork = () => {
@@ -498,6 +500,26 @@ export default function GalleryDashboard() {
           )}
         </div>
       </DashboardLayout>
+      {/* Modal for New Artist Form */}
+      {showNewArtistModal && (
+        <div
+          className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center px-4"
+          onClick={() => setShowNewArtistModal(false)}
+        >
+          <div
+            className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-lg relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              className="absolute top-2 right-2 text-gray-400 hover:text-gray-600 text-xl font-bold"
+              onClick={() => setShowNewArtistModal(false)}
+            >
+              &times;
+            </button>
+            <NewArtistForm onSuccess={() => setShowNewArtistModal(false)} />
+          </div>
+        </div>
+      )}
     </>
   );
 }
