@@ -106,28 +106,26 @@ export default function GalleryDashboard() {
   const location = useLocation();
 
   const tabs = [
-    { value: "dashboard", label: "Resumen" },
-    { value: "artists", label: "Artistas" },
-    { value: "artworks", label: "Obras" },
-    { value: "sales", label: "Ventas" },
-    { value: "exhibitions", label: "Exposiciones" },
-    { value: "settings", label: "Ajustes" },
-    { value: "notificaciones", label: "Notificaciones" },
+    { value: "dashboard", label: "Overview" },
+    { value: "artists", label: "Artists" },
+    { value: "artworks", label: "Artworks" },
+    { value: "sales", label: "Sales" },
+    { value: "exhibitions", label: "Exhibitions" },
+    { value: "settings", label: "Settings" },
+    { value: "notifications", label: "Notifications" },
   ];
 
   const handleAddArtist = () => {
     toast({
-      title: "Función en desarrollo",
-      description:
-        "La función para agregar artistas estará disponible próximamente.",
+      title: "Function under development",
+      description: "The function to add artists will be available soon.",
     });
   };
 
   const handleUploadArtwork = () => {
     toast({
-      title: "Función en desarrollo",
-      description:
-        "La función para subir obras estará disponible próximamente.",
+      title: "Function under development",
+      description: "The function to upload artworks will be available soon.",
     });
   };
 
@@ -148,9 +146,9 @@ export default function GalleryDashboard() {
       <DashboardLayout>
         <div className="flex flex-col space-y-6">
           <div>
-            <h1 className="text-3xl font-bold">Dashboard de Galería</h1>
+            <h1 className="text-3xl font-bold">Gallery Dashboard</h1>
             <p className="text-muted-foreground">
-              Bienvenido/a, {profile?.first_name || "Galería"}
+              Welcome, {profile?.last_name || "Gallery"}
             </p>
           </div>
 
@@ -176,27 +174,27 @@ export default function GalleryDashboard() {
             <div className="space-y-6 mt-6">
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
-                  title="Artistas Representados"
+                  title="Represented Artists"
                   value={mockArtists.length.toString()}
-                  description="Diversos estilos y técnicas"
+                  description="Diverse styles & techniques"
                   icon={<Users className="h-4 w-4 text-blue-500" />}
                 />
                 <StatCard
-                  title="Obras"
+                  title="Artworks"
                   value="83"
-                  description="62 obras en exhibición"
+                  description="62 Artworks in exhibition"
                   icon={<Image className="h-4 w-4 text-green-500" />}
                 />
                 <StatCard
-                  title="Ventas Mensuales"
+                  title="Monthly sales"
                   value="€14,580"
-                  description="Este mes"
+                  description="This month"
                   icon={<LineChart className="h-4 w-4 text-purple-500" />}
                 />
                 <StatCard
-                  title="Comisiones"
+                  title="Commissions"
                   value="€2,840"
-                  description="Este mes"
+                  description="This month"
                   icon={<ShoppingBag className="h-4 w-4 text-amber-500" />}
                 />
               </div>
@@ -205,10 +203,10 @@ export default function GalleryDashboard() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg font-medium">
-                      Artistas Destacados
+                      Featured Artists
                     </CardTitle>
                     <CardDescription>
-                      Artistas representados en tu galería
+                      Artists featured in your gallery
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -235,9 +233,9 @@ export default function GalleryDashboard() {
                           </div>
                         </div>
                         <div className="text-sm">
-                          <p>{artist.artworks} obras</p>
+                          <p>{artist.artworks} artworks</p>
                           <p className="text-xs text-muted-foreground">
-                            {artist.sales} vendidas
+                            {artist.sales} sold
                           </p>
                         </div>
                       </div>
@@ -250,7 +248,7 @@ export default function GalleryDashboard() {
                       className="w-full"
                       onClick={handleAddArtist}
                     >
-                      <Plus className="h-4 w-4 mr-2" /> Agregar artista
+                      <Plus className="h-4 w-4 mr-2" /> Add artist
                     </Button>
                   </CardFooter>
                 </Card>
@@ -258,10 +256,10 @@ export default function GalleryDashboard() {
                 <Card>
                   <CardHeader>
                     <CardTitle className="text-lg font-medium">
-                      Obras Recientes
+                      Recent Artworks
                     </CardTitle>
                     <CardDescription>
-                      Últimas obras añadidas a tu galería
+                      Newest pieces in your gallery
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
@@ -296,7 +294,7 @@ export default function GalleryDashboard() {
                       className="w-full"
                       onClick={handleUploadArtwork}
                     >
-                      <Plus className="h-4 w-4 mr-2" /> Subir nueva obra
+                      <Plus className="h-4 w-4 mr-2" /> Upload new artwork
                     </Button>
                   </CardFooter>
                 </Card>
@@ -305,16 +303,16 @@ export default function GalleryDashboard() {
               <Card>
                 <CardHeader>
                   <CardTitle className="text-lg font-medium">
-                    Actividad Reciente
+                    Recent Activity
                   </CardTitle>
                   <CardDescription>
-                    Movimientos y eventos en tu galería
+                    Recent movements and events in your gallery
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="border-l-2 border-primary pl-4 py-1">
-                      <p className="font-medium">Nueva obra subida</p>
+                      <p className="font-medium">New artwork uploaded</p>
                       <p className="text-sm text-muted-foreground">
                         Carmen Herrera subió "Estructura en Azul"
                       </p>
@@ -323,7 +321,7 @@ export default function GalleryDashboard() {
                       </p>
                     </div>
                     <div className="border-l-2 border-green-500 pl-4 py-1">
-                      <p className="font-medium">Venta completada</p>
+                      <p className="font-medium">Completed sale</p>
                       <p className="text-sm text-muted-foreground">
                         "Reflejo Urbano" fue vendido por €8,900
                       </p>
@@ -332,7 +330,7 @@ export default function GalleryDashboard() {
                       </p>
                     </div>
                     <div className="border-l-2 border-blue-500 pl-4 py-1">
-                      <p className="font-medium">Nuevo artista</p>
+                      <p className="font-medium">New artist joined</p>
                       <p className="text-sm text-muted-foreground">
                         Oscar Murillo se ha unido a tu galería
                       </p>
@@ -349,9 +347,9 @@ export default function GalleryDashboard() {
           {activeTab === "artists" && (
             <div className="space-y-6 mt-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-medium">Artistas Representados</h2>
+                <h2 className="text-2xl font-medium">Represented Artists</h2>
                 <Button onClick={handleAddArtist}>
-                  <Plus className="h-4 w-4 mr-2" /> Nuevo artista
+                  <Plus className="h-4 w-4 mr-2" /> New Artist
                 </Button>
               </div>
 
@@ -385,19 +383,19 @@ export default function GalleryDashboard() {
                       <CardContent className="pt-0">
                         <div className="flex justify-between text-sm">
                           <span>
-                            <strong>{artist.artworks}</strong> obras
+                            <strong>{artist.artworks}</strong> artworks
                           </span>
                           <span>
-                            <strong>{artist.sales}</strong> vendidas
+                            <strong>{artist.sales}</strong> sold
                           </span>
                         </div>
                       </CardContent>
                       <CardFooter className="flex justify-between">
                         <Button variant="outline" size="sm">
-                          Gestionar obras
+                          Manage artworks
                         </Button>
                         <Button variant="secondary" size="sm">
-                          Ver perfil
+                          View profile
                         </Button>
                       </CardFooter>
                     </Card>
@@ -410,9 +408,11 @@ export default function GalleryDashboard() {
           {activeTab === "artworks" && (
             <div className="space-y-6 mt-6">
               <div className="flex justify-between items-center">
-                <h2 className="text-2xl font-medium">Obras en tu galería</h2>
+                <h2 className="text-2xl font-medium">
+                  Artworks in your gallery
+                </h2>
                 <Button onClick={handleUploadArtwork}>
-                  <Plus className="h-4 w-4 mr-2" /> Subir obra
+                  <Plus className="h-4 w-4 mr-2" /> Upload artwork
                 </Button>
               </div>
 
@@ -442,14 +442,14 @@ export default function GalleryDashboard() {
                       </CardContent>
                       <CardFooter className="flex gap-2">
                         <Button variant="outline" size="sm" className="flex-1">
-                          Editar
+                          Edit
                         </Button>
                         <Button
                           variant="secondary"
                           size="sm"
                           className="flex-1"
                         >
-                          Ver
+                          View
                         </Button>
                       </CardFooter>
                     </Card>
@@ -461,12 +461,10 @@ export default function GalleryDashboard() {
           {activeTab === "sales" && (
             <div className="space-y-6 mt-6">
               <Card className="p-6">
-                <h3 className="text-lg font-medium mb-4">
-                  Historial de ventas
-                </h3>
+                <h3 className="text-lg font-medium mb-4">Sales history</h3>
                 <div className="space-y-4">
                   <p className="text-center py-8 text-muted-foreground">
-                    El historial de ventas estará disponible próximamente.
+                    The sales history will be available soon.
                   </p>
                 </div>
               </Card>
@@ -476,10 +474,10 @@ export default function GalleryDashboard() {
           {activeTab === "exhibitions" && (
             <div className="space-y-6 mt-6">
               <Card className="p-6">
-                <h3 className="text-lg font-medium mb-4">Exposiciones</h3>
+                <h3 className="text-lg font-medium mb-4">Exhibitions</h3>
                 <div className="space-y-4">
                   <p className="text-center py-8 text-muted-foreground">
-                    La gestión de exposiciones estará disponible próximamente.
+                    The exhibitions management will be available soon.
                   </p>
                 </div>
               </Card>
@@ -489,19 +487,17 @@ export default function GalleryDashboard() {
           {activeTab === "settings" && (
             <div className="space-y-6 mt-6">
               <Card className="p-6">
-                <h3 className="text-lg font-medium mb-4">
-                  Ajustes de la galería
-                </h3>
+                <h3 className="text-lg font-medium mb-4">Gallery settings</h3>
                 <div className="space-y-4">
                   <p className="text-center py-8 text-muted-foreground">
-                    Los ajustes de la galería estarán disponibles próximamente.
+                    The gallery settings will be available soon.
                   </p>
                 </div>
               </Card>
             </div>
           )}
 
-          {activeTab === "notificaciones" && (
+          {activeTab === "notifications" && (
             <div className="space-y-6 mt-6">
               <NotificationsCenter />
             </div>

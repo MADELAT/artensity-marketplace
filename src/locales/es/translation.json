@@ -1,0 +1,18 @@
+{
+  "dashboard": {
+    "welcome": "Bienvenido a tu dashboard",
+    "notifications": "Notificaciones",
+    "artists": "Artistas",
+    "artworks": "Obras",
+    "sales": "Ventas",
+    "exhibitions": "Exposiciones",
+    "settings": "Ajustes"
+  },
+  "buttons": {
+    "createNotification": "Crear Notificación",
+    "markAsRead": "Marcar como leído",
+    "view": "Ver",
+    "send": "Enviar",
+    "cancel": "Cancelar"
+  }
+}

@@ -116,54 +116,67 @@ export function AuthProvider({ children }: AuthProviderProps) {
     try {
       setIsLoading(true);
       setError(null);
-      console.log("📦 userData recibido en signUp:", userData);
 
+      // 1. Solo registrar el usuario en Auth
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          data: {
-            first_name: userData.first_name,
-            last_name: userData.last_name,
-            role: userData.role || "buyer",
-            telephone: userData.telephone,
-            country: userData.country || "unspecified",
-          },
-        },
       });
 
       if (error) {
+        console.error("Error en signup:", error);
         toast({
           title: "Error de registro",
           description: error.message,
           variant: "destructive",
         });
-        setError(error.message);
-        setIsLoading(false);
         throw error;
       }
 
-      sonnerToast.success("¡Registro exitoso!", {
-        description: "Accediendo a tu dashboard...",
-      });
-
-      // Redirección tras signup
-      if (data.user) {
-        await fetchUserProfileData(data.user.id);
-        await supabase.from("profiles").upsert(
-          {
-            id: data.user.id,
-            country: userData.country || "unspecified",
-            telephone: userData.telephone || null,
-          },
-          { onConflict: "id" }
-        );
+      if (!data?.user?.id) {
+        throw new Error("No se pudo obtener el ID del usuario");
       }
 
+      // 2. Esperar un momento para asegurar que el usuario está registrado
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+
+      // 3. Crear el perfil completo de una sola vez
+      const timestamp = new Date().toISOString();
+      const { error: profileError } = await supabase.from("profiles").insert({
+        id: data.user.id,
+        email: email,
+        first_name: userData.first_name || null,
+        last_name: userData.last_name || null,
+        role: userData.role || "artist",
+        telephone: userData.telephone || null,
+        country: userData.country || null,
+        created_at: timestamp,
+        updated_at: timestamp,
+        status: "approved",
+      });
+
+      if (profileError) {
+        console.error("Error creando perfil:", profileError);
+        // Si falla la creación del perfil, intentamos hacer logout
+        await supabase.auth.signOut();
+        toast({
+          title: "Error al crear perfil",
+          description: "No se pudo completar el registro",
+          variant: "destructive",
+        });
+        throw profileError;
+      }
+
+      toast({
+        title: "¡Registro exitoso!",
+        description: "Tu cuenta ha sido creada.",
+      });
+
+      await fetchUserProfileData(data.user.id);
       setIsLoading(false);
     } catch (error: any) {
-      console.error("Error de registro:", error.message);
       setIsLoading(false);
+      setError(error.message);
       throw error;
     }
   };
