@@ -116,17 +116,11 @@ export default function GalleryDashboard() {
   ];
 
   const handleAddArtist = () => {
-    toast({
-      title: "Function under development",
-      description: "The function to add artists will be available soon.",
-    });
+    navigate("/dashboard/gallery/new-artist");
   };
 
   const handleUploadArtwork = () => {
-    toast({
-      title: "Function under development",
-      description: "The function to upload artworks will be available soon.",
-    });
+    navigate("/gallery/artworks/upload");
   };
 
   return (
@@ -248,7 +242,7 @@ export default function GalleryDashboard() {
                       className="w-full"
                       onClick={handleAddArtist}
                     >
-                      <Plus className="h-4 w-4 mr-2" /> Add artist
+                      <Plus className="h-4 w-4 mr-2" /> New artist
                     </Button>
                   </CardFooter>
                 </Card>
