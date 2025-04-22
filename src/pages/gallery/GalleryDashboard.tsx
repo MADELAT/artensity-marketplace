@@ -168,6 +168,22 @@ export default function GalleryDashboard() {
 
           {activeTab === "dashboard" && (
             <div className="space-y-6 mt-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-center border border-gray-200 hover:bg-gray-50"
+                  onClick={handleAddArtist}
+                >
+                  <Plus className="h-4 w-4 mr-2" /> New artist
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-center border border-gray-200 hover:bg-gray-50"
+                  onClick={handleUploadArtwork}
+                >
+                  <Plus className="h-4 w-4 mr-2" /> Upload new artwork
+                </Button>
+              </div>
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
                   title="Represented Artists"
@@ -237,16 +253,7 @@ export default function GalleryDashboard() {
                       </div>
                     ))}
                   </CardContent>
-                  <CardFooter>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={handleAddArtist}
-                    >
-                      <Plus className="h-4 w-4 mr-2" /> New artist
-                    </Button>
-                  </CardFooter>
+                  <CardFooter>{/* Removed New artist button */}</CardFooter>
                 </Card>
 
                 <Card>
@@ -284,14 +291,7 @@ export default function GalleryDashboard() {
                     ))}
                   </CardContent>
                   <CardFooter>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="w-full"
-                      onClick={handleUploadArtwork}
-                    >
-                      <Plus className="h-4 w-4 mr-2" /> Upload new artwork
-                    </Button>
+                    {/* Removed Upload new artwork button */}
                   </CardFooter>
                 </Card>
               </div>
