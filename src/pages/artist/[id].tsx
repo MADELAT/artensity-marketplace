@@ -96,7 +96,14 @@ export default function ArtistProfile() {
           .eq("status", "approved");
         if (artworksError) throw artworksError;
 
-        setProfile(profileData);
+        setProfile({
+          ...profileData,
+          full_name:
+            profileData.full_name ??
+            `${profileData.first_name ?? ""} ${
+              profileData.last_name ?? ""
+            }`.trim(),
+        });
         setArtworks(artworksData || []);
 
         if (user) {
@@ -197,19 +204,11 @@ export default function ArtistProfile() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero */}
-      <div className="relative min-h-[70vh]">
-        <div
-          className="absolute inset-0 bg-cover bg-center object-cover z-0 transition-opacity"
-          style={{ backgroundImage: `url(${featuredArtwork.image_url})` }}
-        />
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-10" />
-        <div className="relative z-20 flex flex-col justify-center items-center text-white h-full px-4 text-center">
-          <h1 className="text-5xl font-serif font-bold mb-4">
-            {profile.full_name}
-          </h1>
-          <p className="italic text-lg max-w-xl">{randomQuote}</p>
-        </div>
-      </div>
+      <ParallaxHero
+        featuredArtwork={featuredArtwork}
+        profile={profile}
+        randomQuote={randomQuote}
+      />
 
       {/* Info */}
       <div className="max-w-7xl mx-auto px-4 py-12">
@@ -358,6 +357,41 @@ export default function ArtistProfile() {
             )}
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ParallaxHero component
+
+function ParallaxHero({
+  featuredArtwork,
+  profile,
+  randomQuote,
+}: {
+  featuredArtwork: { image_url: string };
+  profile: { full_name: string };
+  randomQuote: string;
+}) {
+  return (
+    <div className="relative h-[80vh] bg-black text-white overflow-hidden">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage: `url(${featuredArtwork.image_url})`,
+          backgroundAttachment: "fixed",
+          backgroundPosition: "center",
+          backgroundSize: "cover",
+          filter: "blur(2px)",
+        }}
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent z-10" />
+      <div className="relative z-20 flex flex-col justify-between h-full max-w-7xl mx-auto px-6 py-16 text-center pointer-events-none">
+        <div />
+        <h1 className="text-6xl md:text-8xl font-serif font-bold leading-tight tracking-wide drop-shadow-xl text-white">
+          {profile.full_name}
+        </h1>
+        <p className="text-lg italic text-gray-200 mb-8">{randomQuote}</p>
       </div>
     </div>
   );
