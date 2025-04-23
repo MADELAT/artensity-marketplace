@@ -25,10 +25,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         setProfile(userProfile);
         setIsLoading(false);
 
-        const isLandingOrLogin = ["/", "/login"].includes(
-          window.location.pathname
-        );
-        if (allowRedirect && isLandingOrLogin) {
+        if (allowRedirect) {
           redirectUserBasedOnRole(userProfile.role, navigate);
         }
       } else {
@@ -142,18 +139,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       // 3. Crear el perfil completo de una sola vez
       const timestamp = new Date().toISOString();
-      const { error: profileError } = await supabase.from("profiles").insert({
-        id: data.user.id,
-        email: email,
-        first_name: userData.first_name || null,
-        last_name: userData.last_name || null,
-        role: userData.role || "artist",
-        telephone: userData.telephone || null,
-        country: userData.country || null,
-        created_at: timestamp,
-        updated_at: timestamp,
-        status: "approved",
-      });
+      const { error: profileError } = await supabase.from("profiles").upsert(
+        {
+          id: data.user.id,
+          email: email,
+          first_name: userData.first_name || null,
+          last_name: userData.last_name || null,
+          role: userData.role || "artist",
+          telephone: userData.telephone || null,
+          country: userData.country || null,
+          created_at: timestamp,
+          updated_at: timestamp,
+          status: "approved",
+        },
+        { onConflict: "id" }
+      );
 
       if (profileError) {
         console.error("Error creando perfil:", profileError);
@@ -172,7 +172,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         description: "Tu cuenta ha sido creada.",
       });
 
-      await fetchUserProfileData(data.user.id);
+      await fetchUserProfileData(data.user.id, true);
       setIsLoading(false);
     } catch (error: any) {
       setIsLoading(false);
