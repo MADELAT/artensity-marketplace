@@ -75,7 +75,9 @@ export default function GalleryDashboard() {
       if (!profile?.id) return;
       const { data, error } = await supabase
         .from("profiles")
-        .select("id, first_name, last_name, avatar_url, country, style")
+        .select(
+          "id, first_name, last_name, avatar_url, country, style, is_featured"
+        )
         .eq("role", "artist")
         .eq("created_by", profile.id);
 
@@ -86,12 +88,29 @@ export default function GalleryDashboard() {
           avatar_url: artist.avatar_url,
           country: artist.country,
           style: artist.style,
+          is_featured: artist.is_featured,
         }));
         setArtists(formatted);
       }
     };
     fetchArtists();
   }, [profile?.id]);
+
+  // Toggle featured state for an artist
+  const toggleFeatured = async (artistId: string, newState: boolean) => {
+    const { error } = await supabase
+      .from("profiles")
+      .update({ is_featured: newState })
+      .eq("id", artistId);
+
+    if (!error) {
+      setArtists((prev) =>
+        prev.map((a) =>
+          a.id === artistId ? { ...a, is_featured: newState } : a
+        )
+      );
+    }
+  };
 
   const tabs = [
     { value: "dashboard", label: "Overview" },
@@ -208,31 +227,34 @@ export default function GalleryDashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {artists.slice(0, 3).map((artist) => (
-                      <div
-                        key={artist.id}
-                        className="flex items-center justify-between"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Avatar>
-                            <AvatarImage
-                              src={artist.avatar_url}
-                              alt={artist.name}
-                            />
-                            <AvatarFallback>
-                              {artist.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <p className="font-medium">{artist.name}</p>
-                            <p className="text-xs text-muted-foreground">
-                              {artist.style}
-                            </p>
+                    {artists
+                      .filter((a) => a.is_featured)
+                      .slice(0, 3)
+                      .map((artist) => (
+                        <div
+                          key={artist.id}
+                          className="flex items-center justify-between"
+                        >
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarImage
+                                src={artist.avatar_url}
+                                alt={artist.name}
+                              />
+                              <AvatarFallback>
+                                {artist.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="font-medium">{artist.name}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {artist.style}
+                              </p>
+                            </div>
                           </div>
+                          {/* You may add artworks/sales fields if available in artist */}
                         </div>
-                        {/* You may add artworks/sales fields if available in artist */}
-                      </div>
-                    ))}
+                      ))}
                   </CardContent>
                   <CardFooter>{/* Removed New artist button */}</CardFooter>
                 </Card>
@@ -325,7 +347,11 @@ export default function GalleryDashboard() {
             <div className="space-y-6 mt-6">
               <div className="flex justify-between items-center">
                 <h2 className="text-2xl font-medium">Represented Artists</h2>
-                <Button onClick={handleAddArtist}>
+                <Button
+                  variant="ghost"
+                  className="border border-gray-300 hover:bg-gray-50 text-gray-800"
+                  onClick={handleAddArtist}
+                >
                   <Plus className="h-4 w-4 mr-2" /> New Artist
                 </Button>
               </div>
@@ -342,6 +368,8 @@ export default function GalleryDashboard() {
                       avatar_url={artist.avatar_url}
                       country={artist.country}
                       style={artist.style}
+                      is_featured={artist.is_featured}
+                      onToggleFeatured={toggleFeatured}
                     />
                   ))
                 )}

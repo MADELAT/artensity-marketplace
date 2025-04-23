@@ -17,6 +17,8 @@ interface GalleryArtistCardProps {
   style?: string; // CSV: "Pintor,Escultor"
   artworksCount?: number;
   salesCount?: number;
+  is_featured?: boolean;
+  onToggleFeatured?: (id: string, newState: boolean) => void;
 }
 
 export default function GalleryArtistCard({
@@ -27,6 +29,8 @@ export default function GalleryArtistCard({
   style,
   artworksCount,
   salesCount,
+  is_featured,
+  onToggleFeatured,
 }: GalleryArtistCardProps) {
   const styles = style?.split(",").map((s) => s.trim()) || [];
 
@@ -49,12 +53,9 @@ export default function GalleryArtistCard({
 
       <CardContent className="pt-0 text-sm text-muted-foreground">
         {styles.length > 0 && (
-          <div className="mb-2">
+          <div className="mb-2 flex flex-wrap gap-2">
             {styles.map((s, idx) => (
-              <span
-                key={idx}
-                className="inline-block mr-2 text-xs bg-gray-100 px-2 py-1 rounded"
-              >
+              <span key={idx} className="text-xs bg-gray-100 px-2 py-1 rounded">
                 {s}
               </span>
             ))}
@@ -70,13 +71,27 @@ export default function GalleryArtistCard({
         </div>
       </CardContent>
 
-      <CardFooter className="flex justify-between">
-        <Button variant="outline" size="sm">
-          Manage artworks
-        </Button>
-        <Button variant="secondary" size="sm">
-          View profile
-        </Button>
+      <CardFooter className="flex flex-col gap-2 items-start">
+        {onToggleFeatured && (
+          <Button
+            variant="ghost"
+            className={
+              is_featured ? "border border-gray-400 text-gray-800" : ""
+            }
+            size="sm"
+            onClick={() => onToggleFeatured(id, !is_featured)}
+          >
+            {is_featured ? "★ Featured" : "☆ Set as Featured"}
+          </Button>
+        )}
+        <div className="flex gap-2 w-full justify-between">
+          <Button variant="outline" size="sm">
+            Manage artworks
+          </Button>
+          <Button variant="secondary" size="sm">
+            View profile
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );
