@@ -111,110 +111,105 @@ export default function ArtistsPanel() {
                 whileHover={{ scale: 1.02 }}
                 className="group relative"
               >
-                <Card className="overflow-hidden h-full border border-muted">
-                  <div className="aspect-[4/3] overflow-hidden relative">
-                    <img
-                      src={placeholderImage}
-                      alt={`${artist.first_name} ${artist.last_name}`}
-                      className="object-cover w-full h-full"
-                    />
-                    {artist.is_featured && (
-                      <div className="absolute top-2 right-2 bg-yellow-400 text-white px-2 py-1 text-xs font-bold rounded shadow">
-                        <Star className="h-4 w-4 inline mr-1" />
-                        Featured
-                      </div>
-                    )}
-                  </div>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-medium capitalize">
-                        {artist.first_name} {artist.last_name}
-                      </h3>
-                      {artist.bio && (
-                        <Tooltip>
-                          <TooltipTrigger>
-                            <span className="text-xs text-muted-foreground underline cursor-help">
-                              Info
-                            </span>
-                          </TooltipTrigger>
-                          <TooltipContent className="max-w-xs text-xs">
-                            {artist.bio}
-                          </TooltipContent>
-                        </Tooltip>
+                <Link to={`/artist/${artist.id}`} className="block h-full">
+                  <Card className="overflow-hidden h-full border border-muted hover:ring-2 hover:ring-primary transition">
+                    <div className="aspect-[4/3] overflow-hidden relative">
+                      <img
+                        src={placeholderImage}
+                        alt={`${artist.first_name} ${artist.last_name}`}
+                        className="object-cover w-full h-full"
+                      />
+                      {artist.is_featured && (
+                        <div className="absolute top-2 right-2 bg-yellow-400 text-white px-2 py-1 text-xs font-bold rounded shadow">
+                          <Star className="h-4 w-4 inline mr-1" />
+                          Featured
+                        </div>
                       )}
                     </div>
-
-                    <p className="text-sm text-muted-foreground mb-1">
-                      {artist.country || "Internacional"}
-                    </p>
-
-                    {artist.style && (
-                      <Badge variant="outline" className="text-xs mb-2">
-                        {artist.style}
-                      </Badge>
-                    )}
-
-                    <div className="text-xs space-y-1 mt-2">
-                      <p>
-                        Obras aprobadas:{" "}
-                        <span className="font-semibold">
-                          {artist.stats?.approved}
-                        </span>
-                      </p>
-                      <p>
-                        Vendidas:{" "}
-                        <span className="font-semibold">
-                          {artist.stats?.sold}
-                        </span>
-                      </p>
-                      <p>
-                        Última actividad:{" "}
-                        <span className="font-semibold">
-                          {artist.stats?.lastActivity}
-                        </span>
-                      </p>
-                    </div>
-
-                    <div className="flex justify-between items-center mt-4">
-                      <div className="flex gap-3">
-                        {artist.instagram && (
-                          <a
-                            href={artist.instagram}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <Instagram className="h-4 w-4 hover:text-primary" />
-                          </a>
-                        )}
-                        {artist.facebook && (
-                          <a
-                            href={artist.facebook}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <Facebook className="h-4 w-4 hover:text-primary" />
-                          </a>
-                        )}
-                        {artist.website && (
-                          <a
-                            href={artist.website}
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            <Globe className="h-4 w-4 hover:text-primary" />
-                          </a>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-medium capitalize">
+                          {artist.first_name} {artist.last_name}
+                        </h3>
+                        {artist.bio && (
+                          <Tooltip>
+                            <TooltipTrigger>
+                              <span className="text-xs text-muted-foreground underline cursor-help">
+                                Info
+                              </span>
+                            </TooltipTrigger>
+                            <TooltipContent className="max-w-xs text-xs">
+                              {artist.bio}
+                            </TooltipContent>
+                          </Tooltip>
                         )}
                       </div>
-                      <Link
-                        to={`/artist/${artist.id}`}
-                        className="text-xs text-primary underline hover:opacity-90 flex items-center gap-1"
-                      >
-                        Ver perfil
-                        <ExternalLink className="h-3 w-3" />
-                      </Link>
-                    </div>
-                  </CardContent>
-                </Card>
+
+                      <p className="text-sm text-muted-foreground mb-1">
+                        {artist.country || "Internacional"}
+                      </p>
+
+                      {artist.style && (
+                        <Badge variant="outline" className="text-xs mb-2">
+                          {artist.style}
+                        </Badge>
+                      )}
+
+                      <div className="text-xs space-y-1 mt-2">
+                        <p>
+                          Obras aprobadas:{" "}
+                          <span className="font-semibold">
+                            {artist.stats?.approved}
+                          </span>
+                        </p>
+                        <p>
+                          Vendidas:{" "}
+                          <span className="font-semibold">
+                            {artist.stats?.sold}
+                          </span>
+                        </p>
+                        <p>
+                          Última actividad:{" "}
+                          <span className="font-semibold">
+                            {artist.stats?.lastActivity}
+                          </span>
+                        </p>
+                      </div>
+
+                      <div className="flex justify-between items-center mt-4">
+                        <div className="flex gap-3">
+                          {artist.instagram && (
+                            <a
+                              href={artist.instagram}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <Instagram className="h-4 w-4 hover:text-primary" />
+                            </a>
+                          )}
+                          {artist.facebook && (
+                            <a
+                              href={artist.facebook}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <Facebook className="h-4 w-4 hover:text-primary" />
+                            </a>
+                          )}
+                          {artist.website && (
+                            <a
+                              href={artist.website}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <Globe className="h-4 w-4 hover:text-primary" />
+                            </a>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
               </motion.div>
             );
           })}
