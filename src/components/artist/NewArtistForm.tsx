@@ -9,6 +9,16 @@ import { useAuth } from "@/contexts/AuthContext";
 import Select from "react-select";
 import countryList from "react-select-country-list";
 
+const styleOptions = [
+  { label: "Pintor", value: "Pintor" },
+  { label: "Escultor", value: "Escultor" },
+  { label: "Grabador", value: "Grabador" },
+  { label: "Dibujante", value: "Dibujante" },
+  { label: "Artista digital", value: "Artista digital" },
+  { label: "Fotógrafo", value: "Fotógrafo" },
+  { label: "Otro", value: "Otro" },
+];
+
 interface ProfileFormData {
   first_name: string;
   last_name: string;
@@ -22,6 +32,7 @@ interface ProfileFormData {
   email?: string;
   telephone?: string;
   country?: string;
+  style?: string[];
 }
 
 export default function NewArtistForm({
@@ -46,6 +57,7 @@ export default function NewArtistForm({
     email: "",
     telephone: "",
     country: "",
+    style: [],
   });
 
   const countryOptions = countryList().getData();
@@ -74,6 +86,7 @@ export default function NewArtistForm({
 
       const { error } = await supabase.from("profiles").insert({
         ...formData,
+        style: formData.style?.join(",") || null,
         role: "artist",
         status: "pending",
         created_by: user.id,
@@ -250,6 +263,25 @@ export default function NewArtistForm({
             placeholder="Paris"
           />
         </div>
+      </div>
+
+      <div>
+        <Label htmlFor="style">Tipo de artista</Label>
+        <Select
+          inputId="style"
+          options={styleOptions}
+          isMulti
+          className="text-sm"
+          value={styleOptions.filter((option) =>
+            formData.style?.includes(option.value)
+          )}
+          onChange={(selected) =>
+            setFormData((prev) => ({
+              ...prev,
+              style: selected.map((s) => s.value),
+            }))
+          }
+        />
       </div>
 
       <div className="grid grid-cols-3 gap-4">
