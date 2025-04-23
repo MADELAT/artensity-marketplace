@@ -31,11 +31,14 @@ export function ArtworkUploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [availableTags, setAvailableTags] = useState<
     { id: number; name: string }[]
   >([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+  const [artists, setArtists] = useState<any[]>([]);
+  const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
+  const isGallery = profile?.role === "gallery";
 
   useEffect(() => {
     async function fetchTags() {
@@ -51,6 +54,24 @@ export function ArtworkUploadForm() {
 
     fetchTags();
   }, []);
+
+  useEffect(() => {
+    if (!isGallery || !user?.id) return;
+
+    const fetchArtists = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, first_name, last_name")
+        .eq("role", "artist")
+        .eq("created_by", user.id);
+
+      if (!error && data) {
+        setArtists(data);
+      }
+    };
+
+    fetchArtists();
+  }, [isGallery, user?.id]);
 
   // Handle file selection
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,6 +107,11 @@ export function ArtworkUploadForm() {
       toast.error(
         "Por favor completa los campos requeridos (título, precio e imagen)"
       );
+      return;
+    }
+
+    if (isGallery && !selectedArtist) {
+      toast.error("Por favor selecciona un artista para asignar la obra");
       return;
     }
 
@@ -140,14 +166,14 @@ export function ArtworkUploadForm() {
           category,
           style,
           image_url: imageUrl,
-          artist_id: user.id,
+          artist_id: isGallery ? selectedArtist : user.id,
           status: "pending",
         });
 
       const { data: insertedArtwork, error: selectError } = await supabase
         .from("pending_artworks")
         .select("id")
-        .eq("artist_id", user.id)
+        .eq("artist_id", isGallery ? selectedArtist : user.id)
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
@@ -189,6 +215,7 @@ export function ArtworkUploadForm() {
       setFile(null);
       setPreviewUrl(null);
       setSelectedTagIds([]);
+      setSelectedArtist(null);
     } catch (error: any) {
       console.error("Error uploading artwork:", error);
       toast.error("Error al subir la obra", {
@@ -277,6 +304,27 @@ export function ArtworkUploadForm() {
               Formatos aceptados: JPG, PNG, WEBP. Máximo 5MB.
             </p>
           </div>
+
+          {isGallery && (
+            <div className="space-y-2">
+              <Label htmlFor="artist">Selecciona un artista *</Label>
+              <Select
+                onValueChange={(val) => setSelectedArtist(val)}
+                value={selectedArtist || ""}
+              >
+                <SelectTrigger id="artist">
+                  <SelectValue placeholder="Elige un artista" />
+                </SelectTrigger>
+                <SelectContent>
+                  {artists.map((artist) => (
+                    <SelectItem key={artist.id} value={artist.id}>
+                      {artist.first_name} {artist.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
 
           {/* Title & Price */}
           <div className="space-y-2">

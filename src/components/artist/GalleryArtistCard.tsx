@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Card,
   CardHeader,
@@ -34,6 +36,25 @@ export default function GalleryArtistCard({
 }: GalleryArtistCardProps) {
   const styles = style?.split(",").map((s) => s.trim()) || [];
 
+  const [realArtworksCount, setRealArtworksCount] = useState<number | null>(
+    null
+  );
+
+  useEffect(() => {
+    const fetchArtworksCount = async () => {
+      const { count, error } = await supabase
+        .from("artworks")
+        .select("*", { count: "exact", head: true })
+        .eq("artist_id", id);
+
+      if (!error && typeof count === "number") {
+        setRealArtworksCount(count);
+      }
+    };
+
+    fetchArtworksCount();
+  }, [id]);
+
   return (
     <Card className="h-full transition-shadow hover:shadow-md">
       <CardHeader className="pb-2">
@@ -63,7 +84,7 @@ export default function GalleryArtistCard({
         )}
         <div className="flex justify-between">
           <span>
-            <strong>{artworksCount ?? 0}</strong> artworks
+            <strong>{realArtworksCount ?? artworksCount ?? 0}</strong> artworks
           </span>
           <span>
             <strong>{salesCount ?? 0}</strong> sold
