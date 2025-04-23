@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 // Removed Tabs components import as manual tab system is used instead
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import NotificationsCenter from "@/pages/admin/components/NotificationsCenter";
 import { StatCard } from "@/components/dashboard/StatCard";
 import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 import {
   PieChart,
   LineChart,
@@ -27,46 +28,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Link } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import NewArtistForm from "@/components/artist/NewArtistForm";
-
-// Mock artist data for demonstration
-const mockArtists = [
-  {
-    id: "1",
-    name: "Carmen Herrera",
-    avatar:
-      "https://images.unsplash.com/photo-1584184924103-e310d9dc31f7?q=80&w=1000",
-    style: "Abstracto geométrico",
-    artworks: 24,
-    sales: 12,
-  },
-  {
-    id: "2",
-    name: "Miguel Ángel Rojas",
-    avatar:
-      "https://images.unsplash.com/photo-1567784177951-6fa58317e16b?q=80&w=800",
-    style: "Arte conceptual",
-    artworks: 18,
-    sales: 8,
-  },
-  {
-    id: "3",
-    name: "Doris Salcedo",
-    avatar:
-      "https://images.unsplash.com/photo-1607462109225-6b64ae2dd3cb?q=80&w=774",
-    style: "Instalación",
-    artworks: 9,
-    sales: 5,
-  },
-  {
-    id: "4",
-    name: "Oscar Murillo",
-    avatar:
-      "https://images.unsplash.com/photo-1577720580479-7d839d829c73?q=80&w=870",
-    style: "Arte contemporáneo",
-    artworks: 32,
-    sales: 17,
-  },
-];
+import GalleryArtistCard from "@/components/artist/GalleryArtistCard";
 
 // Mock recent artworks data
 const mockRecentArtworks = [
@@ -106,6 +68,30 @@ export default function GalleryDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
   const [showNewArtistModal, setShowNewArtistModal] = useState(false);
+  const [artists, setArtists] = useState([]);
+
+  useEffect(() => {
+    const fetchArtists = async () => {
+      if (!profile?.id) return;
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("id, first_name, last_name, avatar_url, country, style")
+        .eq("role", "artist")
+        .eq("created_by", profile.id);
+
+      if (!error && data) {
+        const formatted = data.map((artist) => ({
+          id: artist.id,
+          name: `${artist.first_name} ${artist.last_name}`,
+          avatar_url: artist.avatar_url,
+          country: artist.country,
+          style: artist.style,
+        }));
+        setArtists(formatted);
+      }
+    };
+    fetchArtists();
+  }, [profile?.id]);
 
   const tabs = [
     { value: "dashboard", label: "Overview" },
@@ -187,7 +173,7 @@ export default function GalleryDashboard() {
               <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                 <StatCard
                   title="Represented Artists"
-                  value={mockArtists.length.toString()}
+                  value={artists.length.toString()}
                   description="Diverse styles & techniques"
                   icon={<Users className="h-4 w-4 text-blue-500" />}
                 />
@@ -222,7 +208,7 @@ export default function GalleryDashboard() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    {mockArtists.slice(0, 3).map((artist) => (
+                    {artists.slice(0, 3).map((artist) => (
                       <div
                         key={artist.id}
                         className="flex items-center justify-between"
@@ -230,7 +216,7 @@ export default function GalleryDashboard() {
                         <div className="flex items-center gap-3">
                           <Avatar>
                             <AvatarImage
-                              src={artist.avatar}
+                              src={artist.avatar_url}
                               alt={artist.name}
                             />
                             <AvatarFallback>
@@ -244,12 +230,7 @@ export default function GalleryDashboard() {
                             </p>
                           </div>
                         </div>
-                        <div className="text-sm">
-                          <p>{artist.artworks} artworks</p>
-                          <p className="text-xs text-muted-foreground">
-                            {artist.sales} sold
-                          </p>
-                        </div>
+                        {/* You may add artworks/sales fields if available in artist */}
                       </div>
                     ))}
                   </CardContent>
@@ -350,53 +331,20 @@ export default function GalleryDashboard() {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {mockArtists.map((artist) => (
-                  <Link
-                    to={`/gallery/artists/${artist.id}`}
-                    key={artist.id}
-                    className="block"
-                  >
-                    <Card className="h-full transition-shadow hover:shadow-md">
-                      <CardHeader className="pb-2">
-                        <div className="flex items-center gap-4">
-                          <Avatar className="h-12 w-12">
-                            <AvatarImage
-                              src={artist.avatar}
-                              alt={artist.name}
-                            />
-                            <AvatarFallback>
-                              {artist.name.charAt(0)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <CardTitle className="text-lg">
-                              {artist.name}
-                            </CardTitle>
-                            <CardDescription>{artist.style}</CardDescription>
-                          </div>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="pt-0">
-                        <div className="flex justify-between text-sm">
-                          <span>
-                            <strong>{artist.artworks}</strong> artworks
-                          </span>
-                          <span>
-                            <strong>{artist.sales}</strong> sold
-                          </span>
-                        </div>
-                      </CardContent>
-                      <CardFooter className="flex justify-between">
-                        <Button variant="outline" size="sm">
-                          Manage artworks
-                        </Button>
-                        <Button variant="secondary" size="sm">
-                          View profile
-                        </Button>
-                      </CardFooter>
-                    </Card>
-                  </Link>
-                ))}
+                {artists.length === 0 ? (
+                  <p className="text-muted-foreground">No artists found.</p>
+                ) : (
+                  artists.map((artist) => (
+                    <GalleryArtistCard
+                      key={artist.id}
+                      id={artist.id}
+                      name={artist.name}
+                      avatar_url={artist.avatar_url}
+                      country={artist.country}
+                      style={artist.style}
+                    />
+                  ))
+                )}
               </div>
             </div>
           )}
