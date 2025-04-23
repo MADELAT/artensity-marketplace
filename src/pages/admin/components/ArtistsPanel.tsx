@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -204,15 +205,13 @@ export default function ArtistsPanel() {
                           </a>
                         )}
                       </div>
-                      <a
-                        href={`/artist/${artist.id}`}
-                        target="_blank"
-                        rel="noreferrer"
+                      <Link
+                        to={`/artist/${artist.id}`}
                         className="text-xs text-primary underline hover:opacity-90 flex items-center gap-1"
                       >
                         Ver perfil
                         <ExternalLink className="h-3 w-3" />
-                      </a>
+                      </Link>
                     </div>
                   </CardContent>
                 </Card>
