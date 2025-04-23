@@ -6,6 +6,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
+import Select from "react-select";
+import countryList from "react-select-country-list";
 
 interface ProfileFormData {
   first_name: string;
@@ -17,6 +19,9 @@ interface ProfileFormData {
   twitter: string;
   avatar_url?: string;
   bio_pdf_url?: string;
+  email?: string;
+  telephone?: string;
+  country?: string;
 }
 
 export default function NewArtistForm({
@@ -38,7 +43,12 @@ export default function NewArtistForm({
     twitter: "",
     avatar_url: "",
     bio_pdf_url: "",
+    email: "",
+    telephone: "",
+    country: "",
   });
+
+  const countryOptions = countryList().getData();
 
   const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
 
@@ -65,6 +75,7 @@ export default function NewArtistForm({
       const { error } = await supabase.from("profiles").insert({
         ...formData,
         role: "artist",
+        status: "pending",
         created_by: user.id,
       });
 
@@ -74,7 +85,9 @@ export default function NewArtistForm({
         title: "Artist profile created successfully",
         variant: "default",
       });
-      onSuccess();
+      setTimeout(() => {
+        onSuccess();
+      }, 100);
     } catch (error) {
       console.error("Error al crear artista:", error);
       toast({ title: "Error creating artist profile", variant: "destructive" });
@@ -157,6 +170,29 @@ export default function NewArtistForm({
             onChange={handleInputChange}
           />
         </div>
+        <div className="col-span-2">
+          <Label htmlFor="email">Email (uso interno)</Label>
+          <Input
+            id="email"
+            name="email"
+            type="email"
+            value={formData.email || ""}
+            onChange={handleInputChange}
+            placeholder="nombre@correo.com"
+          />
+        </div>
+
+        <div className="col-span-2">
+          <Label htmlFor="telephone">Teléfono (uso interno)</Label>
+          <Input
+            id="telephone"
+            name="telephone"
+            type="tel"
+            value={formData.telephone || ""}
+            onChange={handleInputChange}
+            placeholder="+52 55 0000 0000"
+          />
+        </div>
       </div>
 
       <div>
@@ -180,6 +216,40 @@ export default function NewArtistForm({
           type="url"
           placeholder="https://tuwebsite.com"
         />
+      </div>
+
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor="country">Country</Label>
+          <Select
+            inputId="country"
+            options={countryOptions}
+            value={countryOptions.find((c) => c.value === formData.country)}
+            onChange={(selected) =>
+              setFormData((prev) => ({
+                ...prev,
+                country: selected?.label || "",
+              }))
+            }
+            className="text-sm"
+            isSearchable={true}
+          />
+        </div>
+        <div>
+          <Label htmlFor="city">City</Label>
+          <Input
+            id="city"
+            name="city"
+            value={(formData as any).city || ""}
+            onChange={(e) =>
+              setFormData((prev) => ({
+                ...prev,
+                city: e.target.value,
+              }))
+            }
+            placeholder="Paris"
+          />
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">

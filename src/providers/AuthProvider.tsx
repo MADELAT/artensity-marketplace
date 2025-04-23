@@ -155,6 +155,30 @@ export function AuthProvider({ children }: AuthProviderProps) {
         { onConflict: "id" }
       );
 
+      // Si el rol es "gallery", insertar en la tabla galleries
+      if (userData.role === "gallery") {
+        const { error: galleryError } = await supabase
+          .from("galleries")
+          .insert({
+            id: data.user.id,
+            first_name: userData.first_name || null,
+            last_name: userData.last_name || null,
+            email,
+            country: userData.country || null,
+            created_at: timestamp,
+          });
+
+        if (galleryError) {
+          console.error("Error creando galería:", galleryError);
+          toast({
+            title: "Error al crear galería",
+            description:
+              "El perfil básico se creó, pero no se pudo registrar la galería.",
+            variant: "destructive",
+          });
+        }
+      }
+
       if (profileError) {
         console.error("Error creando perfil:", profileError);
         // Si falla la creación del perfil, intentamos hacer logout
