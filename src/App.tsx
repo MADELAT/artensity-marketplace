@@ -7,6 +7,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
 import ArtistProfile from "./pages/artist/ArtistProfile";
+import GalleryProfile from "./pages/gallery/GalleryProfile";
 import { ArtworkUploadForm } from "@/components/artist/ArtworkUploadForm";
 
 // Pages
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/galleries" element={<Galleries />} />
               <Route path="/home" element={<Explore />} />
               <Route path="/artist/:username" element={<ArtistProfile />} />
+              <Route path="/gallery/:username" element={<GalleryProfile />} />
 
               {/* ✅ Admin Dashboard route habilitada */}
               <Route

@@ -1,11 +1,23 @@
-
 import { useState, useEffect } from "react";
 import { Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface ArtworkFiltersProps {
@@ -44,14 +56,14 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
       priceRange: [0, 10000],
       sortBy: "newest",
     });
-    
+
     if (isMobile) {
       setIsSheetOpen(false);
     }
   };
 
   const updateFilter = (key: keyof FilterValues, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters((prev) => ({ ...prev, [key]: value }));
   };
 
   const FiltersContent = () => (
@@ -72,6 +84,25 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
             <SelectItem value="Photography">Photography</SelectItem>
             <SelectItem value="Digital">Digital</SelectItem>
             <SelectItem value="Mixed Media">Mixed Media</SelectItem>
+            <SelectItem value="Collage">Collage</SelectItem>
+            <SelectItem value="Drawing">Drawing</SelectItem>
+            <SelectItem value="Printmaking">Printmaking</SelectItem>
+            <SelectItem value="Installation">Installation</SelectItem>
+            <SelectItem value="Textile">Textile</SelectItem>
+            <SelectItem value="Ceramics">Ceramics</SelectItem>
+            <SelectItem value="Glass Art">Glass Art</SelectItem>
+            <SelectItem value="Conceptual">Conceptual</SelectItem>
+            <SelectItem value="Video Art">Video Art</SelectItem>
+            <SelectItem value="Artificial Intelligence">
+              Artificial Intelligence
+            </SelectItem>
+            <SelectItem value="Kinetic Art">Kinetic Art</SelectItem>
+            <SelectItem value="Land Art / Eco Art">
+              Land Art / Eco Art
+            </SelectItem>
+            <SelectItem value="Found Object / Ready-Made">
+              Found Object / Ready-Made
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -92,6 +123,20 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
             <SelectItem value="Minimalist">Minimalist</SelectItem>
             <SelectItem value="Figurative">Figurative</SelectItem>
             <SelectItem value="Expressionist">Expressionist</SelectItem>
+            <SelectItem value="Surrealist">Surrealist</SelectItem>
+            <SelectItem value="Realist">Realist</SelectItem>
+            <SelectItem value="Naïve / Outsider">Naïve / Outsider</SelectItem>
+            <SelectItem value="Pop Art">Pop Art</SelectItem>
+            <SelectItem value="Conceptual">Conceptual</SelectItem>
+            <SelectItem value="Geometric">Geometric</SelectItem>
+            <SelectItem value="Symbolist">Symbolist</SelectItem>
+            <SelectItem value="Baroque / Classical">
+              Baroque / Classical
+            </SelectItem>
+            <SelectItem value="Street / Urban Art">
+              Street / Urban Art
+            </SelectItem>
+            <SelectItem value="Futurist / Sci-fi">Futurist / Sci-fi</SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -112,6 +157,21 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
             <SelectItem value="Watercolor">Watercolor</SelectItem>
             <SelectItem value="Digital">Digital</SelectItem>
             <SelectItem value="Mixed Media">Mixed Media</SelectItem>
+            <SelectItem value="Ink">Ink</SelectItem>
+            <SelectItem value="Charcoal">Charcoal</SelectItem>
+            <SelectItem value="Graphite">Graphite</SelectItem>
+            <SelectItem value="Pastel">Pastel</SelectItem>
+            <SelectItem value="Tempera">Tempera</SelectItem>
+            <SelectItem value="Collage">Collage</SelectItem>
+            <SelectItem value="Encaustic">Encaustic</SelectItem>
+            <SelectItem value="Etching">Etching</SelectItem>
+            <SelectItem value="Screen Printing">Screen Printing</SelectItem>
+            <SelectItem value="Assemblage">Assemblage</SelectItem>
+            <SelectItem value="3D Modeling">3D Modeling</SelectItem>
+            <SelectItem value="AI-generated">AI-generated</SelectItem>
+            <SelectItem value="Performance Documentation">
+              Performance Documentation
+            </SelectItem>
           </SelectContent>
         </Select>
       </div>
@@ -154,7 +214,11 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
 
       {isMobile && (
         <div className="pt-4 border-t">
-          <Button onClick={handleReset} variant="outline" className="w-full mb-2">
+          <Button
+            onClick={handleReset}
+            variant="outline"
+            className="w-full mb-2"
+          >
             <X className="mr-2 h-4 w-4" /> Reset Filters
           </Button>
           <Button onClick={() => setIsSheetOpen(false)} className="w-full">
@@ -176,14 +240,12 @@ export function ArtworkFilters({ onFilterChange }: ArtworkFiltersProps) {
         <SheetContent side="left" className="w-full sm:max-w-md">
           <SheetHeader className="mb-5">
             <SheetTitle>Filters</SheetTitle>
-            <SheetDescription>
-              Refine your artwork search
-            </SheetDescription>
+            <SheetDescription>Refine your artwork search</SheetDescription>
           </SheetHeader>
           <FiltersContent />
         </SheetContent>
       </Sheet>
-      
+
       <Select
         value={filters.sortBy}
         onValueChange={(value) => updateFilter("sortBy", value)}

@@ -46,10 +46,10 @@ export const ArtworksSection: FC<ArtworksSectionProps> = ({
       <div className="flex justify-between items-center">
         <CardTitle className="text-2xl">
           {filterStatus === "pending"
-            ? "Obras Pendientes"
+            ? "Pending Artworks"
             : filterStatus === "sold"
-            ? "Obras Vendidas"
-            : "Mis Obras"}
+            ? "Sold Artworks"
+            : "My Artworks"}
         </CardTitle>
         <div className="flex gap-2">
           <Button
