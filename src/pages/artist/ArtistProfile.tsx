@@ -44,15 +44,33 @@ interface Artwork {
 type FilterKey = "series" | "technique" | "category" | "year";
 
 const inspirationalQuotes = [
-  "Cada obra de arte es un acto de coraje.",
-  "El arte es la mentira que nos permite darnos cuenta de la verdad.",
-  "La creatividad es contagiosa, pásala.",
-  "El arte no reproduce lo visible, hace visible.",
-  "El arte es el puente entre lo visible y lo invisible.",
+  "Every work of art is an act of defiance.",
+  "Art is the lie that reveals the truth.",
+  "Creativity is contagious—pass it on.",
+  "Art does not depict the visible; it makes visible.",
+  "Art is the bridge between the seen and the unseen.",
+  "The artist is not a maker, but a revealer.",
+  "To create is to believe in something that doesn’t exist—yet.",
+  "Art is a wound turned into light.",
+  "Through art, we remember what it means to feel.",
+  "Great art whispers what cannot be screamed.",
+  "Art is the silence between words, the breath between thoughts.",
+  "True art does not decorate; it disrupts.",
+  "To create is to risk everything for something invisible.",
+  "Art is the most beautiful form of resistance.",
+  "Artists paint what others are too afraid to say.",
+  "Art is not a mirror—it’s a hammer.",
+  "What we dare not live, we paint.",
+  "Art heals what logic cannot touch.",
+  "A single line drawn with truth is worth a thousand perfect strokes.",
+  "In a world gone blind, the artist still sees.",
+  "In times of destruction, an Artist transcends by creating.",
+  "Creativity is allowing oneself to make mistakes. Art is knowing which ones to keep.",
+  "An artist doesn't just create art, but an extraordinary way to look into the ordinary.",
 ];
 
 export default function ArtistProfile() {
-  const { id } = useParams<{ id: string }>();
+  const { username } = useParams<{ username: string }>();
   const { user } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [artworks, setArtworks] = useState<Artwork[]>([]);
@@ -81,18 +99,24 @@ export default function ArtistProfile() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Choose table based on authentication
+      const tableName = user ? "profiles" : "public_profiles";
       try {
+        // Get profile by username
         const { data: profileData, error: profileError } = await supabase
-          .from("profiles")
+          .from(tableName)
           .select("*")
-          .eq("id", id)
+          .eq("username", username)
           .single();
         if (profileError) throw profileError;
 
+        // choose artworks table/view based on authentication
+        const artworksTable = user ? "artworks" : "public_artworks";
+        // Then get artworks by artist_id (profile id)
         const { data: artworksData, error: artworksError } = await supabase
-          .from("artworks")
+          .from(artworksTable)
           .select("*")
-          .eq("artist_id", id)
+          .eq("artist_id", profileData.id)
           .eq("status", "approved");
         if (artworksError) throw artworksError;
 
@@ -111,7 +135,7 @@ export default function ArtistProfile() {
             .from("follows")
             .select("*")
             .eq("follower_id", user.id)
-            .eq("followed_id", id)
+            .eq("followed_id", profileData.id)
             .maybeSingle();
           setIsFollowing(!!followData);
         }
@@ -124,7 +148,8 @@ export default function ArtistProfile() {
     };
 
     fetchData();
-  }, [id, user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [username, user]);
 
   const handleFollow = async () => {
     if (!user) {
@@ -137,12 +162,13 @@ export default function ArtistProfile() {
     }
 
     try {
+      if (!profile) return;
       if (isFollowing) {
         const { error } = await supabase
           .from("follows")
           .delete()
           .eq("follower_id", user.id)
-          .eq("followed_id", id);
+          .eq("followed_id", profile.id);
         if (error) throw error;
         toast({
           title: "Unfollowed",
@@ -151,7 +177,7 @@ export default function ArtistProfile() {
       } else {
         const { error } = await supabase.from("follows").insert({
           follower_id: user.id,
-          followed_id: id,
+          followed_id: profile.id,
         });
         if (error) throw error;
         toast({
@@ -352,7 +378,7 @@ export default function ArtistProfile() {
               </div>
             ) : (
               <p className="text-gray-500 text-center mt-8">
-                Este artista aún no ha subido obras aprobadas.
+                This artist has not uploaded any approved artworks yet.
               </p>
             )}
           </div>

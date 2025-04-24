@@ -6,7 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./providers/AuthProvider";
-import ArtistProfile from "@/pages/artist/[id]";
+import ArtistProfile from "./pages/artist/ArtistProfile";
 import { ArtworkUploadForm } from "@/components/artist/ArtworkUploadForm";
 
 // Pages
@@ -46,7 +46,7 @@ const App = () => (
               <Route path="/artists" element={<Artists />} />
               <Route path="/galleries" element={<Galleries />} />
               <Route path="/home" element={<Explore />} />
-              <Route path="/artist/:id" element={<ArtistProfile />} />
+              <Route path="/artist/:username" element={<ArtistProfile />} />
 
               {/* ✅ Admin Dashboard route habilitada */}
               <Route

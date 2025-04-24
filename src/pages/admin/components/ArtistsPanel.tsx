@@ -111,7 +111,10 @@ export default function ArtistsPanel() {
                 whileHover={{ scale: 1.02 }}
                 className="group relative"
               >
-                <Link to={`/artist/${artist.id}`} className="block h-full">
+                <Link
+                  to={`/artist/${artist.username}`}
+                  className="block h-full"
+                >
                   <Card className="overflow-hidden h-full border border-muted hover:ring-2 hover:ring-primary transition">
                     <div className="aspect-[4/3] overflow-hidden relative">
                       <img

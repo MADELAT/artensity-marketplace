@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
-import { useAuth } from '@/contexts/AuthContext';
+import { ReactNode } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface ProtectedRouteProps {
   children: ReactNode;
@@ -26,18 +26,24 @@ const ProtectedRoute = ({ children, allowedRoles }: ProtectedRouteProps) => {
     return <Navigate to="/login" state={{ from: location.pathname }} replace />;
   }
 
-  // ✅ Permitir al usuario logueado navegar en páginas públicas
-  const isPublicPath = ['/', '/explore', '/home', '/about', '/artists', '/galleries'].includes(location.pathname);
+  // Allow logged‑in users to access public pages (including individual artist profiles)
+  const isArtistPublic = location.pathname.startsWith("/artist/");
+  const isPublicPath =
+    isArtistPublic ||
+    ["/", "/explore", "/home", "/about", "/artists", "/galleries"].includes(
+      location.pathname
+    );
+
   if (profile && !allowedRoles.includes(profile.role) && !isPublicPath) {
-    if (location.pathname.startsWith('/dashboard/')) {
+    if (location.pathname.startsWith("/dashboard/")) {
       switch (profile.role) {
-        case 'admin':
+        case "admin":
           return <Navigate to="/dashboard/admin" replace />;
-        case 'artist':
+        case "artist":
           return <Navigate to="/dashboard/artist" replace />;
-        case 'gallery':
+        case "gallery":
           return <Navigate to="/dashboard/gallery" replace />;
-        case 'buyer':
+        case "buyer":
         default:
           return <Navigate to="/home" replace />;
       }
