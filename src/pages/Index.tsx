@@ -35,7 +35,7 @@ export default function Index() {
               ArTendency
             </h1>
             <p className="text-xl md:text-2xl text-white/90 mb-8 font-light tracking-wider">
-              Where artists exists
+              Art as an inspiring weapon
             </p>
             <div className="flex flex-wrap justify-center gap-6 mt-16">
               <Button size="lg" className="bg-transparent border border-white hover:bg-white/20 text-white text-lg px-8 py-6" asChild>
