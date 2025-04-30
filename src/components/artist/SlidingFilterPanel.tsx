@@ -182,6 +182,7 @@ export const SlidingFilterPanel = ({
         variant="outline" 
         className="flex items-center gap-2 mb-4"
         onClick={() => setOpen(true)}
+        id={`${Math.random().toString(36).substring(2, 9)}-filter-button`}
       >
         <SlidersHorizontal className="w-4 h-4" />
         <span>Filter</span>

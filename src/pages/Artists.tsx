@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Layout } from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -297,6 +296,7 @@ export default function Artists() {
                   <SlidingFilterPanel 
                     onFilterChange={handleFilterChange} 
                     initialFilters={filters} 
+                    id="artist-filter-button"
                   />
                 </div>
 

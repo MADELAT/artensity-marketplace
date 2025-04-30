@@ -1,3 +1,4 @@
+
 import * as LucideIcons from 'lucide-react';
 
 interface IconProps {
@@ -6,9 +7,12 @@ interface IconProps {
 }
 
 export function Icon({ name, className }: IconProps) {
-  const LucideIcon = LucideIcons[name];
+  const IconComponent = LucideIcons[name];
 
-  if (!LucideIcon) return null;
+  if (!IconComponent) {
+    console.warn(`Icon ${name} not found in lucide-react`);
+    return null;
+  }
 
-  return <LucideIcon className={className} />;
+  return <IconComponent className={className} />;
 }
