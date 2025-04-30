@@ -4,6 +4,10 @@ import { Layout } from "@/components/layout/Layout";
 import { ArtworkGrid } from "@/components/artwork/ArtworkGrid";
 import { ArtworkFilters, FilterValues } from "@/components/artwork/ArtworkFilters";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { SlidingFilterPanel } from "@/components/artist/SlidingFilterPanel";
+import { Button } from "@/components/ui/button";
+import { Filter } from "lucide-react";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
 
 export default function Explore() {
   const isMobile = useIsMobile();
@@ -32,12 +36,42 @@ export default function Explore() {
         <div className="flex flex-col md:flex-row gap-6">
           {!isMobile && (
             <div className="w-full md:w-1/4">
+              {/* Standard filters - visible on desktop */}
               <ArtworkFilters onFilterChange={handleFilterChange} />
+              
+              {/* Advanced filters */}
+              <div className="mt-6">
+                <SlidingFilterPanel 
+                  onFilterChange={handleFilterChange} 
+                  initialFilters={filters}
+                />
+              </div>
             </div>
           )}
           
           <div className="w-full md:w-3/4">
-            {isMobile && <ArtworkFilters onFilterChange={handleFilterChange} />}
+            {isMobile && (
+              <div className="flex flex-wrap gap-3 mb-4">
+                {/* Mobile filters */}
+                <ArtworkFilters onFilterChange={handleFilterChange} />
+                
+                {/* Mobile sliding filter panel */}
+                <Drawer>
+                  <DrawerTrigger asChild>
+                    <Button variant="outline" className="flex items-center gap-2">
+                      <Filter className="h-4 w-4" />
+                      <span>Advanced Filters</span>
+                    </Button>
+                  </DrawerTrigger>
+                  <DrawerContent>
+                    <div className="px-4 py-6">
+                      <SlidingFilterPanel onFilterChange={handleFilterChange} initialFilters={filters} />
+                    </div>
+                  </DrawerContent>
+                </Drawer>
+              </div>
+            )}
+            
             <ArtworkGrid 
               category={filters.category !== "all" ? filters.category : ""} 
               style={filters.style !== "all" ? filters.style : ""} 

@@ -1,3 +1,4 @@
+
 // GalleryProfile.tsx – usa ParallaxHeroGallery como componente externo
 
 import { useEffect, useState } from "react";
@@ -5,8 +6,11 @@ import { useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
-import { Instagram, Facebook, Globe } from "lucide-react";
+import { Instagram, Facebook, Globe, Filter } from "lucide-react";
 import ParallaxHeroGallery from "@/components/gallery/ParallaxHeroGallery";
+import { SlidingFilterPanel, FilterValues } from "@/components/artist/SlidingFilterPanel";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const inspirationalQuotes = [
   "Every work of art is an act of defiance.",
@@ -15,7 +19,7 @@ const inspirationalQuotes = [
   "Art does not depict the visible; it makes visible.",
   "Art is the bridge between the seen and the unseen.",
   "The artist is not a maker, but a revealer.",
-  "To create is to believe in something that doesn’t exist—yet.",
+  "To create is to believe in something that doesn't exist—yet.",
   "Art is a wound turned into light.",
   "Through art, we remember what it means to feel.",
   "Great art whispers what cannot be screamed.",
@@ -24,7 +28,7 @@ const inspirationalQuotes = [
   "To create is to risk everything for something invisible.",
   "Art is the most beautiful form of resistance.",
   "Artists paint what others are too afraid to say.",
-  "Art is not a mirror—it’s a hammer.",
+  "Art is not a mirror—it's a hammer.",
   "What we dare not live, we paint.",
   "Art heals what logic cannot touch.",
   "A single line drawn with truth is worth a thousand perfect strokes.",
@@ -54,9 +58,24 @@ const fallbackImages = [
 export default function GalleryProfile() {
   const { username } = useParams();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
 
   const [gallery, setGallery] = useState(null);
   const [featuredArtwork, setFeaturedArtwork] = useState(null);
+  const [activeTab, setActiveTab] = useState('Overview');
+  const [filters, setFilters] = useState<FilterValues>({
+    category: "all",
+    style: "all",
+    technique: "all",
+    priceRange: [0, 10000],
+    sortBy: "newest",
+  });
+
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+    // Here you would typically fetch filtered data
+    console.log("Applied filters:", newFilters);
+  };
 
   useEffect(() => {
     const fetchGallery = async () => {
@@ -131,24 +150,51 @@ export default function GalleryProfile() {
           {['Overview', 'Artists', 'Artworks', 'Events', 'Contact'].map((item) => (
             <li
               key={item}
-              className="hover:text-black transition-colors cursor-pointer text-sm md:text-base">
+              className={`hover:text-black transition-colors cursor-pointer text-sm md:text-base ${
+                activeTab === item ? "font-medium text-black" : ""
+              }`}
+              onClick={() => setActiveTab(item)}
+            >
               {item}
             </li>
           ))}
         </ul>
       </nav>
 
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 px-4 py-16">
-        {mockArtists.map((artist, i) => (
-          <div
-            key={i}
-            className="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition">
-            <h3 className="text-lg font-semibold mb-1">{artist.name}</h3>
-            <p className="text-sm text-gray-500">{artist.country}</p>
-            <p className="text-xs text-gray-400 italic">{artist.style}</p>
-          </div>
-        ))}
-      </section>
+      <div className="container mx-auto px-4 py-8">
+        {/* Filter integration */}
+        <div className="mb-6">
+          {isMobile ? (
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant="outline" className="flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  <span>Filter</span>
+                </Button>
+              </DrawerTrigger>
+              <DrawerContent>
+                <div className="px-4 py-6">
+                  <SlidingFilterPanel onFilterChange={handleFilterChange} initialFilters={filters} />
+                </div>
+              </DrawerContent>
+            </Drawer>
+          ) : (
+            <SlidingFilterPanel onFilterChange={handleFilterChange} initialFilters={filters} />
+          )}
+        </div>
+
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {mockArtists.map((artist, i) => (
+            <div
+              key={i}
+              className="border border-gray-200 p-4 rounded-lg shadow-sm hover:shadow-md transition">
+              <h3 className="text-lg font-semibold mb-1">{artist.name}</h3>
+              <p className="text-sm text-gray-500">{artist.country}</p>
+              <p className="text-xs text-gray-400 italic">{artist.style}</p>
+            </div>
+          ))}
+        </section>
+      </div>
 
       <footer className="border-t py-8 text-center">
         <div className="flex justify-center space-x-4 text-gray-500">

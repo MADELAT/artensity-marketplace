@@ -18,9 +18,25 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { MapPin, Search, Filter, Building, Users } from 'lucide-react';
+import { SlidingFilterPanel, FilterValues } from "@/components/artist/SlidingFilterPanel";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+// Define the Gallery interface for type safety
+interface Gallery {
+  id: string;
+  first_name: string;
+  location: string;
+  bio: string;
+  avatar_url: string;
+  specialization: string;
+  founded: string;
+  artists_count: number;
+  featured_image: string;
+}
 
 // Mock gallery data
-const mockGalleries = [
+const mockGalleries: Gallery[] = [
   {
     id: '1',
     first_name: 'Galería Marlborough',
@@ -133,13 +149,15 @@ const specializations = [
 ];
 
 export default function Galleries() {
-  const [galleries, setGalleries] = useState(mockGalleries);
+  const [galleries, setGalleries] = useState<Gallery[]>(mockGalleries);
   const [loading, setLoading] = useState(true);
   const [locationFilter, setLocationFilter] = useState('Todas las ciudades');
   const [specializationFilter, setSpecializationFilter] = useState('Todas las especialidades');
   const [searchTerm, setSearchTerm] = useState('');
   const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [filters, setFilters] = useState<FilterValues>({});
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     fetchGalleries();
@@ -159,7 +177,19 @@ export default function Galleries() {
       
       // If we got real data, use it; otherwise, use mock data
       if (data && data.length > 0) {
-        setGalleries(data);
+        // Transform the data to match our Gallery interface
+        const transformedData: Gallery[] = data.map(profile => ({
+          id: profile.id,
+          first_name: profile.first_name || '',
+          location: profile.city || 'Unknown',
+          bio: profile.bio || 'Gallery on ArTendency',
+          avatar_url: profile.avatar_url || '',
+          specialization: profile.specialization || 'Arte contemporáneo',
+          founded: profile.founded_year || '',
+          artists_count: profile.artists_count || Math.floor(Math.random() * 30) + 5,
+          featured_image: profile.featured_image || '',
+        }));
+        setGalleries(transformedData);
       } else {
         setGalleries(mockGalleries);
       }
@@ -175,6 +205,22 @@ export default function Galleries() {
       setLoading(false);
     }
   };
+
+  // Handle filter changes from SlidingFilterPanel
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+    
+    // Update existing filters if applicable
+    if (newFilters.location) {
+      setLocationFilter(newFilters.location === 'All Locations' ? 'Todas las ciudades' : newFilters.location);
+    }
+    
+    if (newFilters.style) {
+      setSpecializationFilter(newFilters.style === 'all' ? 'Todas las especialidades' : newFilters.style);
+    }
+    
+    console.log("Applied filters:", newFilters);
+  };
   
   // Filter galleries based on selected filters
   const filteredGalleries = galleries.filter((gallery) => {
@@ -184,7 +230,17 @@ export default function Galleries() {
       gallery.first_name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFeatured = !featuredOnly || (featuredOnly && gallery.featured_image);
     
-    return matchesLocation && matchesSpecialization && matchesSearch && matchesFeatured;
+    // Additional filters from SlidingFilterPanel
+    const matchesExtraFilters = Object.entries(filters).every(([key, value]) => {
+      if (!value || key === 'location' || key === 'style') return true;
+      if (key === 'country' && value !== 'All Countries') {
+        // For simplicity, we're assuming Spanish galleries unless specified otherwise
+        return value === 'Spain';
+      }
+      return true;
+    });
+    
+    return matchesLocation && matchesSpecialization && matchesSearch && matchesFeatured && matchesExtraFilters;
   });
   
   return (
@@ -222,6 +278,41 @@ export default function Galleries() {
                 </div>
                 
                 <Separator />
+                
+                {/* New sliding filter panel integration */}
+                <div className="mb-4">
+                  {isMobile ? (
+                    <Drawer>
+                      <DrawerTrigger asChild>
+                        <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+                          <Filter className="h-4 w-4" />
+                          <span>Filtros avanzados</span>
+                        </Button>
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <div className="px-4 py-6">
+                          <SlidingFilterPanel onFilterChange={handleFilterChange} initialFilters={filters} />
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      className="w-full flex items-center justify-center gap-2"
+                      onClick={() => document.getElementById('gallery-filter-button')?.click()}
+                    >
+                      <Filter className="h-4 w-4" />
+                      <span>Filtros avanzados</span>
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="hidden">
+                  <SlidingFilterPanel 
+                    onFilterChange={handleFilterChange} 
+                    initialFilters={filters} 
+                  />
+                </div>
                 
                 <div>
                   <h3 className="font-medium mb-3 flex items-center gap-2">
@@ -288,6 +379,7 @@ export default function Galleries() {
                     setSpecializationFilter('Todas las especialidades');
                     setSearchTerm('');
                     setFeaturedOnly(false);
+                    setFilters({});
                   }}
                 >
                   Limpiar filtros
@@ -313,6 +405,7 @@ export default function Galleries() {
                       setSpecializationFilter('Todas las especialidades');
                       setSearchTerm('');
                       setFeaturedOnly(false);
+                      setFilters({});
                     }}
                   >
                     Limpiar filtros
@@ -373,7 +466,7 @@ export default function Galleries() {
                           
                           <div className="mt-3 flex items-center gap-2">
                             <Users className="h-4 w-4 text-muted-foreground" />
-                            <span className="text-sm">{gallery.artists_count || Math.floor(Math.random() * 20) + 10} artistas</span>
+                            <span className="text-sm">{gallery.artists_count} artistas</span>
                           </div>
                         </CardContent>
                       </Card>

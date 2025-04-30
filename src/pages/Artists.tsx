@@ -18,9 +18,24 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from '@/integrations/supabase/client';
 import { Link } from 'react-router-dom';
 import { Search, Filter, MapPin } from 'lucide-react';
+import { SlidingFilterPanel, FilterValues } from "@/components/artist/SlidingFilterPanel";
+import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import { useIsMobile } from "@/hooks/use-mobile";
+
+// Define the Artist interface for type safety
+interface Artist {
+  id: string;
+  first_name: string;
+  last_name: string;
+  country: string;
+  style: string;
+  bio: string;
+  featured_artwork: string;
+  avatar_url: string;
+}
 
 // Mock artist data
-const mockArtists = [
+const mockArtists: Artist[] = [
   {
     id: '1',
     first_name: 'Carmen',
@@ -124,13 +139,15 @@ const countries = [
 ];
 
 export default function Artists() {
-  const [artists, setArtists] = useState(mockArtists);
+  const [artists, setArtists] = useState<Artist[]>(mockArtists);
   const [loading, setLoading] = useState(true);
   const [styleFilter, setStyleFilter] = useState('Todos los estilos');
   const [countryFilter, setCountryFilter] = useState('Todos los países');
   const [searchTerm, setSearchTerm] = useState('');
   const [featuredOnly, setFeaturedOnly] = useState(false);
+  const [filters, setFilters] = useState<FilterValues>({});
   const { toast } = useToast();
+  const isMobile = useIsMobile();
   
   useEffect(() => {
     fetchArtists();
@@ -150,7 +167,18 @@ export default function Artists() {
       
       // If we got real data, use it; otherwise, use mock data
       if (data && data.length > 0) {
-        setArtists(data);
+        // Transform the data to match our Artist interface
+        const transformedData: Artist[] = data.map(profile => ({
+          id: profile.id,
+          first_name: profile.first_name || '',
+          last_name: profile.last_name || '',
+          country: profile.country || 'Unknown',
+          style: profile.style || 'Contemporary',
+          bio: profile.bio || 'Artist on ArTendency',
+          featured_artwork: profile.featured_artwork || '',
+          avatar_url: profile.avatar_url || '',
+        }));
+        setArtists(transformedData);
       } else {
         setArtists(mockArtists);
       }
@@ -166,6 +194,22 @@ export default function Artists() {
       setLoading(false);
     }
   };
+
+  // Handle filter changes from SlidingFilterPanel
+  const handleFilterChange = (newFilters: FilterValues) => {
+    setFilters(newFilters);
+    
+    // Update existing filters if applicable
+    if (newFilters.style) {
+      setStyleFilter(newFilters.style === 'all' ? 'Todos los estilos' : newFilters.style);
+    }
+    
+    if (newFilters.country) {
+      setCountryFilter(newFilters.country === 'All Countries' ? 'Todos los países' : newFilters.country);
+    }
+    
+    console.log("Applied filters:", newFilters);
+  };
   
   // Filter artists based on selected filters
   const filteredArtists = artists.filter((artist) => {
@@ -175,7 +219,14 @@ export default function Artists() {
       `${artist.first_name} ${artist.last_name}`.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFeatured = !featuredOnly || (featuredOnly && artist.featured_artwork);
     
-    return matchesStyle && matchesCountry && matchesSearch && matchesFeatured;
+    // Additional filters from SlidingFilterPanel
+    const matchesExtraFilters = Object.entries(filters).every(([key, value]) => {
+      if (!value || key === 'style' || key === 'country') return true;
+      if (key === 'technique' && value !== 'all') return artist.style.includes(value);
+      return true;
+    });
+    
+    return matchesStyle && matchesCountry && matchesSearch && matchesFeatured && matchesExtraFilters;
   });
   
   return (
@@ -214,6 +265,41 @@ export default function Artists() {
                 
                 <Separator />
                 
+                {/* New sliding filter panel integration */}
+                <div className="mb-4">
+                  {isMobile ? (
+                    <Drawer>
+                      <DrawerTrigger asChild>
+                        <Button variant="outline" className="w-full flex items-center justify-center gap-2">
+                          <Filter className="h-4 w-4" />
+                          <span>Filtros avanzados</span>
+                        </Button>
+                      </DrawerTrigger>
+                      <DrawerContent>
+                        <div className="px-4 py-6">
+                          <SlidingFilterPanel onFilterChange={handleFilterChange} initialFilters={filters} />
+                        </div>
+                      </DrawerContent>
+                    </Drawer>
+                  ) : (
+                    <Button 
+                      variant="outline" 
+                      className="w-full flex items-center justify-center gap-2"
+                      onClick={() => document.getElementById('artist-filter-button')?.click()}
+                    >
+                      <Filter className="h-4 w-4" />
+                      <span>Filtros avanzados</span>
+                    </Button>
+                  )}
+                </div>
+                
+                <div className="hidden">
+                  <SlidingFilterPanel 
+                    onFilterChange={handleFilterChange} 
+                    initialFilters={filters} 
+                  />
+                </div>
+
                 <div>
                   <h3 className="font-medium mb-3 flex items-center gap-2">
                     <Filter className="h-4 w-4" /> Filtros
@@ -279,6 +365,7 @@ export default function Artists() {
                     setCountryFilter('Todos los países');
                     setSearchTerm('');
                     setFeaturedOnly(false);
+                    setFilters({});
                   }}
                 >
                   Limpiar filtros
@@ -304,6 +391,7 @@ export default function Artists() {
                       setCountryFilter('Todos los países');
                       setSearchTerm('');
                       setFeaturedOnly(false);
+                      setFilters({});
                     }}
                   >
                     Limpiar filtros
