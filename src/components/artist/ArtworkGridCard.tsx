@@ -29,6 +29,7 @@ interface Artwork {
   created_at: string;
 }
 
+// Create a string literal type to ensure only these values are accepted
 type ViewMode = 'grid' | 'list';
 
 interface ArtworkGridCardProps {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { Artwork } from "@/types/supabase";
@@ -13,6 +12,10 @@ export interface ArtworkCardData {
   imageUrl: string;
   year: number | null;
   medium: string;
+  // Add missing properties
+  category: string;
+  series: string;
+  technique: string;
   isFavorite?: boolean;
 }
 
@@ -57,6 +60,10 @@ export function useArtworks({
         imageUrl: artwork.image_url || '',
         year: artwork.year,
         medium: artwork.technique || 'Unknown',
+        // Add the missing properties with default values if not available
+        category: artwork.category || '',
+        series: '', // No direct mapping in provided Artwork type
+        technique: artwork.technique || '',
       }));
       setArtworks(mappedArtworks);
       setLoading(false);
@@ -124,6 +131,16 @@ export function useArtworks({
             "Photography",
             "Installation"
           ][index % 8],
+          // Add missing properties with sample data
+          category: [
+            "Painting", "Sculpture", "Photography", "Digital", "Mixed Media"
+          ][index % 5],
+          series: [
+            "Urban Life", "Nature's Embrace", "Abstract Emotions", "Dreams", "Landscapes"
+          ][index % 5],
+          technique: [
+            "Oil", "Acrylic", "Watercolor", "Digital", "Mixed Media"
+          ][index % 5],
         }));
         
         // Filter by props if provided

@@ -14,5 +14,8 @@ export function Icon({ name, className }: IconProps) {
     return null;
   }
 
-  return <LucideIcon className={className} />;
+  // Cast the icon component to the correct type to fix TypeScript error
+  const IconComponent = LucideIcon as React.ComponentType<{ className?: string }>;
+  
+  return <IconComponent className={className} />;
 }
