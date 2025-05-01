@@ -29,7 +29,7 @@ interface Artwork {
   created_at: string;
 }
 
-// Create a string literal type to ensure only these values are accepted
+// Define ViewMode as a string to avoid type comparison issues
 type ViewMode = 'grid' | 'list';
 
 interface ArtworkGridCardProps {
@@ -70,6 +70,7 @@ export function ArtworkGridCard({
     }).format(price);
   };
 
+  // Check if we're in list mode and render the list view if true
   if (viewMode === 'list') {
     return (
       <Card className="group">
@@ -147,6 +148,7 @@ export function ArtworkGridCard({
     );
   }
 
+  // Render the grid view for 'grid' mode (default)
   return (
     <Card
       className={cn(
@@ -173,7 +175,7 @@ export function ArtworkGridCard({
 
       <CardContent className={cn(
         "p-4",
-        viewMode === 'list' && "flex-1"
+        viewMode === 'list' ? "flex-1" : ""
       )}>
         <div className="space-y-2">
           <h3 className="font-medium truncate">{artwork.title}</h3>
@@ -188,7 +190,7 @@ export function ArtworkGridCard({
 
         <div className={cn(
           "flex gap-2 mt-4",
-          viewMode === 'list' && "justify-end"
+          viewMode === 'list' ? "justify-end" : ""
         )}>
           <Button variant="outline" size="icon" onClick={onEdit}>
             <Edit2 className="h-4 w-4" />
