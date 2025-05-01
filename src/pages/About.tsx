@@ -1,86 +1,188 @@
 
+import { motion } from "framer-motion";
 import { Layout } from "@/components/layout/Layout";
+import { Globe, Award, Users, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
+
+// Animaciones para elementos al hacer scroll
+const fadeInUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
+};
 
 export default function About() {
   return (
     <Layout>
-      <div className="relative min-h-screen">
-        {/* Background Image with Overlay */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1572947650440-e8a97ef053b2?q=80&w=2070"
-            alt="Gallery Interior"
-            className="w-full h-full object-cover opacity-20"
-          />
-          <div className="absolute inset-0 bg-gradient-to-b from-background/50 to-background/80"></div>
-        </div>
+      {/* Hero Section con Parallax */}
+      <div 
+        className="relative min-h-[60vh] flex items-center justify-center bg-cover bg-center bg-fixed"
+        style={{ 
+          backgroundImage: `url(https://unsplash.com/photos/C5s_V9SNXmI/download?force=true)` 
+        }}
+      >
+        {/* Overlay para mejorar legibilidad del texto */}
+        <div className="absolute inset-0 bg-black/50 backdrop-blur-sm z-0"></div>
         
-        <div className="container mx-auto px-4 py-24 relative z-10">
-          <div className="max-w-4xl mx-auto space-y-12">
-            <div className="text-center space-y-4">
-              <h1 className="text-5xl font-serif font-light tracking-wider">Sobre ArTendency</h1>
-              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-                Una plataforma creada por y para artistas, galeristas y coleccionistas
+        {/* Contenido del Hero */}
+        <div className="container mx-auto relative z-10 text-center px-4 py-16">
+          <motion.h1 
+            className="text-5xl md:text-6xl font-serif text-white mb-4 tracking-wider"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            Sobre ArTendency
+          </motion.h1>
+          
+          <motion.p 
+            className="text-xl md:text-2xl text-white/90 italic font-serif max-w-3xl mx-auto mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+          >
+            "El arte no se explica, se respira. Esta es nuestra forma de respirar."
+          </motion.p>
+        </div>
+      </div>
+      
+      {/* Contenido Principal */}
+      <div className="container mx-auto px-4 py-16 md:py-24">
+        <div className="max-w-5xl mx-auto space-y-24">
+          {/* Nuestra Misión */}
+          <motion.section 
+            className="grid md:grid-cols-2 gap-8 items-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <motion.div className="space-y-6" variants={fadeInUp}>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
+                <Globe className="w-8 h-8" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-serif font-light">Nuestra Misión</h2>
+              <p className="text-lg text-muted-foreground">
+                ArTendency nace con el propósito de democratizar el acceso al arte contemporáneo, 
+                tejiendo un puente invisible entre artistas emergentes y establecidos con coleccionistas y 
+                amantes del arte alrededor del mundo.
               </p>
-            </div>
+              <p className="text-lg text-muted-foreground">
+                Creemos firmemente en la magia de la transparencia, la autenticidad y la 
+                trazabilidad en el mercado del arte, ofreciendo un espacio donde cada obra 
+                cuenta su historia, desde su concepción hasta su nuevo hogar.
+              </p>
+            </motion.div>
             
-            <div className="space-y-12">
-              <section className="space-y-6 bg-white/10 backdrop-blur-sm p-8 rounded-lg">
-                <h2 className="text-3xl font-serif font-light">Nuestra Misión</h2>
-                <p className="text-lg">
-                  ArTendency nace con el propósito de democratizar el acceso al arte contemporáneo, 
-                  creando un puente entre artistas emergentes y establecidos con coleccionistas y 
-                  amantes del arte alrededor del mundo.
-                </p>
-                <p className="text-lg">
-                  Creemos firmemente en la importancia de la transparencia, la autenticidad y la 
-                  trazabilidad en el mercado del arte, ofreciendo una plataforma que garantiza 
-                  la procedencia y autenticidad de cada obra.
-                </p>
-              </section>
-              
-              <section className="space-y-6 bg-white/10 backdrop-blur-sm p-8 rounded-lg">
-                <h2 className="text-3xl font-serif font-light">Curaduría y Calidad</h2>
-                <p className="text-lg">
-                  Cada artista y obra en ArTendency pasa por un riguroso proceso de selección 
-                  y verificación. Nuestro comité curatorial, formado por profesionales del arte 
-                  con amplia experiencia, evalúa cuidadosamente cada solicitud.
-                </p>
-                <p className="text-lg">
-                  Este enfoque nos permite mantener un alto nivel de calidad, ofreciendo a los 
-                  coleccionistas la seguridad de invertir en obras auténticas con potencial 
-                  artístico y económico.
-                </p>
-              </section>
-              
-              <section className="space-y-6 bg-white/10 backdrop-blur-sm p-8 rounded-lg">
-                <h2 className="text-3xl font-serif font-light">Una Comunidad Global</h2>
-                <p className="text-lg">
-                  ArTendency es más que un marketplace: es una comunidad global que conecta 
-                  a personas apasionadas por el arte. Artistas, galerías y coleccionistas de 
-                  todo el mundo encuentran en nuestra plataforma un espacio para descubrir, 
-                  conectar y crecer.
-                </p>
-                <p className="text-lg">
-                  Facilitamos el intercambio cultural y artístico sin fronteras, promoviendo 
-                  el descubrimiento de nuevos talentos y tendencias desde cualquier rincón 
-                  del planeta.
-                </p>
-              </section>
-              
-              <section className="space-y-6 bg-white/10 backdrop-blur-sm p-8 rounded-lg">
-                <h2 className="text-3xl font-serif font-light">Únete a Nosotros</h2>
-                <p className="text-lg">
-                  Te invitamos a formar parte de ArTendency, ya sea como artista, galería o coleccionista. 
-                  Juntos, estamos redefiniendo el futuro del mercado del arte, haciéndolo más accesible, 
-                  transparente y conectado.
-                </p>
-                <p className="text-lg">
-                  Descubre, colecciona y conecta a través del arte en ArTendency.
-                </p>
-              </section>
-            </div>
-          </div>
+            <motion.div 
+              className="aspect-square bg-cover bg-center rounded-lg shadow-xl overflow-hidden"
+              variants={fadeInUp}
+              style={{ 
+                backgroundImage: `url(https://unsplash.com/photos/ieHjFj4lZvo/download?force=true)` 
+              }}
+            >
+              <div className="w-full h-full bg-gradient-to-br from-primary/30 to-transparent"></div>
+            </motion.div>
+          </motion.section>
+          
+          {/* Curaduría y Calidad */}
+          <motion.section 
+            className="grid md:grid-cols-2 gap-8 items-center md:flex-row-reverse"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <motion.div className="space-y-6 md:order-2" variants={fadeInUp}>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
+                <Award className="w-8 h-8" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-serif font-light">Curaduría y Calidad</h2>
+              <p className="text-lg text-muted-foreground">
+                Cada artista y obra en ArTendency atraviesa un delicado proceso de selección 
+                y verificación. Nuestro comité curatorial, formado por almas entregadas al arte
+                con décadas de experiencia, evalúa cuidadosamente cada pincelada, cada concepto.
+              </p>
+              <p className="text-lg text-muted-foreground">
+                Este enfoque nos permite crear un ecosistema de excelencia donde los 
+                coleccionistas encuentran la confianza de invertir en piezas auténticas con 
+                valor artístico y potencial que trasciende el tiempo.
+              </p>
+            </motion.div>
+            
+            <motion.div 
+              className="aspect-square bg-cover bg-center rounded-lg shadow-xl overflow-hidden md:order-1"
+              variants={fadeInUp}
+              style={{ 
+                backgroundImage: `url(https://unsplash.com/photos/UsUfpYMBgRo/download?force=true)` 
+              }}
+            >
+              <div className="w-full h-full bg-gradient-to-br from-primary/30 to-transparent"></div>
+            </motion.div>
+          </motion.section>
+          
+          {/* Una Comunidad Global */}
+          <motion.section 
+            className="grid md:grid-cols-2 gap-8 items-center"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-100px" }}
+          >
+            <motion.div className="space-y-6" variants={fadeInUp}>
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 text-primary mb-4">
+                <Users className="w-8 h-8" />
+              </div>
+              <h2 className="text-3xl md:text-4xl font-serif font-light">Una Comunidad Global</h2>
+              <p className="text-lg text-muted-foreground">
+                ArTendency es mucho más que un marketplace: es un ecosistema vibrante que conecta 
+                a almas apasionadas por la expresión artística. Artistas, galerías y coleccionistas de 
+                todo el mundo encuentran aquí un lienzo en blanco para descubrir, 
+                conectar y crecer.
+              </p>
+              <p className="text-lg text-muted-foreground">
+                Facilitamos el diálogo cultural y artístico sin fronteras, celebrando 
+                el descubrimiento de nuevas voces y tendencias desde cualquier rincón 
+                del planeta, tejiendo una red global unida por la belleza.
+              </p>
+            </motion.div>
+            
+            <motion.div 
+              className="aspect-square bg-cover bg-center rounded-lg shadow-xl overflow-hidden"
+              variants={fadeInUp}
+              style={{ 
+                backgroundImage: `url(https://unsplash.com/photos/9I2W5-7Kp4k/download?force=true)` 
+              }}
+            >
+              <div className="w-full h-full bg-gradient-to-br from-primary/30 to-transparent"></div>
+            </motion.div>
+          </motion.section>
+          
+          {/* CTA Final */}
+          <motion.section 
+            className="text-center py-8 md:py-16"
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+          >
+            <motion.h2 
+              className="text-3xl md:text-4xl font-serif font-light mb-6"
+              variants={fadeInUp}
+            >
+              Únete a Nosotros
+            </motion.h2>
+            
+            <motion.p 
+              className="text-lg text-muted-foreground max-w-3xl mx-auto mb-8"
+              variants={fadeInUp}
+            >
+              Te invitamos a formar parte del universo ArTendency, ya sea como artista, galería o coleccionista. 
+              Juntos, estamos reescribiendo el futuro del mercado del arte, haciéndolo más accesible, 
+              transparente y conectado.
+            </motion.p>
+            
+            <motion.div variants={fadeInUp}>
+              <Button size="lg" className="font-serif">
+                Descubre más <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+            </motion.div>
+          </motion.section>
         </div>
       </div>
     </Layout>
