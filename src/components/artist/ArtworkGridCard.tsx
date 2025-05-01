@@ -29,7 +29,7 @@ interface Artwork {
   created_at: string;
 }
 
-// Define ViewMode as a string to avoid type comparison issues
+// Define ViewMode as a string type with strictly 'grid' or 'list' options
 type ViewMode = 'grid' | 'list';
 
 interface ArtworkGridCardProps {
