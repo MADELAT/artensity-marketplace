@@ -1,7 +1,10 @@
-import { createClient } from '@supabase/supabase-js'
+// src/integrations/supabase/client.ts
 
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+import { createClient } from '@supabase/supabase-js';
+import { SUPABASE_URL, SUPABASE_ANON_KEY } from '@/env.public';
+
+const supabaseUrl = SUPABASE_URL;
+const supabaseAnonKey = SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables. Please check your .env file.');
@@ -14,10 +17,3 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: true
   }
 });
-
-// (Opcional) Prueba de conexión
-// const testConnection = async () => {
-//   const { data, error } = await supabase.storage.listBuckets();
-//   console.log('Buckets visibles desde Supabase client.ts:', data, error);
-// };
-// testConnection();
