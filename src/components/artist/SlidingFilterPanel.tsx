@@ -314,14 +314,14 @@ export const SlidingFilterPanel = ({
             <div className="space-y-2">
               <h3 className="text-sm font-medium">Year</h3>
               <Select 
-                value={filters.year?.toString() || ""} 
-                onValueChange={(value) => handleFilterChange('year', value ? parseInt(value) : undefined)}
+                value={filters.year?.toString() || "all_years"} 
+                onValueChange={(value) => handleFilterChange('year', value === "all_years" ? undefined : parseInt(value))}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select year" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="">All Years</SelectItem>
+                  <SelectItem value="all_years">All Years</SelectItem>
                   {availableYears.map((year) => (
                     <SelectItem key={year} value={year.toString()}>
                       {year}
