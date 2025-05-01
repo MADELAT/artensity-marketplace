@@ -7,12 +7,12 @@ interface IconProps {
 }
 
 export function Icon({ name, className }: IconProps) {
-  const IconComponent = LucideIcons[name];
+  const LucideIcon = LucideIcons[name];
 
-  if (!IconComponent) {
+  if (!LucideIcon) {
     console.warn(`Icon ${name} not found in lucide-react`);
     return null;
   }
 
-  return <IconComponent className={className} />;
+  return <LucideIcon className={className} />;
 }

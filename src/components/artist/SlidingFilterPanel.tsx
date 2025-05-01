@@ -56,12 +56,14 @@ interface SlidingFilterPanelProps {
   onFilterChange: (filters: FilterValues) => void;
   initialFilters?: FilterValues;
   filterOptions?: FilterOptions;
+  id?: string;
 }
 
 export const SlidingFilterPanel = ({
   onFilterChange,
   initialFilters = {},
-  filterOptions = {}
+  filterOptions = {},
+  id
 }: SlidingFilterPanelProps) => {
   // State for managing the filters
   const [filters, setFilters] = useState<FilterValues>(initialFilters);
@@ -182,7 +184,7 @@ export const SlidingFilterPanel = ({
         variant="outline" 
         className="flex items-center gap-2 mb-4"
         onClick={() => setOpen(true)}
-        id={`${Math.random().toString(36).substring(2, 9)}-filter-button`}
+        id={id || `${Math.random().toString(36).substring(2, 9)}-filter-button`}
       >
         <SlidersHorizontal className="w-4 h-4" />
         <span>Filter</span>

@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -28,9 +29,11 @@ interface Artwork {
   created_at: string;
 }
 
+type ViewMode = 'grid' | 'list';
+
 interface ArtworkGridCardProps {
   artwork: Artwork;
-  viewMode: 'grid' | 'list';
+  viewMode: ViewMode;
   onEdit: () => void;
   onView: () => void;
   onViewStats: () => void;
@@ -155,7 +158,7 @@ export function ArtworkGridCard({
         viewMode === 'grid' ? "aspect-square" : "w-48"
       )}>
         <img
-          src={artwork.image_url || '/placeholder-artwork.jpg'}
+          src={artwork.image_url || '/placeholder.svg'}
           alt={artwork.title}
           className="w-full h-full object-cover"
         />
@@ -202,4 +205,4 @@ export function ArtworkGridCard({
       </CardContent>
     </Card>
   );
-} 
+}

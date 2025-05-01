@@ -49,6 +49,9 @@ export function ArtworkGrid({ category, artistId, style, technique, artworks: pr
           imageUrl={artwork.imageUrl}
           year={artwork.year || 0}
           medium={artwork.medium}
+          category={artwork.category || ""}
+          series={artwork.series || ""}
+          technique={artwork.technique || ""}
           isFavorite={favorites.includes(artwork.id)}
           onToggleFavorite={handleToggleFavorite}
         />

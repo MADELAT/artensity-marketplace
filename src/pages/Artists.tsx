@@ -296,7 +296,6 @@ export default function Artists() {
                   <SlidingFilterPanel 
                     onFilterChange={handleFilterChange} 
                     initialFilters={filters} 
-                    id="artist-filter-button"
                   />
                 </div>
 

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -12,8 +11,8 @@ export default function BuyerDashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
   
   return (
-    <DashboardLayout userType="buyer">
-      <div className="flex flex-col space-y-6">
+    <div className="min-h-screen bg-background">
+      <div className="flex flex-col space-y-6 p-6">
         <div>
           <h1 className="text-3xl font-bold">Collector Dashboard</h1>
           <p className="text-muted-foreground">
@@ -115,6 +114,6 @@ export default function BuyerDashboard() {
           </TabsContent>
         </Tabs>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

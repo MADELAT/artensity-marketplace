@@ -11,46 +11,46 @@ import { ArtistWelcome } from '@/components/artist/ArtistWelcome';
 import { ArtworkGrid } from '@/components/artist/ArtworkGrid';
 import { useState } from 'react';
 
-interface Artwork {
+interface DashboardArtwork {
   id: string;
   title: string;
   description: string;
-  imageUrl: string;
+  image_url: string; // Changed from imageUrl for consistency
   price: number;
   status: 'available' | 'sold' | 'reserved';
   views: number;
   likes: number;
-  createdAt: Date;
+  created_at: string; // Changed from createdAt for consistency
 }
 
-const exampleArtworks: Artwork[] = [
+const exampleArtworks: DashboardArtwork[] = [
   {
     id: '1',
     title: 'Atardecer en la playa',
     description: 'Óleo sobre lienzo, 60x80cm',
-    imageUrl: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=500&auto=format&fit=crop&q=60',
+    image_url: 'https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=500&auto=format&fit=crop&q=60',
     price: 1200,
     status: 'available',
     views: 156,
     likes: 23,
-    createdAt: new Date('2024-01-15')
+    created_at: '2024-01-15'
   },
   {
     id: '2',
     title: 'Retrato urbano',
     description: 'Acrílico sobre madera, 40x40cm',
-    imageUrl: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b9a4?w=500&auto=format&fit=crop&q=60',
+    image_url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b9a4?w=500&auto=format&fit=crop&q=60',
     price: 800,
     status: 'sold',
     views: 89,
     likes: 12,
-    createdAt: new Date('2024-01-10')
+    created_at: '2024-01-10'
   }
 ];
 
 export function DashboardHome() {
   const navigate = useNavigate();
-  const [artworks, setArtworks] = useState<Artwork[]>(exampleArtworks);
+  const [artworks, setArtworks] = useState<DashboardArtwork[]>(exampleArtworks);
 
   const handleUploadArtwork = () => {
     navigate('/dashboard/artist/artworks/upload');
@@ -146,4 +146,4 @@ export function DashboardHome() {
       />
     </div>
   );
-} 
+}
