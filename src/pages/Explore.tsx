@@ -8,6 +8,7 @@ import { SlidingFilterPanel } from "@/components/artist/SlidingFilterPanel";
 import { Button } from "@/components/ui/button";
 import { Filter } from "lucide-react";
 import { Drawer, DrawerContent, DrawerTrigger } from "@/components/ui/drawer";
+import ParallaxHero from "@/components/common/ParallaxHero";
 
 export default function Explore() {
   const isMobile = useIsMobile();
@@ -25,14 +26,13 @@ export default function Explore() {
 
   return (
     <Layout>
-      <div className="container mx-auto py-8 px-4">
-        <div className="mb-8">
-          <h1 className="text-3xl font-serif font-bold mb-2">Explore Artworks</h1>
-          <p className="text-muted-foreground">
-            Discover and collect contemporary art from around the world
-          </p>
-        </div>
+      {/* Parallax Hero */}
+      <ParallaxHero
+        title="Explora ArTendency"
+        subtitle="Descubre y colecciona arte contemporáneo de todo el mundo"
+      />
 
+      <div className="container mx-auto py-8 px-4">
         <div className="flex flex-col md:flex-row gap-6">
           {!isMobile && (
             <div className="w-full md:w-1/4">
