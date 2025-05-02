@@ -87,7 +87,7 @@ export const SlidingFilterPanel = ({
   ];
 
   const [availableYears, setAvailableYears] = useState<number[]>(
-    filterOptions.years || Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i)
+    filterOptions.years || Array.from({ length: 50 }, (_, i) => new Date().getFullYear() - i)
   );
 
   const countryOptions = useMemo(() => {
@@ -199,6 +199,7 @@ export const SlidingFilterPanel = ({
               { label: "Technique", field: "technique", options: availableTechniques },
               { label: "Category", field: "category", options: availableCategories },
               { label: "Style", field: "style", options: availableStyles },
+              { label: "Dimensions", field: "dimension", options: ["all", "small", "medium", "large"] },
               { label: "Location", field: "location", options: availableLocations },
               { label: "Country", field: "country", options: availableCountries },
             ].map(({ label, field, options }) => (

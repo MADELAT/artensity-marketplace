@@ -73,16 +73,17 @@ export default function ArtworkApproval() {
       /* insertar en artworks (incluimos 'series') */
       const { error: insertErr } = await supabase.from("artworks").insert([{
         title:        artwork.title,
-        series:       artwork.series,          // ← ahora sí copiamos la serie
+        series:       artwork.series,
         artist_id:    artwork.artist_id,
         price:        artwork.price,
         description:  artwork.description,
         image_url:    artwork.image_url,
         technique:    artwork.technique,
-        dimensions:   artwork.dimensions,
         category:     artwork.category,
         style:        artwork.style,
         year:         artwork.year,
+        width_cm:     artwork.width_cm,   // ← agrega esto
+        height_cm:    artwork.height_cm,  // ← y esto
         status:       "approved",
         is_sold:      false,
         views:        0,

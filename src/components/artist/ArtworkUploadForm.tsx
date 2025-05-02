@@ -18,9 +18,6 @@ import { Loader2, Upload, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
-// ──────────────────────────────────────────
-// Listas fijas
-// ──────────────────────────────────────────
 const artCategories = [
   "Painting", "Sculpture", "Photography", "Drawing", "Engraving", "Printmaking",
   "Digital art", "Collage", "Conceptual art", "Textile art", "Installation",
@@ -40,12 +37,12 @@ const artTechniques = [
 ];
 
 export function ArtworkUploadForm() {
-  // ────────── estados ──────────
   const [title, setTitle] = useState("");
-  const [series, setSeries] = useState("");         // ← NUEVO
+  const [series, setSeries] = useState("");
   const [description, setDescription] = useState("");
   const [technique, setTechnique] = useState("");
-  const [dimensions, setDimensions] = useState("");
+  const [widthCm, setWidthCm] = useState<number | "">("");
+  const [heightCm, setHeightCm] = useState<number | "">("");
   const [year, setYear] = useState<number | "">("");
   const [price, setPrice] = useState<number | "">("");
   const [category, setCategory] = useState("");
@@ -61,16 +58,12 @@ export function ArtworkUploadForm() {
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
   const isGallery = profile?.role === "gallery";
 
-  // ────────── cargar tags ──────────
   useEffect(() => {
-    supabase
-      .from("tags")
-      .select("id, name")
-      .order("name")
-      .then(({ data }) => data && setAvailableTags(data));
+    supabase.from("tags").select("id, name").order("name").then(({ data }) => {
+      if (data) setAvailableTags(data);
+    });
   }, []);
 
-  // ────────── cargar artistas (galería) ──────────
   useEffect(() => {
     if (!isGallery || !user?.id) return;
     supabase
@@ -81,7 +74,6 @@ export function ArtworkUploadForm() {
       .then(({ data }) => data && setArtists(data));
   }, [isGallery, user?.id]);
 
-  // ────────── selección de archivo ──────────
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files?.[0]) return;
     const f = e.target.files[0];
@@ -90,15 +82,14 @@ export function ArtworkUploadForm() {
     r.onloadend = () => setPreviewUrl(r.result as string);
     r.readAsDataURL(f);
   };
+
   const clearImage = () => {
     setFile(null);
     setPreviewUrl(null);
   };
 
-  // ────────── submit ──────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!user) return toast.error("You must be logged in to upload artworks");
     if (!title || !price || !file)
       return toast.error("Please complete title, price and image");
@@ -107,7 +98,6 @@ export function ArtworkUploadForm() {
 
     setIsUploading(true);
     try {
-      // 1) subir imagen
       const ext = file.name.split(".").pop();
       const fileName = `${user.id}-${Math.random().toString(36).slice(2)}.${ext}`;
       const { error: upErr } = await supabase.storage
@@ -120,13 +110,13 @@ export function ArtworkUploadForm() {
         .getPublicUrl(fileName);
       const imageUrl = urlData.publicUrl;
 
-      // 2) insertar en pending_artworks
       const { error: dbErr } = await supabase.from("pending_artworks").insert({
         title,
-        series,               // ← NUEVO
+        series,
         description,
         technique,
-        dimensions,
+        width_cm: widthCm || null,
+        height_cm: heightCm || null,
         year: year || null,
         price: price || 0,
         category,
@@ -137,7 +127,6 @@ export function ArtworkUploadForm() {
       });
       if (dbErr) throw new Error(dbErr.message);
 
-      // 3) obtener id y vincular tags
       const { data: inserted } = await supabase
         .from("pending_artworks")
         .select("id")
@@ -145,6 +134,7 @@ export function ArtworkUploadForm() {
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
+
       if (inserted && selectedTagIds.length) {
         const rel = selectedTagIds.map((tagId) => ({
           artwork_id: inserted.id,
@@ -157,12 +147,12 @@ export function ArtworkUploadForm() {
         description: "Your artwork has been sent and is pending approval.",
       });
 
-      // reset
       setTitle("");
-      setSeries("");          // ← reset series
+      setSeries("");
       setDescription("");
       setTechnique("");
-      setDimensions("");
+      setWidthCm("");
+      setHeightCm("");
       setYear("");
       setPrice("");
       setCategory("");
@@ -179,11 +169,9 @@ export function ArtworkUploadForm() {
     }
   };
 
-  // ────────── UI ──────────
   return (
     <Card className="p-6">
       <form onSubmit={handleSubmit} className="space-y-6">
-        {/* encabezado */}
         <div className="space-y-2">
           <h3 className="text-lg font-medium">Upload a new artwork</h3>
           <p className="text-sm text-muted-foreground">
@@ -192,52 +180,26 @@ export function ArtworkUploadForm() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {/* imagen */}
           <div className="space-y-2 col-span-2">
             <Label htmlFor="image">Artwork image *</Label>
             <div className="border-2 border-dashed rounded-md p-4 flex flex-col items-center justify-center">
               {previewUrl ? (
                 <div className="relative w-full">
-                  <img
-                    src={previewUrl}
-                    alt="Preview"
-                    className="rounded-md max-h-64 mx-auto"
-                  />
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="destructive"
-                    className="absolute right-2 top-2"
-                    onClick={clearImage}
-                  >
+                  <img src={previewUrl} alt="Preview" className="rounded-md max-h-64 mx-auto" />
+                  <Button type="button" size="icon" variant="destructive" className="absolute right-2 top-2" onClick={clearImage}>
                     <X size={16} />
                   </Button>
                 </div>
               ) : (
-                <label
-                  htmlFor="image-upload"
-                  className="flex flex-col items-center justify-center cursor-pointer w-full h-40"
-                >
+                <label htmlFor="image-upload" className="flex flex-col items-center justify-center cursor-pointer w-full h-40">
                   <Upload className="h-10 w-10 text-muted-foreground mb-2" />
-                  <span className="text-sm text-muted-foreground">
-                    Click to select an image
-                  </span>
+                  <span className="text-sm text-muted-foreground">Click to select an image</span>
                 </label>
               )}
-              <input
-                id="image-upload"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleFileChange}
-              />
+              <input id="image-upload" type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
             </div>
-            <p className="text-xs text-muted-foreground">
-              Accepted formats: JPG, PNG, WEBP. Maximum 3MB.
-            </p>
           </div>
 
-          {/* seleccionar artista */}
           {isGallery && (
             <div className="space-y-2">
               <Label htmlFor="artist">Select an artist *</Label>
@@ -256,130 +218,79 @@ export function ArtworkUploadForm() {
             </div>
           )}
 
-          {/* título y serie */}
           <div className="space-y-2">
             <Label htmlFor="title">Title *</Label>
-            <Input
-              id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              required
-            />
+            <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} required />
           </div>
+
           <div className="space-y-2">
             <Label htmlFor="series">Series</Label>
-            <Input
-              id="series"
-              placeholder="e.g. Blue Period"
-              value={series}
-              onChange={(e) => setSeries(e.target.value)}
-            />
+            <Input id="series" value={series} onChange={(e) => setSeries(e.target.value)} />
           </div>
 
-          {/* precio */}
           <div className="space-y-2">
             <Label htmlFor="price">Price (€) *</Label>
-            <Input
-              id="price"
-              type="number"
-              min="0"
-              step="0.01"
-              value={price}
-              onChange={(e) =>
-                setPrice(e.target.value ? parseFloat(e.target.value) : "")
-              }
-              required
-            />
+            <Input id="price" type="number" min="0" step="0.01" value={price} onChange={(e) => setPrice(e.target.value ? parseFloat(e.target.value) : "")} required />
           </div>
 
-          {/* technique dropdown */}
           <div className="space-y-2">
             <Label htmlFor="technique">Technique</Label>
             <Select value={technique} onValueChange={setTechnique}>
-              <SelectTrigger id="technique">
-                <SelectValue placeholder="Select a technique" />
-              </SelectTrigger>
+              <SelectTrigger id="technique"><SelectValue placeholder="Select a technique" /></SelectTrigger>
               <SelectContent>
                 {artTechniques.map((tech) => (
-                  <SelectItem key={tech} value={tech}>
-                    {tech}
-                  </SelectItem>
+                  <SelectItem key={tech} value={tech}>{tech}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* dimensiones */}
-          <div className="space-y-2">
-            <Label htmlFor="dimensions">Dimensions</Label>
-            <Input
-              id="dimensions"
-              placeholder="e.g. 50x70cm"
-              value={dimensions}
-              onChange={(e) => setDimensions(e.target.value)}
-            />
-          </div>
-
-          {/* category & style */}
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
             <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger id="category">
-                <SelectValue placeholder="Select a category" />
-              </SelectTrigger>
+              <SelectTrigger id="category"><SelectValue placeholder="Select a category" /></SelectTrigger>
               <SelectContent>
                 {artCategories.map((cat) => (
-                  <SelectItem key={cat} value={cat}>
-                    {cat}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="style">Style</Label>
-            <Select value={style} onValueChange={setStyle}>
-              <SelectTrigger id="style">
-                <SelectValue placeholder="Select a style" />
-              </SelectTrigger>
-              <SelectContent>
-                {artStyles.map((s) => (
-                  <SelectItem key={s} value={s}>
-                    {s}
-                  </SelectItem>
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
-          {/* año */}
-          <div className="space-y-2">
-            <Label htmlFor="year">Year</Label>
-            <Input
-              id="year"
-              type="number"
-              min="1900"
-              max={new Date().getFullYear()}
-              value={year}
-              onChange={(e) =>
-                setYear(e.target.value ? parseInt(e.target.value) : "")
-              }
-            />
+          {/* Style + Dimensions + Year */}
+          <div className="col-span-2 flex flex-col sm:flex-row gap-4 items-end">
+            <div className="space-y-2 w-full sm:w-1/2">
+              <Label htmlFor="style">Style</Label>
+              <Select value={style} onValueChange={setStyle}>
+                <SelectTrigger id="style"><SelectValue placeholder="Select a style" /></SelectTrigger>
+                <SelectContent>
+                  {artStyles.map((s) => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex gap-4 w-full sm:w-1/2">
+              <div className="space-y-2 flex-1">
+                <Label htmlFor="width_cm">Width (cm)</Label>
+                <Input id="width_cm" type="number" min="0" value={widthCm} onChange={(e) => setWidthCm(e.target.value ? parseFloat(e.target.value) : "")} />
+              </div>
+              <div className="space-y-2 flex-1">
+                <Label htmlFor="height_cm">Height (cm)</Label>
+                <Input id="height_cm" type="number" min="0" value={heightCm} onChange={(e) => setHeightCm(e.target.value ? parseFloat(e.target.value) : "")} />
+              </div>
+              <div className="space-y-2 flex-1">
+                <Label htmlFor="year">Year</Label>
+                <Input id="year" type="number" min="1900" max={new Date().getFullYear()} value={year} onChange={(e) => setYear(e.target.value ? parseInt(e.target.value) : "")} />
+              </div>
+            </div>
           </div>
 
-          {/* descripción */}
           <div className="space-y-2 col-span-2">
             <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your artwork, inspiration, context..."
-            />
+            <Textarea id="description" rows={4} value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Describe your artwork, inspiration, context..." />
           </div>
 
-          {/* tags */}
           <div className="space-y-2 col-span-2">
             <Label htmlFor="tags">Tags</Label>
             <ScrollArea className="h-24 rounded-md border p-2">
@@ -405,13 +316,10 @@ export function ArtworkUploadForm() {
                 ))}
               </div>
             </ScrollArea>
-            <p className="text-xs text-muted-foreground">
-              Click on the tags to select them.
-            </p>
+            <p className="text-xs text-muted-foreground">Click on the tags to select them.</p>
           </div>
         </div>
 
-        {/* botón enviar */}
         <div className="flex justify-end">
           <Button type="submit" disabled={isUploading} className="w-full sm:w-auto">
             {isUploading ? (
