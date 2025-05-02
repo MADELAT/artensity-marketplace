@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { 
   Sheet,
@@ -12,6 +11,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Separator } from "@/components/ui/separator";
+import countryList from "react-select-country-list";
+import CountrySelect from "react-select";
+import { useMemo } from "react";
 import { 
   Select,
   SelectContent,
@@ -70,27 +72,71 @@ export const SlidingFilterPanel = ({
   const [open, setOpen] = useState(false);
   
   // Dynamic filter options
-  const [availableSeries, setAvailableSeries] = useState<string[]>(
-    filterOptions.series || ["All Series", "Abstract", "Nature", "Portrait", "Landscape"]
-  );
+  const [availableSeries, setAvailableSeries] = useState<string[]>(["All Series"]);
+
+  useEffect(() => {
+    const fetchSeries = async () => {
+      const { data, error } = await supabase
+        .from("public_series")   // ← ahora consultamos la vista
+        .select("series");       // la vista ya viene depurada
+
+      if (error) {
+        console.error("Error fetching series:", error);
+        return;
+      }
+
+      const uniqueSeries = data
+        .map((row) => row.series)
+        .filter((s): s is string => !!s)
+        .sort((a, b) => a.localeCompare(b));
+
+      setAvailableSeries(["All Series", ...uniqueSeries]);
+    };
+
+    fetchSeries();
+  }, []);
+  
   const [availableTechniques, setAvailableTechniques] = useState<string[]>(
-    filterOptions.techniques || ["all", "Oil", "Acrylic", "Watercolor", "Digital", "Mixed Media"]
+    filterOptions.techniques || ["all", "Oil", "Acrylic", "Watercolor", "Mixed Media", "Graphite", "Pencil", "Carving", "Casting", "Serigraphy", "Digital", "Other"]
   );
   const [availableCategories, setAvailableCategories] = useState<string[]>(
-    filterOptions.categories || ["all", "Painting", "Sculpture", "Photography", "Installation", "Drawing"]
+    filterOptions.categories || ["all", "Painting", "Sculpture", "Printmaking", "Collage", "Textile", "Photography", "Installation", "Drawing", "VideoArt", "Other"]
   );
   const [availableStyles, setAvailableStyles] = useState<string[]>(
-    filterOptions.styles || ["all", "Contemporary", "Abstract", "Figurative", "Minimalist", "Conceptual"]
+    filterOptions.styles || ["all", "Contemporary", "Abstract", "Figurative", "Minimalist", "Conceptual", "Surrealist", "HiperRealist", "Expressionist", "Realist", "Pop Art", "Geometric", "Street Art", "Other"]
   );
   const [availableYears, setAvailableYears] = useState<number[]>(
     filterOptions.years || Array.from({ length: 10 }, (_, i) => new Date().getFullYear() - i)
   );
-  const [availableLocations, setAvailableLocations] = useState<string[]>(
-    filterOptions.locations || ["All Locations", "Madrid", "Barcelona", "New York", "Paris", "London"]
-  );
+  const countryOptions = useMemo(() => {
+    const options = countryList().getData();
+    return [{ label: "All Countries", value: "all" }, ...options];
+  }, []);
+  
   const [availableCountries, setAvailableCountries] = useState<string[]>(
-    filterOptions.countries || ["All Countries", "Spain", "USA", "France", "UK", "Germany", "Italy"]
+    countryOptions.map((c) => c.label)
   );
+  
+  const [availableLocations, setAvailableLocations] = useState<string[]>(["All Locations"]);
+
+  useEffect(() => {
+    const fetchLocationsFromProfiles = async () => {
+      const { data, error } = await supabase
+        .from("profiles")
+        .select("city")
+        .not("city", "is", null);
+
+      if (error) {
+        console.error("Error fetching locations:", error);
+        return;
+      }
+
+      const uniqueCities = Array.from(new Set(data.map((item) => item.city))).sort();
+      setAvailableLocations(["All Locations", ...uniqueCities]);
+    };
+
+    fetchLocationsFromProfiles();
+  }, []);
   const rarityOptions = ["Unique piece", "Limited edition", "Open edition"];
   
   // Min and max price for the range slider
@@ -435,3 +481,4 @@ export const SlidingFilterPanel = ({
     </>
   );
 };
+
