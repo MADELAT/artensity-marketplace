@@ -28,9 +28,8 @@ export default function ArtworkApproval() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedArtwork, setSelectedArtwork] = useState(null);
 
-  useEffect(() => {
-    fetchPendingArtworks();
-  }, []);
+  /* ───────────────── cargar obras pendientes ───────────────── */
+  useEffect(() => { fetchPendingArtworks(); }, []);
 
   const fetchPendingArtworks = async () => {
     try {
@@ -39,79 +38,73 @@ export default function ArtworkApproval() {
         .from("pending_artworks")
         .select("*, profiles:artist_id(first_name, last_name)")
         .eq("status", "pending");
-
       if (error) throw error;
       setPendingArtworks(data || []);
-    } catch (error) {
-      console.error("Error fetching pending artworks:", error);
+    } catch (e) {
+      console.error(e);
       toast({
         title: "Error",
         description: "No se pudieron cargar las obras pendientes",
         variant: "destructive",
       });
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
+  /* ───────────────── aprobar obra ───────────────── */
   const handleApprove = async (artwork) => {
     try {
-      const { data: existing, error: checkError } = await supabase
+      /* evitar duplicados */
+      const { data: existing, error: checkErr } = await supabase
         .from("artworks")
         .select("id")
         .eq("title", artwork.title)
         .eq("artist_id", artwork.artist_id)
         .limit(1);
-
-      if (checkError) throw checkError;
-      if (existing && existing.length > 0) {
+      if (checkErr) throw checkErr;
+      if (existing?.length) {
         sonnerToast.error("Ya aprobada", {
-          description: `La obra "${artwork.title}" ya ha sido aprobada previamente`,
+          description: `La obra "${artwork.title}" ya se había publicado`,
         });
-
         await supabase.from("pending_artworks").delete().eq("id", artwork.id);
-
         setPendingArtworks((prev) => prev.filter((a) => a.id !== artwork.id));
         return;
       }
 
-      const { error: insertError } = await supabase.from("artworks").insert([
-        {
-          title: artwork.title,
-          artist_id: artwork.artist_id,
-          price: artwork.price,
-          description: artwork.description,
-          image_url: artwork.image_url,
-          technique: artwork.technique,
-          dimensions: artwork.dimensions,
-          category: artwork.category,
-          style: artwork.style,
-          year: artwork.year,
-          status: "approved",
-          is_sold: false,
-          views: 0,
-          likes: 0,
-        },
-      ]);
+      /* insertar en artworks (incluimos 'series') */
+      const { error: insertErr } = await supabase.from("artworks").insert([{
+        title:        artwork.title,
+        series:       artwork.series,          // ← ahora sí copiamos la serie
+        artist_id:    artwork.artist_id,
+        price:        artwork.price,
+        description:  artwork.description,
+        image_url:    artwork.image_url,
+        technique:    artwork.technique,
+        dimensions:   artwork.dimensions,
+        category:     artwork.category,
+        style:        artwork.style,
+        year:         artwork.year,
+        status:       "approved",
+        is_sold:      false,
+        views:        0,
+        likes:        0,
+      }]);
+      if (insertErr) throw insertErr;
 
-      if (insertError) throw insertError;
-
+      /* borrar de pendientes */
       await supabase.from("pending_artworks").delete().eq("id", artwork.id);
-
       setPendingArtworks((prev) => prev.filter((a) => a.id !== artwork.id));
       setDialogOpen(false);
 
       sonnerToast.success("Obra aprobada", {
-        description: `La obra "${artwork.title}" ha sido aprobada y publicada`,
+        description: `La obra "${artwork.title}" ha sido publicada`,
       });
-    } catch (error) {
-      console.error("Error approving artwork:", error);
-      sonnerToast.error("Error", {
-        description: "No se pudo aprobar la obra",
-      });
+    } catch (e) {
+      console.error("Error approving artwork:", e);
+      sonnerToast.error("Error", { description: "No se pudo aprobar la obra" });
     }
   };
 
+  /* ───────────────── rechazar obra ───────────────── */
   const handleReject = async (artwork) => {
     if (!rejectReason) {
       sonnerToast.error("Error", {
@@ -119,31 +112,21 @@ export default function ArtworkApproval() {
       });
       return;
     }
-
     try {
       const { error } = await supabase
         .from("pending_artworks")
-        .update({
-          status: "rejected",
-          admin_comment: rejectReason,
-        })
+        .update({ status: "rejected", admin_comment: rejectReason })
         .eq("id", artwork.id);
-
       if (error) throw error;
-
       setPendingArtworks((prev) => prev.filter((a) => a.id !== artwork.id));
-
       setRejectReason("");
       setDialogOpen(false);
-
       sonnerToast.success("Obra rechazada", {
         description: `La obra "${artwork.title}" ha sido rechazada`,
       });
-    } catch (error) {
-      console.error("Error rejecting artwork:", error);
-      sonnerToast.error("Error", {
-        description: "No se pudo rechazar la obra",
-      });
+    } catch (e) {
+      console.error(e);
+      sonnerToast.error("Error", { description: "No se pudo rechazar la obra" });
     }
   };
 
@@ -152,6 +135,7 @@ export default function ArtworkApproval() {
     setDialogOpen(true);
   };
 
+  /* ───────────────── UI ───────────────── */
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
@@ -163,7 +147,7 @@ export default function ArtworkApproval() {
 
       {loading ? (
         <div className="text-center py-10">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent"></div>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-primary border-r-transparent" />
           <p className="mt-2 text-sm text-muted-foreground">
             Cargando obras pendientes...
           </p>
@@ -193,9 +177,7 @@ export default function ArtworkApproval() {
                 <TableRow key={artwork.id}>
                   <TableCell>
                     <img
-                      src={
-                        artwork.image_url || "https://via.placeholder.com/150"
-                      }
+                      src={artwork.image_url || "https://via.placeholder.com/150"}
                       alt={artwork.title}
                       className="w-16 h-16 object-cover rounded-md cursor-pointer hover:opacity-80 transition-opacity"
                       onClick={() => openArtworkDetails(artwork)}
@@ -261,10 +243,7 @@ export default function ArtworkApproval() {
               <div className="grid gap-4 py-4">
                 <div className="aspect-square relative max-h-96">
                   <img
-                    src={
-                      selectedArtwork.image_url ||
-                      "https://via.placeholder.com/800"
-                    }
+                    src={selectedArtwork.image_url || "https://via.placeholder.com/800"}
                     alt={selectedArtwork.title}
                     className="w-full h-full object-contain rounded-md"
                   />
@@ -290,9 +269,7 @@ export default function ArtworkApproval() {
                   <div>
                     <p className="text-sm font-medium">Enviada</p>
                     <p className="text-sm">
-                      {new Date(
-                        selectedArtwork.created_at
-                      ).toLocaleDateString()}
+                      {new Date(selectedArtwork.created_at).toLocaleDateString()}
                     </p>
                   </div>
                   {selectedArtwork.technique && (
@@ -330,10 +307,7 @@ export default function ArtworkApproval() {
                 </div>
 
                 <div className="flex justify-end gap-2">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleReject(selectedArtwork)}
-                  >
+                  <Button variant="outline" onClick={() => handleReject(selectedArtwork)}>
                     <XCircle className="h-4 w-4 mr-1" />
                     Rechazar
                   </Button>

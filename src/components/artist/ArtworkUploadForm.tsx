@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,8 +18,31 @@ import { Loader2, Upload, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+// ──────────────────────────────────────────
+// Listas fijas
+// ──────────────────────────────────────────
+const artCategories = [
+  "Painting", "Sculpture", "Photography", "Drawing", "Engraving", "Printmaking",
+  "Digital art", "Collage", "Conceptual art", "Textile art", "Installation",
+  "Art object", "Video art", "Other",
+];
+
+const artStyles = [
+  "Abstract", "Minimalism", "Conceptual", "Expressionism", "Figurative",
+  "Surrealism", "Pop Art", "Realism", "Geometric", "HyperRealism",
+  "Street Art", "Other",
+];
+
+const artTechniques = [
+  "Oil", "Acrylic", "Watercolor", "Mixed Media", "Gouache", "Encaustic", "Ink",
+  "Graphite / Pencil", "Charcoal", "Digital Painting", "Resin", "Collage",
+  "Serigraphy", "Silver & gelatin", "Carving", "Casting", "Other",
+];
+
 export function ArtworkUploadForm() {
+  // ────────── estados ──────────
   const [title, setTitle] = useState("");
+  const [series, setSeries] = useState("");         // ← NUEVO
   const [description, setDescription] = useState("");
   const [technique, setTechnique] = useState("");
   const [dimensions, setDimensions] = useState("");
@@ -31,180 +53,113 @@ export function ArtworkUploadForm() {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+
   const { user, profile } = useAuth();
-  const [availableTags, setAvailableTags] = useState<
-    { id: number; name: string }[]
-  >([]);
+  const [availableTags, setAvailableTags] = useState<{ id: number; name: string }[]>([]);
   const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
   const [artists, setArtists] = useState<any[]>([]);
   const [selectedArtist, setSelectedArtist] = useState<string | null>(null);
   const isGallery = profile?.role === "gallery";
 
+  // ────────── cargar tags ──────────
   useEffect(() => {
-    async function fetchTags() {
-      const { data, error } = await supabase
-        .from("tags")
-        .select("id, name")
-        .order("name");
-
-      if (!error && data) {
-        setAvailableTags(data);
-      }
-    }
-
-    fetchTags();
+    supabase
+      .from("tags")
+      .select("id, name")
+      .order("name")
+      .then(({ data }) => data && setAvailableTags(data));
   }, []);
 
+  // ────────── cargar artistas (galería) ──────────
   useEffect(() => {
     if (!isGallery || !user?.id) return;
-
-    const fetchArtists = async () => {
-      const { data, error } = await supabase
-        .from("profiles")
-        .select("id, first_name, last_name")
-        .eq("role", "artist")
-        .eq("created_by", user.id);
-
-      if (!error && data) {
-        setArtists(data);
-      }
-    };
-
-    fetchArtists();
+    supabase
+      .from("profiles")
+      .select("id, first_name, last_name")
+      .eq("role", "artist")
+      .eq("created_by", user.id)
+      .then(({ data }) => data && setArtists(data));
   }, [isGallery, user?.id]);
 
-  // Handle file selection
+  // ────────── selección de archivo ──────────
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files[0]) {
-      const selectedFile = e.target.files[0];
-      setFile(selectedFile);
-
-      // Create preview URL
-      const fileReader = new FileReader();
-      fileReader.onloadend = () => {
-        setPreviewUrl(fileReader.result as string);
-      };
-      fileReader.readAsDataURL(selectedFile);
-    }
+    if (!e.target.files?.[0]) return;
+    const f = e.target.files[0];
+    setFile(f);
+    const r = new FileReader();
+    r.onloadend = () => setPreviewUrl(r.result as string);
+    r.readAsDataURL(f);
   };
-
-  // Clear selected image
   const clearImage = () => {
     setFile(null);
     setPreviewUrl(null);
   };
 
-  // Submit handler
+  // ────────── submit ──────────
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!user) {
-      toast.error("Debes iniciar sesión para subir obras");
-      return;
-    }
-
-    if (!title || !price || !file) {
-      toast.error(
-        "Por favor completa los campos requeridos (título, precio e imagen)"
-      );
-      return;
-    }
-
-    if (isGallery && !selectedArtist) {
-      toast.error("Por favor selecciona un artista para asignar la obra");
-      return;
-    }
+    if (!user) return toast.error("You must be logged in to upload artworks");
+    if (!title || !price || !file)
+      return toast.error("Please complete title, price and image");
+    if (isGallery && !selectedArtist)
+      return toast.error("Please select an artist");
 
     setIsUploading(true);
-
     try {
-      // 1. Upload the image to Supabase Storage
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${user.id}-${Math.random()
-        .toString(36)
-        .substring(2, 15)}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      // Validate bucket exists before upload
-      const { data: buckets } = await supabase.storage.listBuckets();
-      console.log("Available buckets:", buckets);
-
-      // Check if artworks bucket exists
-      if (!buckets?.some((bucket) => bucket.name === "artworks")) {
-        throw new Error(
-          "El bucket 'artworks' no existe. Por favor contacta al administrador."
-        );
-      }
-
-      // Upload to the artworks bucket
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      // 1) subir imagen
+      const ext = file.name.split(".").pop();
+      const fileName = `${user.id}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const { error: upErr } = await supabase.storage
         .from("artworks")
-        .upload(filePath, file);
+        .upload(fileName, file);
+      if (upErr) throw new Error(upErr.message);
 
-      if (uploadError) {
-        console.error("Upload error:", uploadError);
-        throw new Error(`Error al subir la imagen: ${uploadError.message}`);
-      }
-
-      // 2. Get the public URL
-      const { data: publicUrlData } = supabase.storage
+      const { data: urlData } = supabase.storage
         .from("artworks")
-        .getPublicUrl(filePath);
+        .getPublicUrl(fileName);
+      const imageUrl = urlData.publicUrl;
 
-      const imageUrl = publicUrlData.publicUrl;
+      // 2) insertar en pending_artworks
+      const { error: dbErr } = await supabase.from("pending_artworks").insert({
+        title,
+        series,               // ← NUEVO
+        description,
+        technique,
+        dimensions,
+        year: year || null,
+        price: price || 0,
+        category,
+        style,
+        image_url: imageUrl,
+        artist_id: isGallery ? selectedArtist : user.id,
+        status: "pending",
+      });
+      if (dbErr) throw new Error(dbErr.message);
 
-      // 3. Save the artwork data to the pending_artworks table
-      const { error: dbError } = await supabase
-        .from("pending_artworks")
-        .insert({
-          title,
-          description,
-          technique,
-          dimensions,
-          year: year || null,
-          price: price || 0,
-          category,
-          style,
-          image_url: imageUrl,
-          artist_id: isGallery ? selectedArtist : user.id,
-          status: "pending",
-        });
-
-      const { data: insertedArtwork, error: selectError } = await supabase
+      // 3) obtener id y vincular tags
+      const { data: inserted } = await supabase
         .from("pending_artworks")
         .select("id")
         .eq("artist_id", isGallery ? selectedArtist : user.id)
         .order("created_at", { ascending: false })
         .limit(1)
         .single();
-
-      if (insertedArtwork && selectedTagIds.length > 0) {
-        const artworkId = insertedArtwork.id;
-        const tagRelations = selectedTagIds.map((tagId) => ({
-          artwork_id: artworkId,
+      if (inserted && selectedTagIds.length) {
+        const rel = selectedTagIds.map((tagId) => ({
+          artwork_id: inserted.id,
           tag_id: tagId,
         }));
-
-        const { error: tagsInsertError } = await supabase
-          .from("artwork_tags")
-          .insert(tagRelations);
-
-        if (tagsInsertError) {
-          console.error("Error al asignar etiquetas:", tagsInsertError);
-        }
+        await supabase.from("artwork_tags").insert(rel);
       }
 
-      if (dbError) {
-        throw new Error(`Error al guardar la obra: ${dbError.message}`);
-      }
-
-      // Success!
-      toast.success("¡Obra enviada con éxito!", {
-        description: "Tu obra ha sido enviada y está pendiente de aprobación.",
+      toast.success("¡Artwork successfully sent!", {
+        description: "Your artwork has been sent and is pending approval.",
       });
 
-      // Reset form
+      // reset
       setTitle("");
+      setSeries("");          // ← reset series
       setDescription("");
       setTechnique("");
       setDimensions("");
@@ -216,54 +171,31 @@ export function ArtworkUploadForm() {
       setPreviewUrl(null);
       setSelectedTagIds([]);
       setSelectedArtist(null);
-    } catch (error: any) {
-      console.error("Error uploading artwork:", error);
-      toast.error("Error al subir la obra", {
-        description: error.message,
-      });
+    } catch (err: any) {
+      console.error(err);
+      toast.error("Error al subir la obra", { description: err.message });
     } finally {
       setIsUploading(false);
     }
   };
 
-  const artCategories = [
-    "Pintura",
-    "Escultura",
-    "Fotografía",
-    "Dibujo",
-    "Grabado",
-    "Arte digital",
-    "Arte conceptual",
-    "Instalación",
-    "Arte objeto",
-  ];
-
-  const artStyles = [
-    "Abstracto",
-    "Realismo",
-    "Impresionismo",
-    "Expresionismo",
-    "Surrealismo",
-    "Minimalismo",
-    "Pop Art",
-    "Arte conceptual",
-  ];
-
+  // ────────── UI ──────────
   return (
     <Card className="p-6">
       <form onSubmit={handleSubmit} className="space-y-6">
+        {/* encabezado */}
         <div className="space-y-2">
-          <h3 className="text-lg font-medium">Sube una nueva obra</h3>
+          <h3 className="text-lg font-medium">Upload a new artwork</h3>
           <p className="text-sm text-muted-foreground">
-            Completa el formulario para enviar tu obra para aprobación
+            Complete the form to send your artwork for approval
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-          {/* Image upload */}
+          {/* imagen */}
           <div className="space-y-2 col-span-2">
-            <Label htmlFor="image">Imagen de la obra *</Label>
-            <div className="border-2 border-dashed rounded-md p-4 flex items-center justify-center flex-col">
+            <Label htmlFor="image">Artwork image *</Label>
+            <div className="border-2 border-dashed rounded-md p-4 flex flex-col items-center justify-center">
               {previewUrl ? (
                 <div className="relative w-full">
                   <img
@@ -288,7 +220,7 @@ export function ArtworkUploadForm() {
                 >
                   <Upload className="h-10 w-10 text-muted-foreground mb-2" />
                   <span className="text-sm text-muted-foreground">
-                    Haz clic para seleccionar una imagen
+                    Click to select an image
                   </span>
                 </label>
               )}
@@ -301,24 +233,22 @@ export function ArtworkUploadForm() {
               />
             </div>
             <p className="text-xs text-muted-foreground">
-              Formatos aceptados: JPG, PNG, WEBP. Máximo 5MB.
+              Accepted formats: JPG, PNG, WEBP. Maximum 3MB.
             </p>
           </div>
 
+          {/* seleccionar artista */}
           {isGallery && (
             <div className="space-y-2">
-              <Label htmlFor="artist">Selecciona un artista *</Label>
-              <Select
-                onValueChange={(val) => setSelectedArtist(val)}
-                value={selectedArtist || ""}
-              >
+              <Label htmlFor="artist">Select an artist *</Label>
+              <Select value={selectedArtist || ""} onValueChange={setSelectedArtist}>
                 <SelectTrigger id="artist">
-                  <SelectValue placeholder="Elige un artista" />
+                  <SelectValue placeholder="Select an artist" />
                 </SelectTrigger>
                 <SelectContent>
-                  {artists.map((artist) => (
-                    <SelectItem key={artist.id} value={artist.id}>
-                      {artist.first_name} {artist.last_name}
+                  {artists.map((a) => (
+                    <SelectItem key={a.id} value={a.id}>
+                      {a.first_name} {a.last_name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -326,9 +256,9 @@ export function ArtworkUploadForm() {
             </div>
           )}
 
-          {/* Title & Price */}
+          {/* título y serie */}
           <div className="space-y-2">
-            <Label htmlFor="title">Título *</Label>
+            <Label htmlFor="title">Title *</Label>
             <Input
               id="title"
               value={title}
@@ -337,7 +267,18 @@ export function ArtworkUploadForm() {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="price">Precio (€) *</Label>
+            <Label htmlFor="series">Series</Label>
+            <Input
+              id="series"
+              placeholder="e.g. Blue Period"
+              value={series}
+              onChange={(e) => setSeries(e.target.value)}
+            />
+          </div>
+
+          {/* precio */}
+          <div className="space-y-2">
+            <Label htmlFor="price">Price (€) *</Label>
             <Input
               id="price"
               type="number"
@@ -351,31 +292,40 @@ export function ArtworkUploadForm() {
             />
           </div>
 
-          {/* Technique & Dimensions */}
+          {/* technique dropdown */}
           <div className="space-y-2">
-            <Label htmlFor="technique">Técnica</Label>
-            <Input
-              id="technique"
-              value={technique}
-              onChange={(e) => setTechnique(e.target.value)}
-            />
+            <Label htmlFor="technique">Technique</Label>
+            <Select value={technique} onValueChange={setTechnique}>
+              <SelectTrigger id="technique">
+                <SelectValue placeholder="Select a technique" />
+              </SelectTrigger>
+              <SelectContent>
+                {artTechniques.map((tech) => (
+                  <SelectItem key={tech} value={tech}>
+                    {tech}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
+
+          {/* dimensiones */}
           <div className="space-y-2">
-            <Label htmlFor="dimensions">Dimensiones</Label>
+            <Label htmlFor="dimensions">Dimensions</Label>
             <Input
               id="dimensions"
-              placeholder="Ej: 50x70cm"
+              placeholder="e.g. 50x70cm"
               value={dimensions}
               onChange={(e) => setDimensions(e.target.value)}
             />
           </div>
 
-          {/* Category & Style */}
+          {/* category & style */}
           <div className="space-y-2">
-            <Label htmlFor="category">Categoría</Label>
+            <Label htmlFor="category">Category</Label>
             <Select value={category} onValueChange={setCategory}>
               <SelectTrigger id="category">
-                <SelectValue placeholder="Seleccione una categoría" />
+                <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
                 {artCategories.map((cat) => (
@@ -387,10 +337,10 @@ export function ArtworkUploadForm() {
             </Select>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="style">Estilo</Label>
+            <Label htmlFor="style">Style</Label>
             <Select value={style} onValueChange={setStyle}>
               <SelectTrigger id="style">
-                <SelectValue placeholder="Seleccione un estilo" />
+                <SelectValue placeholder="Select a style" />
               </SelectTrigger>
               <SelectContent>
                 {artStyles.map((s) => (
@@ -402,9 +352,9 @@ export function ArtworkUploadForm() {
             </Select>
           </div>
 
-          {/* Year */}
+          {/* año */}
           <div className="space-y-2">
-            <Label htmlFor="year">Año</Label>
+            <Label htmlFor="year">Year</Label>
             <Input
               id="year"
               type="number"
@@ -417,21 +367,21 @@ export function ArtworkUploadForm() {
             />
           </div>
 
-          {/* Description */}
+          {/* descripción */}
           <div className="space-y-2 col-span-2">
-            <Label htmlFor="description">Descripción</Label>
+            <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe tu obra, inspiración, contexto..."
+              placeholder="Describe your artwork, inspiration, context..."
             />
           </div>
 
-          {/* Tags */}
+          {/* tags */}
           <div className="space-y-2 col-span-2">
-            <Label htmlFor="tags">Etiquetas</Label>
+            <Label htmlFor="tags">Tags</Label>
             <ScrollArea className="h-24 rounded-md border p-2">
               <div className="flex flex-wrap gap-2">
                 {availableTags.map((tag) => (
@@ -456,23 +406,20 @@ export function ArtworkUploadForm() {
               </div>
             </ScrollArea>
             <p className="text-xs text-muted-foreground">
-              Haz clic en las etiquetas para seleccionarlas.
+              Click on the tags to select them.
             </p>
           </div>
         </div>
 
+        {/* botón enviar */}
         <div className="flex justify-end">
-          <Button
-            type="submit"
-            disabled={isUploading}
-            className="w-full sm:w-auto"
-          >
+          <Button type="submit" disabled={isUploading} className="w-full sm:w-auto">
             {isUploading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Subiendo...
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Uploading...
               </>
             ) : (
-              "Subir obra"
+              "Upload artwork"
             )}
           </Button>
         </div>
