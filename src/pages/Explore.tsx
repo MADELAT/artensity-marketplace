@@ -27,8 +27,8 @@ export default function Explore() {
     <Layout>
       {/* Parallax Hero */}
       <ParallaxHero
-        title="Explora ArTendency"
-        subtitle="Descubre y colecciona arte contemporáneo de todo el mundo"
+        title="Explore ArtTrendy"
+        subtitle="Discover and collect contemporary art from around the world"
       />
 
       <div className="container mx-auto py-8 px-4">

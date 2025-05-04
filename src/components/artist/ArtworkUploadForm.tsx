@@ -8,15 +8,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import {
-  Select,
+  Select as ShadSelect,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { Loader2, Upload, X } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import ReactSelect from "react-select";
 
 const artCategories = [
   "Painting", "Sculpture", "Photography", "Drawing", "Engraving", "Printmaking",
@@ -203,7 +203,7 @@ export function ArtworkUploadForm() {
           {isGallery && (
             <div className="space-y-2">
               <Label htmlFor="artist">Select an artist *</Label>
-              <Select value={selectedArtist || ""} onValueChange={setSelectedArtist}>
+              <ShadSelect value={selectedArtist || ""} onValueChange={setSelectedArtist}>
                 <SelectTrigger id="artist">
                   <SelectValue placeholder="Select an artist" />
                 </SelectTrigger>
@@ -214,7 +214,7 @@ export function ArtworkUploadForm() {
                     </SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </ShadSelect>
             </div>
           )}
 
@@ -235,40 +235,40 @@ export function ArtworkUploadForm() {
 
           <div className="space-y-2">
             <Label htmlFor="technique">Technique</Label>
-            <Select value={technique} onValueChange={setTechnique}>
+            <ShadSelect value={technique} onValueChange={setTechnique}>
               <SelectTrigger id="technique"><SelectValue placeholder="Select a technique" /></SelectTrigger>
               <SelectContent>
                 {artTechniques.map((tech) => (
                   <SelectItem key={tech} value={tech}>{tech}</SelectItem>
                 ))}
               </SelectContent>
-            </Select>
+            </ShadSelect>
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Select value={category} onValueChange={setCategory}>
+            <ShadSelect value={category} onValueChange={setCategory}>
               <SelectTrigger id="category"><SelectValue placeholder="Select a category" /></SelectTrigger>
               <SelectContent>
                 {artCategories.map((cat) => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
               </SelectContent>
-            </Select>
+            </ShadSelect>
           </div>
 
           {/* Style + Dimensions + Year */}
           <div className="col-span-2 flex flex-col sm:flex-row gap-4 items-end">
             <div className="space-y-2 w-full sm:w-1/2">
               <Label htmlFor="style">Style</Label>
-              <Select value={style} onValueChange={setStyle}>
+              <ShadSelect value={style} onValueChange={setStyle}>
                 <SelectTrigger id="style"><SelectValue placeholder="Select a style" /></SelectTrigger>
                 <SelectContent>
                   {artStyles.map((s) => (
                     <SelectItem key={s} value={s}>{s}</SelectItem>
                   ))}
                 </SelectContent>
-              </Select>
+              </ShadSelect>
             </div>
             <div className="flex gap-4 w-full sm:w-1/2">
               <div className="space-y-2 flex-1">
@@ -293,30 +293,25 @@ export function ArtworkUploadForm() {
 
           <div className="space-y-2 col-span-2">
             <Label htmlFor="tags">Tags</Label>
-            <ScrollArea className="h-24 rounded-md border p-2">
-              <div className="flex flex-wrap gap-2">
-                {availableTags.map((tag) => (
-                  <Badge
-                    key={tag.id}
-                    onClick={() =>
-                      setSelectedTagIds((prev) =>
-                        prev.includes(tag.id)
-                          ? prev.filter((id) => id !== tag.id)
-                          : [...prev, tag.id]
-                      )
-                    }
-                    className={`cursor-pointer ${
-                      selectedTagIds.includes(tag.id)
-                        ? "bg-primary text-white"
-                        : "bg-gray-200 text-gray-800"
-                    }`}
-                  >
-                    {tag.name}
-                  </Badge>
-                ))}
-              </div>
-            </ScrollArea>
-            <p className="text-xs text-muted-foreground">Click on the tags to select them.</p>
+            <ReactSelect
+              isMulti
+              inputId="tags"
+              options={availableTags.map((tag) => ({
+                label: tag.name,
+                value: tag.id,
+              }))}
+              value={availableTags
+                .filter((tag) => selectedTagIds.includes(tag.id))
+                .map((tag) => ({ label: tag.name, value: tag.id }))}
+              onChange={(selected) =>
+                setSelectedTagIds(selected.map((tag) => tag.value))
+              }
+              className="text-sm"
+              placeholder="Select tags"
+            />
+            <p className="text-xs text-muted-foreground">
+              Select all tags that apply to your artwork.
+            </p>
           </div>
         </div>
 

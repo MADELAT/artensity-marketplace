@@ -10,13 +10,17 @@ import Select from "react-select";
 import countryList from "react-select-country-list";
 
 const styleOptions = [
-  { label: "Pintor", value: "Pintor" },
-  { label: "Escultor", value: "Escultor" },
-  { label: "Grabador", value: "Grabador" },
-  { label: "Dibujante", value: "Dibujante" },
-  { label: "Artista digital", value: "Artista digital" },
-  { label: "Fotógrafo", value: "Fotógrafo" },
-  { label: "Otro", value: "Otro" },
+  { label: "Painter", value: "Painter" },
+  { label: "Sculptor", value: "Sculptor" },
+  { label: "Printmaker", value: "Printmaker" },
+  { label: "Draughtsman", value: "Draughtsman" },
+  { label: "Digital artist", value: "Digital artist" },
+  { label: "Installer", value: "Installer" },
+  { label: "Photographer", value: "Photographer" },
+  { label: "Multimedia artist", value: "Multimedia artist" },
+  { label: "Interdisciplinary artist", value: "Interdisciplinary artist" },
+  { label: "Conceptual artist", value: "Conceptual artist" },
+  { label: "Other", value: "Other" },
 ];
 
 interface ProfileFormData {
@@ -102,7 +106,7 @@ export default function NewArtistForm({
         onSuccess();
       }, 100);
     } catch (error) {
-      console.error("Error al crear artista:", error);
+      console.error("Error creating artist profile", error);
       toast({ title: "Error creating artist profile", variant: "destructive" });
     } finally {
       setIsSaving(false);
@@ -155,7 +159,7 @@ export default function NewArtistForm({
         )}
       </div>
       <div>
-        <Label htmlFor="avatar">Avatar (optional)</Label>
+        <Label htmlFor="avatar">Avatar (Recommended)</Label>
         <Input
           id="avatar"
           type="file"
@@ -184,7 +188,7 @@ export default function NewArtistForm({
           />
         </div>
         <div className="col-span-2">
-          <Label htmlFor="email">Email (uso interno)</Label>
+          <Label htmlFor="email">Email (internal use)</Label>
           <Input
             id="email"
             name="email"
@@ -196,7 +200,7 @@ export default function NewArtistForm({
         </div>
 
         <div className="col-span-2">
-          <Label htmlFor="telephone">Teléfono (uso interno)</Label>
+          <Label htmlFor="telephone">Telephone (internal use)</Label>
           <Input
             id="telephone"
             name="telephone"
@@ -266,7 +270,7 @@ export default function NewArtistForm({
       </div>
 
       <div>
-        <Label htmlFor="style">Tipo de artista</Label>
+        <Label htmlFor="style">Artist type</Label>
         <Select
           inputId="style"
           options={styleOptions}
